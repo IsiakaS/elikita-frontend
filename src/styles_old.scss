@@ -1,0 +1,74 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+@use '../theme-colors' as my_theme;
+
+html {
+    color-scheme: light dark;
+
+    @include mat.theme((color:(primary: my_theme.$primary-palette,
+                theme-type: dark),
+            typography: 'Nunito Sans',
+            density: -2))
+}
+
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.transparent-loader {
+    .mat-mdc-dialog-surface {
+        background-color: transparent;
+    }
+}
+
+.transparent-loader-backdrop {
+    opacity: 0.1;
+    background-color: #0001;
+}
+
+.g-just-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.g-just-flex.flex-between {
+    justify-content: space-between;
+}
+
+.g-just-flex.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+@for $i from 1 through 30 {
+    .p-#{$i} {
+        padding: #{$i}px
+    }
+
+    .pb-#{$i} {
+        padding-bottom: #{$i}px
+    }
+
+    .gap-#{$i} {
+        gap: #{$i}px
+    }
+
+}
+
+
+html {
+    --mat-card-subtitle-text-weight: normal
+}

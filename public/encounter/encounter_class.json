@@ -1,0 +1,29 @@
+{
+  "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+  "concept": [
+    {
+      "code": "IMP",
+      "display": "inpatient encounter"
+    },
+    {
+      "code": "AMB",
+      "display": "ambulatory"
+    },
+    {
+      "code": "OBSENC",
+      "display": "observation encounter"
+    },
+    {
+      "code": "EMER",
+      "display": "emergency"
+    },
+    {
+      "code": "VR",
+      "display": "virtual"
+    },
+    {
+      "code": "HH",
+      "display": "home health"
+    }
+  ]
+}

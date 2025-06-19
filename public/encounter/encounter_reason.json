@@ -1,0 +1,109 @@
+{
+  "system": "http://terminology.hl7.org/CodeSystem/encounter-reason",
+  "concept": [
+    {
+      "code": "routine",
+      "display": "Routine Check-up"
+    },
+    {
+      "code": "followup",
+      "display": "Follow-up Visit"
+    },
+    {
+      "code": "emergency",
+      "display": "Emergency Visit"
+    },
+    {
+      "code": "sick",
+      "display": "Sick Visit"
+    },
+    {
+      "code": "consult",
+      "display": "Consultation"
+    },
+    {
+      "code": "wellchild",
+      "display": "Well Child Visit"
+    },
+    {
+      "code": "pregnancy",
+      "display": "Pregnancy-related Visit"
+    },
+    {
+      "code": "immunization",
+      "display": "Immunization Visit"
+    },
+    {
+      "code": "headache",
+      "display": "Headache"
+    },
+    {
+      "code": "abdominal-pain",
+      "display": "Abdominal Pain"
+    },
+    {
+      "code": "fever",
+      "display": "Fever"
+    },
+    {
+      "code": "cough",
+      "display": "Cough"
+    },
+    {
+      "code": "back-pain",
+      "display": "Back Pain"
+    },
+    {
+      "code": "diabetes",
+      "display": "Diabetes Management"
+    },
+    {
+      "code": "hypertension",
+      "display": "Hypertension Management"
+    },
+    {
+      "code": "mental-health",
+      "display": "Mental Health Consultation"
+    },
+    {
+      "code": "injury",
+      "display": "Injury Evaluation"
+    },
+    {
+      "code": "skin-rash",
+      "display": "Skin Rash"
+    },
+    {
+      "code": "shortness-of-breath",
+      "display": "Shortness of Breath"
+    },
+    {
+      "code": "chest-pain",
+      "display": "Chest Pain"
+    },
+    {
+      "code": "ear-pain",
+      "display": "Ear Pain"
+    },
+    {
+      "code": "vision-problem",
+      "display": "Vision Problem"
+    },
+    {
+      "code": "urinary-issue",
+      "display": "Urinary Problem"
+    },
+    {
+      "code": "vaccination",
+      "display": "Vaccination"
+    },
+    {
+      "code": "post-op",
+      "display": "Post-operative Follow-up"
+    },
+    {
+      "code": "lab-results",
+      "display": "Lab Results Discussion"
+    }
+  ]
+}

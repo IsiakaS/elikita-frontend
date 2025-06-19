@@ -1,0 +1,711 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+@use '../theme-colors' as my_theme;
+
+html {
+  color-scheme: light dark;
+
+  @include mat.theme((color:(primary: my_theme.$primary-palette,
+        theme-type: color-scheme),
+      typography: 'Nunito Sans',
+      density: -2));
+
+  @include mat.tabs-overrides((label-text-weight: 500,
+      label-text-size: 1.1rem))
+}
+
+.mat-mdc-card-title {
+  color: light-dark(#000, #fff);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Nunito Sans', "Helvetica Neue", sans-serif;
+}
+
+
+
+// overides
+.secondary-button {
+  @include mat.button-overrides((filled-label-text-color:var(--mat-sys-on-surface),
+      filled-container-color: var(--mat-sys-surface-container-lowest),
+      filled-horizontal-padding: 1rem));
+  @include mat.fab-overrides((extended-container-height: max-content,
+      container-color: var(--mat-sys-surface-container-lowest)));
+}
+
+.filter-top-right {
+  @include mat.form-field-overrides((outlined-container-shape: 30px,
+      container-height: 20px,
+      container-vertical-padding: 7px))
+}
+
+body {
+  @include mat.chips-overrides ((container-shape-radius: 20px))
+}
+
+
+
+
+.action-menu {
+
+
+
+  a {
+    cursor: pointer;
+    border-bottom: 1px solid var(--mat-sys-outline);
+
+    display: flex;
+    gap: 15px;
+
+    padding: 10px 15px !important;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+  }
+}
+
+
+
+.transparent-loader {
+  .mat-mdc-dialog-surface {
+    background-color: transparent;
+  }
+}
+
+.transparent-loader-backdrop {
+  opacity: 0.1;
+  background-color: #0003;
+}
+
+.g-just-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.g-just-flex.flex-between {
+  justify-content: space-between;
+}
+
+g.just-flex.align-items-center {
+  align-items: center;
+}
+
+.g-just-flex.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+@for $i from 1 through 30 {
+  .p-#{$i} {
+    padding: #{$i}px
+  }
+
+  .m-#{$i} {
+    margin: #{$i}px;
+  }
+
+  .mx-#{$i} {
+    margin-right: #{$i}px;
+    margin-left: #{$i}px;
+  }
+
+  .pb-#{$i} {
+    padding-bottom: #{$i}px
+  }
+
+  .gap-#{$i} {
+    gap: #{$i}px
+  }
+
+  .mb-#{$i} {
+    margin-bottom: #{$i}px;
+  }
+
+  .pt-#{$i} {
+    padding-top: #{$i}px;
+  }
+
+  .px-#{$i} {
+    padding-right: #{$i}px;
+    padding-left: #{$i}px;
+  }
+
+  .py-#{$i} {
+    padding-top: #{$i}px;
+    padding-bottom: #{$i}px;
+  }
+
+  .my-#{$i} {
+    margin-top: #{$i}px;
+    margin-bottom: #{$i}px;
+  }
+
+  .mt-#{$i} {
+    margin-top: #{$i}px;
+
+  }
+
+  .ms-#{$i} {
+    margin-left : #{$i}px;
+
+  }
+
+  .me-#{$i} {
+    margin-right: #{$i}px;
+
+  }
+
+}
+
+
+html {
+  --mat-card-subtitle-text-weight: normal
+}
+
+.filter-top-left {
+  width: min-content;
+}
+
+
+// component direct overide
+.mat-expansion-panel-header {
+  padding: 0 10px !important;
+}
+
+.position-relative {
+  position: relative !important;
+}
+
+.position-absolute {
+  position: absolute !important;
+}
+
+.g-just-flex.align-items-center {
+  align-items: center;
+}
+
+.g-just-flex.justify-content-start {
+  justify-content: flex-start;
+}
+
+
+.g-just-flex.justify-content-end {
+  justify-content: flex-end;
+}
+
+.filter.top {
+  .mat-mdc-form-field-subscript-wrapper {
+    height: 0px;
+    padding: 0px;
+  }
+}
+
+
+
+table tr {
+  position: relative;
+  cursor: pointer;
+  z-index: 99999999;
+
+  td {
+    z-index: 999999999;
+  }
+
+  a {
+    color: black;
+    text-decoration: none;
+    border-radius: 2px;
+    padding: 4px 6px;
+    position: relative;
+
+    z-index: 9999999999;
+
+    &:hover {
+      background-color: #0001;
+    }
+  }
+
+
+  &:hover:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    z-index: 33333;
+    background-color: #0001;
+
+  }
+
+}
+
+.cdk-overlay-container {
+  z-index: 099999999;
+}
+
+.tables .mat-mdc-card {
+  border: 1px solid var(mat-sys-outline) !important;
+}
+
+table.mat-mdc-table {
+  // display: block;
+  // width: 100%;
+  // overflow: auto;
+}
+
+.mdc-snackbar__label {
+  padding: 0px !important;
+}
+
+.container-bg {
+  .mat-mdc-card {
+    height: 100%;
+  }
+}
+
+.mat-drawer {
+
+  background-color: var(--mat-sys-surface) !important;
+}
+
+.error-dialog {
+  .mat-mdc-dialog-surface {
+    border-radius: 0px;
+    background-color: #000;
+  }
+}
+
+.suggested-tasks-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.suggested-tasks {
+  .suggested-tasks-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .suggested-task {
+    cursor: pointer;
+    min-width: 180px;
+    flex: 1 0 180px;
+    width: min-content;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    align-items: center;
+    background-color: var(--mat-sys-surface);
+
+    .after-div {
+      display: none;
+    }
+
+    &.success {
+      border: 2px solid green;
+      position: relative;
+
+      &.success>.after-div {
+
+        position: absolute;
+        right: -12.5px;
+        top: -12.5px;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border-radius: 50%;
+        background-color: green;
+        border: 2px solid;
+
+        border-color: var(--mat-sys-surface-container-low);
+
+        mat-icon {
+          font-size: 20px;
+          height: 20px;
+          width: 20px;
+
+        }
+      }
+    }
+  }
+
+  .mat-expansion-panel {
+    box-shadow: none !important;
+  }
+
+  .mat-expansion-panel-header {
+    padding: 10px 12px !important;
+  }
+}
+
+.rounded-icon-wrapper {
+  padding: 5px;
+  flex: 0 0 24px;
+  border-radius: 50%;
+  display: flex;
+  background-color: var(--mat-sys-surface-container-low);
+
+
+  mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.profile-card .action-button {
+  width: 100%;
+  justify-content: flex-end;
+  display: flex;
+
+  .mdc-button {
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    &:not(.header-group) {
+      border-radius: 0px;
+    }
+  }
+
+}
+
+.profile-card .cards-wrapper {
+  display: flex;
+  gap: 45px;
+  flex-wrap: wrap;
+  // align-items: flex-end;
+
+  .mat-mdc-card {
+    flex: 1 0 350px;
+  }
+}
+
+.profile-card .mat-mdc-card {
+  width: 350px;
+  max-width: 100%;
+  border: 1px solid var(--mat-sys-outline) !important;
+  // box-shadow: 2px 2px 7px 0px var(--mat-sys-outline);
+
+  .mat-mdc-card-title {
+    font-size: 1rem !important;
+
+  }
+
+  .mat-mdc-card-subtitle {
+    font-size: 0.8rem !important;
+    line-height: 18px;
+  }
+
+  .fields-wrapper {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .field-title {
+    FONT-SIZE: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+    // text-align: right;
+  }
+
+  .field-group {
+    padding: 5px 0px;
+    // border-bottom: 1px solid var(--mat-sys-outline);
+    flex: 1 1 max-content;
+    // display: flex;
+    // align-items: center;
+    // flex-direction: column;
+  }
+
+  .field-value {
+    font-weight: 500;
+  }
+
+  .field-value.with-icon {
+    display: flex;
+    gap: 8px;
+  }
+
+  .field-group.icon-only {
+    border-top: 1px solid var(--mat-sys-outline);
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    .field-value {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+
+      a {
+        display: block;
+        border: 1px solid;
+        border-color: var(--mat-sys-on-surface);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--mat-sys-on-surface);
+        // background-color: var(--mat-sys-on-primary);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+
+
+        mat-icon {
+          font-size: 20px;
+          height: 20px;
+          width: 20px;
+
+        }
+      }
+
+    }
+  }
+}
+
+.table-header-panels.mat-expansion-panel {
+  overflow: visible;
+
+  .mat-expansion-panel-body {
+    position: absolute;
+    top: 100%;
+    z-index: 9999999999;
+    max-height: 180px;
+    overflow: auto;
+    background: var(--mat-sys-surface);
+  }
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+  min-width: max-content !important;
+}
+
+.aform {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.aform .mat-mdc-form-field,
+.aform .form-array,
+.aform .form-group {
+  flex: 1 1 auto;
+}
+
+.aform .mat-mdc-form-field .below {
+
+  display: block;
+  position: absolute;
+
+  &~input {
+    margin-bottom: 20px;
+  }
+}
+
+
+.round-icon-wrapper {
+  width: max-content;
+  padding: 10px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.contrast {
+    background-color: var(--mat-sys-surface-container-lowest);
+    color: var(--mat-sys-on-surface);
+  }
+
+}
+
+.subtitle-text-color {
+  color: light-dark(#8a7c7a, #bbb);
+}
+
+.subtitle-text-color-2 {
+  color: light-dark(#00000099, #bbb);
+}
+
+.status-green mat-icon {
+  color: green;
+  background-color: #e0f2e9;
+  border: 1px solid #a5d6a7;
+}
+
+.status-orange mat-icon {
+  color: orange;
+  background-color: #fff8e1;
+  border: 1px solid #ffcc80;
+}
+
+.status-purple mat-icon {
+  color: #6A1B9A;
+  background-color: #f3e5f5;
+  border: 1px solid #ce93d8;
+}
+
+.status-red mat-icon {
+  color: red;
+  background-color: #ffebee;
+  border: 1px solid #ef9a9a;
+}
+
+.status-dark-green mat-icon {
+  color: #2E7D32;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+}
+
+.status-deep-red mat-icon {
+  color: #B71C1C;
+  background-color: #ffebee;
+  border: 1px solid #ef9a9a;
+}
+
+.status-warning-red mat-icon {
+  color: #E53935;
+  background-color: #fdecea;
+  border: 1px solid #ef9a9a;
+}
+
+.status-gray mat-icon {
+  color: gray;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+.status-muted-gray mat-icon {
+  color: #757575;
+  background-color: #eeeeee;
+  border: 1px dashed #bdbdbd;
+}
+
+
+.mat-mdc-form-field-infix [matsuffix] {
+  position: absolute;
+  right: 10px;
+  z-index: 999999;
+
+
+  &~input {
+    padding-right: 30px;
+    width: auto;
+  }
+
+  width: 20px;
+  height: 20px;
+
+}
+
+.mat-mdc-text-field-wrapper .mat-mdc-form-field-flex .mat-mdc-floating-label {
+  display: block;
+  padding-right: 30px;
+}
+
+.mat-mdc-form-field-hint {
+
+  position: absolute;
+  top: 100%;
+  left: 0px;
+
+}
+
+.mat-mdc-form-field .mdc-floating-label--float-above {
+  /* padding-right: 0px !important; */
+  width: max-content;
+}
+
+// status  - https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-status&_format=json
+
+// intent - https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-intent&_format=json
+
+// priority - https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-priority&_format=json
+
+// code  - filter - http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/procedure-code&_FORMAT=JSON&filter=blood%20sugar
+
+// orderDetail.parameter.code - (form your own)
+
+// orderDetail.parameter.valueString - textarea
+
+// subject
+
+// authoredOn
+
+// requester
+
+// performer-type - http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/participant-role&_FORMAT=JSON
+
+.g-just-flex {
+  &.flex-column {
+    flex-direction: column;
+  }
+}
+
+.custom-dialog-container {
+  padding: 20px !important;
+}
+
+.form-array {
+  margin-right: 30px;
+  margin-bottom: 30px;
+}
+
+.aForm {
+  border: 2px solid var(--mat-sys-outline);
+}
+
+.form-group {
+  margin-right: 30px;
+  margin-bottom: 30px;
+  margin-top: 0px;
+
+}
+
+.detail-base.mat-expansion-panel {
+  overflow: visible;
+
+  .mat-expansion-panel-body {
+    position: absolute;
+    right: 0px;
+    top: 100%;
+    max-height: 300px;
+    overflow: auto;
+  }
+
+
+}
+
+body {
+  @include mat.progress-spinner-overrides((active-indicator-color: var(--mat-sys-on-surface),
+      size:10px,
+      active-indicator-width: 2px));
+
+  .mat-mdc-progress-spinner {
+    width: 10px !important;
+    height: 10px !important;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+  "concept": [
+    {
+      "code": "vital-signs",
+      "display": "Vital Signs"
+    },
+    {
+      "code": "laboratory",
+      "display": "Laboratory"
+    },
+    {
+      "code": "imaging",
+      "display": "Imaging"
+    },
+    {
+      "code": "survey",
+      "display": "Survey"
+    },
+    {
+      "code": "exam",
+      "display": "Exam"
+    },
+    {
+      "code": "therapy",
+      "display": "Therapy"
+    },
+    {
+      "code": "activity",
+      "display": "Activity"
+    },
+    {
+      "code": "social-history",
+      "display": "Social History"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+<mat-card>
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Diagnoses for
+                    <a (click)="patientOpenAndClose.openPatientDetailsStrip()" style="text-decoration: none;"
+                        [routerLink]="['/patients', patientId]" routerLinkActive="router-link-active">
+                        {{patientName | async}}
+                    </a>
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and add current and past diagnoses for this patient
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+                <a mat-flat-button class="">
+                    <mat-icon>add</mat-icon>
+                    Add Diagnoses
+                </a>
+
+
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  patientObservationTableFilterArray"
+            [patientsFiltersFormControlObject]=" patientObservationFiltersFormControlObject">
+
+        </app-table-header>
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+
+            <!--name - coding.code.display-->
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="code" sortActionDescription="Sort by Name">
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.code.coding[0].display | titlecase}}</td>
+            </ng-container>
+
+            <!--dateRecorded - recordedDateTime -->
+            <ng-container matColumnDef="recordedDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="recordedDate"
+                    sortActionDescription="Sort by Date Recorded">
+                    Date Recorded
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.recordedDate | date: 'medium'}}</td>
+            </ng-container>
+
+            <!--category - category.coding.display -->
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
+                    sortActionDescription="Sort by Category">
+                    Category
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.category[0].coding[0].code | titlecase}}</td>
+            </ng-container>
+
+            <!--verificationStatus - verificationStatus.coding[0].code   -->
+            <ng-container matColumnDef="verificationStatus">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="verificationStatus"
+                    sortActionDescription="Sort by Verification Status">
+                    Verification Status
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.verificationStatus.coding[0].code | titlecase}}</td>
+            </ng-container>
+
+
+            <!--clinicalStatus - clinicalStatus.coding[0].code -->
+            <ng-container matColumnDef="clinicalStatus">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="clinicalStatus"
+                    sortActionDescription="Sort by Clinical Status">
+                    Clinical Status
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.clinicalStatus.coding[0].code | titlecase}}</td>
+            </ng-container>
+            <!--severity - severity.coding[0].display -->
+            <ng-container matColumnDef="severity">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="severity"
+                    sortActionDescription="Sort by Severity">
+                    Severity
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.severity.coding[0].display | titlecase}}</td>
+            </ng-container>
+            <!--onsetDateTime - onsetDateTime -->
+            <ng-container matColumnDef="onsetDateTime">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="onsetDateTime"
+                    sortActionDescription="Sort by Onset Date">
+                    Onset Date
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.onsetDateTime | date: 'medium'}}</td>
+            </ng-container>
+            <!--abatementDateTime - abatementDateTime -->
+            <ng-container matColumnDef="abatementDateTime">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="abatementDateTime"
+                    sortActionDescription="Sort by Abatement Date">
+                    Abatement Date
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.abatementDateTime | date: 'medium'}}</td>
+            </ng-container>
+            <!--asserter - asserter.reference -->
+            <ng-container matColumnDef="asserter">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="asserter"
+                    sortActionDescription="Sort by Asserter">
+                    Asserter
+                </th>
+                <td mat-cell *matCellDef="let element">{{references.get(element.asserter.reference)['name'][0].given[0]
+                    | titlecase}} {{references.get(element.asserter.reference)['name'][0].family | titlecase}}</td>
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="patientConditionDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: patientConditionDisplayedColumns;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>

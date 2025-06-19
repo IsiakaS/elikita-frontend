@@ -1,0 +1,25 @@
+{
+  "system": "http://hl7.org/fhir/encounter-reason-use",
+  "concept": [
+    {
+      "code": "CC",
+      "display": "Chief Complaint"
+    },
+    {
+      "code": "HC",
+      "display": "Health Concern"
+    },
+    {
+      "code": "AD",
+      "display": "Admitting Diagnosis"
+    },
+    {
+      "code": "RV",
+      "display": "Reason for Visit"
+    },
+    {
+      "code": "HM",
+      "display": "Health Maintenance (including screening)"
+    }
+  ]
+}

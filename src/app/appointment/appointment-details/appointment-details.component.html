@@ -1,0 +1,325 @@
+<mat-card class="profile-card px-15 pb-20">
+    <mat-card-header>
+        <mat-card-title>
+            Appointment Detail
+        </mat-card-title>
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-10">
+            <mat-divider>
+
+            </mat-divider>
+            <div class="my-20"></div>
+            <div class="my-20 action-button">
+                <a mat-flat-button (click)="encounterService.addEncounter('100001')">
+                    Initiate encounter
+                </a>
+            </div>
+            <div class="cards-wrapper">
+                <mat-card>
+                    <mat-card-header>
+                        <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                            <!-- <div class="header-icon">
+
+                        </div> -->
+                            <div class="header-words  ">
+                                <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <mat-icon>person</mat-icon> <mat-card-title>Requester</mat-card-title>
+                                </div>
+                                <mat-card-subtitle>Details of the person you have an appointment with
+                                </mat-card-subtitle>
+                            </div>
+                        </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="my-10 mt-20">
+                            <!-- <mat-divider>
+
+                        </mat-divider> -->
+                            <div class="my-10"></div>
+                            <div class="card-content-details">
+                                <div class="fields-wrapper g-just-flex gap-15">
+
+
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            Patient
+                                        </div>
+                                        <div class="field-title">
+                                            Requester Category
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            Peter James
+                                        </div>
+                                        <div class="field-title">
+                                            Name
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="mailto:assidiiq25@gmail.com">
+                                            <mat-icon>mail</mat-icon>
+                                        </a> -->
+                                            <span>
+                                                assidiiq25&#64;gmail.com
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Email
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="tel:+2348109290534">
+                                            <mat-icon>phone</mat-icon>
+                                        </a> -->
+                                            <span>
+                                                +2348109290534
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Phone
+                                        </div>
+                                    </div>
+                                    <div class="field-group icon-only">
+                                        <div class="field-value">
+                                            <a href="mailto:assidiiq25@gmail.com">
+                                                <mat-icon>mail</mat-icon>
+                                            </a>
+                                        </div>
+                                        <div class="field-value">
+                                            <a href="tel:+2348109290534">
+                                                <mat-icon>phone</mat-icon>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+
+                <mat-card>
+                    <mat-card-header>
+                        <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                            <!-- <div class="header-icon">
+
+                        </div> -->
+                            <div class="header-words  ">
+                                <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <mat-icon>event</mat-icon> <mat-card-title>Date & Time</mat-card-title>
+                                </div>
+                                <!-- <mat-card-subtitle>Details of the person you have an appointment with
+                                </mat-card-subtitle> -->
+                            </div>
+                        </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="my-10 mt-20">
+                            <!-- <mat-divider>
+
+                        </mat-divider> -->
+                            <div class="my-10"></div>
+                            <div class="card-content-details">
+                                <div class="fields-wrapper g-just-flex gap-15">
+
+
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            Jun 6, 2025
+                                        </div>
+                                        <div class="field-title">
+                                            Date
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            12:00pm - 12:30pm
+                                        </div>
+                                        <div class="field-title">
+                                            Time Range
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="mailto:assidiiq25@gmail.com">
+                                            <mat-icon>mail</mat-icon>
+                                        </a> -->
+                                            <span>
+                                                30 minutes
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Duration
+                                        </div>
+                                    </div>
+                                    <!-- <div class="field-group">
+                                        <div class="field-value with-icon">
+                                        
+                                            <span>
+                                                +2348109290534
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Phone
+                                        </div>
+                                    </div> -->
+                                    <!-- <div class="field-group icon-only">
+                                        <div class="field-value">
+                                            <a href="mailto:assidiiq25@gmail.com">
+                                                <mat-icon>mail</mat-icon>
+                                            </a>
+                                        </div>
+                                        <div class="field-value">
+                                            <a href="tel:+2348109290534">
+                                                <mat-icon>phone</mat-icon>
+                                            </a>
+                                        </div>
+
+                                    </div> -->
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <mat-card>
+                    <mat-card-header>
+                        <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                            <!-- <div class="header-icon">
+
+                        </div> -->
+                            <div class="header-words  ">
+                                <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <mat-icon>adjust</mat-icon> <mat-card-title>Agenda</mat-card-title>
+                                </div>
+                                <mat-card-subtitle>The purpose of the appointment
+                                </mat-card-subtitle>
+                            </div>
+                        </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="my-10 mt-20">
+                            <!-- <mat-divider>
+
+                        </mat-divider> -->
+                            <div class="my-10"></div>
+                            <div class="card-content-details">
+                                <div class="fields-wrapper g-just-flex gap-15">
+
+
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            Community Health
+                                        </div>
+                                        <div class="field-title">
+                                            Requested Service
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            General Practice
+                                        </div>
+                                        <div class="field-title">
+                                            Requested Specialty
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="mailto:assidiiq25@gmail.com">
+                                            <mat-icon>mail</mat-icon>
+                                        </a> -->
+                                            <span>
+                                                Routine
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Type of Appointment
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="mailto:assidiiq25@gmail.com">
+                                            <mat-icon>mail</mat-icon>
+                                        </a> -->
+                                            <span [ngClass]="{'grey': true, 'round': true, 'redbg': true}">
+                                                Emergency
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Priority
+                                        </div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-value with-icon">
+                                            <!-- <a href="mailto:assidiiq25@gmail.com">
+                                            <mat-icon>mail</mat-icon>
+                                        </a> -->
+                                            Headache
+
+                                        </div>
+                                        <div class="field-title">
+                                            Reason for Appointment
+                                        </div>
+                                    </div>
+                                    <!-- <div class="field-group">
+                                        <div class="field-value with-icon">
+                                        
+                                            <span>
+                                                +2348109290534
+                                            </span>
+                                        </div>
+                                        <div class="field-title">
+                                            Phone
+                                        </div>
+                                    </div> -->
+                                    <!-- <div class="field-group icon-only">
+                                        <div class="field-value">
+                                            <a href="mailto:assidiiq25@gmail.com">
+                                                <mat-icon>mail</mat-icon>
+                                            </a>
+                                        </div>
+                                        <div class="field-value">
+                                            <a href="tel:+2348109290534">
+                                                <mat-icon>phone</mat-icon>
+                                            </a>
+                                        </div>
+
+                                    </div> -->
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+
+        </div>
+    </mat-card-content>
+</mat-card>

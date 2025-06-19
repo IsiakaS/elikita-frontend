@@ -1,0 +1,20 @@
+[
+  {
+    "resourceType": "ServiceRequest",
+    "id": "example",
+    "status": "active",
+    "intent": "order",
+    "subject": {
+      "reference": "Patient/pat1"
+    },
+    "requester": {
+      "reference": "Practitioner/prac1"
+    },
+    "performer": [
+      {
+        "reference": "Practitioner/prac1"
+      }
+    ],
+    "occurrenceDateTime": "2023-05-12T09:00:00Z"
+  }
+]

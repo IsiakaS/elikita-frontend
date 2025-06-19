@@ -1,0 +1,170 @@
+<mat-card>
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Appointments
+
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and filter your appointments
+                </mat-card-subtitle>
+            </div>
+
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  appointmentTableFilterArray"
+            [patientsFiltersFormControlObject]=" appointmentFiltersFormControlObject">
+
+        </app-table-header>
+
+
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+
+            <!--name - coding.code.display-->
+            <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="date" sortActionDescription="Sort by Date">
+                    Date
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.requestedPeriod && element.requestedPeriod.length?`${element.requestedPeriod[0].start |
+                    date: 'mediumDate'}`:
+                    '_'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="duration">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="duration"
+                    sortActionDescription="Sort by Duration">
+                    Duration
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.requestedPeriod &&
+                    element.requestedPeriod.length?`${element.requestedPeriod[0].start | date: 'shortTime'}`: '_' }} -
+                    {{element.requestedPeriod && element.requestedPeriod.length?`${element.requestedPeriod[0].end |
+                    date: 'shortTime'}`: ""}} </td>
+            </ng-container>
+
+            <!--dateRecorded - recordedDateTime -->
+            <ng-container matColumnDef="subject">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="subject" sortActionDescription="Sort by Subject">
+                    Patient
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.participant?element.participant[0].actor.display:""}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="contact">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="contact" sortActionDescription="Sort by contact">
+                    Contact
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.participant?(referenceObject[element.participant[0].actor.display] |
+                    async): "_"}}</td>
+            </ng-container>
+
+            <!--category - category.coding.display -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="status" sortActionDescription="Sort by Status">
+                    Status
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span
+                        [ngClass]="{'grey': true, 'round': true, 'greenbg':element.status === 'fulfilled', 'yellowbg':element.status === 'arrived', 'bluebg':element.status === 'booked'}">
+                        {{element.status | titlecase}}
+                    </span>
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="priority"
+                    sortActionDescription="Sort by Priority">
+                    Priority
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span
+                        [ngClass]="{'grey': true, 'round': true, 'yellowbg':element.priority.display === 'ASAP', 'redbg':element.priority.display === 'emergency'}">
+                        {{element.priority.display | titlecase}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!--verificationStatus - verificationStatus.coding[0].code   -->
+            <ng-container matColumnDef="serviceType">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="serviceType"
+                    sortActionDescription="Sort by serviceType">
+                    Services
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @for(each of element.serviceType[0].coding; track $index;){
+                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
+                        <span>{{each.display}}</span>
+
+                    </div>
+
+                    }
+
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="specialty">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="specialty"
+                    sortActionDescription="Sort by specialty">
+                    Department
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @for(each of element.specialty[0].coding; track $index;){
+                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
+                        <span>{{each.display}}</span>
+
+                    </div>
+
+                    }
+
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reason">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="reason" sortActionDescription="Sort by reason">
+                    Reason
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @for(each of element.reason[0].coding; track $index;){
+                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
+                        <span>{{each.reason}}</span>
+
+                    </div>
+
+                    }
+
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="appointmentType">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="appointmentType"
+                    sortActionDescription="Sort by appointmentType">
+                    Type of Appointment
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @for(each of element.appointmentType.coding; track $index;){
+                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
+                        <span>{{each.code}}</span>
+
+                    </div>
+
+                    }
+
+                </td>
+            </ng-container>
+
+
+            <!--clinicalStatus - clinicalStatus.coding[0].code -->
+
+
+            <tr mat-header-row *matHeaderRowDef="appointmentDisplayedColumns"></tr>
+            <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns: appointmentDisplayedColumns;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>

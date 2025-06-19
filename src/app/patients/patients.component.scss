@@ -1,0 +1,15 @@
+mat-card-header {
+
+    .left,
+    .right {
+        flex: 1 1 auto
+    }
+
+    .right {
+        justify-content: flex-end;
+    }
+
+    .top-filter-control {
+        width: min-content;
+    }
+}

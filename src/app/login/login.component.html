@@ -1,0 +1,148 @@
+<div class="container-fluid">
+    <div class="absolute-bg">
+        <div class="w70">
+
+        </div>
+        <div class="w30">
+
+        </div>
+    </div>
+    <div class="maths-title">
+        <h1> Elikita2
+        </h1>
+    </div>
+    <div class="main-wrapper">
+
+        <main>
+
+            <div class="child-component">
+                <div class="register-wrapper">
+                    <div class="form-title">
+                        <div class="form-name">
+                            Sign In
+                        </div>
+                        <div class="form-description">
+                            Sign in to Elikita
+                        </div>
+                    </div>
+                    <form [formGroup]="registerForm" (submit)="submitForm()">
+                        <!-- <mat-form-field appearance="outline">
+        <mat-label>
+            First Name
+        </mat-label>
+        <i class="fa-regular fa-envelope" matPrefix></i>
+        
+        <input type="text" matInput>
+        <i class="fa-solid fa-circle-check" matSuffix></i>
+        <mat-error></mat-error>
+
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>
+            Last Name / Surname
+        </mat-label>
+        <i class="fa-regular fa-envelope" matPrefix></i>
+       
+        <input type="text" matInput>
+        <i class="fa-solid fa-circle-check" matSuffix></i>
+        <mat-error></mat-error>
+
+    </mat-form-field> -->
+                        <mat-form-field style="margin-bottom: -10px;" appearance="outline" style="flex: 0 1 280px">
+                            <mat-label>
+                                Email
+                            </mat-label>
+                            <!-- <i class="fa-regular fa-envelope" matPrefix></i> -->
+                            <mat-icon matPrefix>mail</mat-icon>
+                            <input type="email" matInput formControlName="email">
+                            <div class="validity-indicator" matSuffix>
+
+                                <div [style.color]="'green'"
+                                    [style.display]="registerForm.get('email')?.valid && registerForm.get('email')?.touched?'block':'none'">
+                                    <mat-icon>
+                                        check_circle
+                                    </mat-icon>
+                                </div>
+                                <div [style.color]="'var(--mat-sys-error)'"
+                                    [style.display]="!registerForm.get('email')?.valid && registerForm.get('email')?.touched?'block':'none'">
+                                    <mat-icon>
+                                        cancel
+                                    </mat-icon>
+                                </div>
+                            </div>
+                            <mat-error></mat-error>
+
+
+                        </mat-form-field>
+                        <div class="mat-form-error" style="
+                        margin-top: -12px;
+                        margin-bottom: 20px;
+                        ">
+                            @if(registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched ){
+                            <div>
+                                An email is required
+                            </div>}
+                            @if(registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.touched){
+                            <div class="mat-error">
+                                Please, enter a valid email
+                            </div>}
+                        </div>
+
+
+                        <mat-form-field appearance="outline" style="flex: 0 1 280px">
+
+                            <mat-label>
+                                Password
+                            </mat-label>
+                            <!-- <i class="fa-regular fa-envelope" matPrefix></i> -->
+
+                            <mat-icon matPrefix>key</mat-icon>
+                            <input [type]="showPassword?'text':'password'" matInput formControlName="password">
+
+                            <div class="vischeck" matSuffix>
+                                <mat-icon (click)="showPassword = false"
+                                    [style.display]="showPassword?'inline-block': 'none'">visibility_off</mat-icon>
+                                <mat-icon (click)="showPassword = true"
+                                    [style.display]="showPassword?'none': 'inline-block'">visibility</mat-icon>
+
+                            </div>
+
+                            <mat-error> </mat-error>
+
+
+
+
+                        </mat-form-field>
+
+
+                        <button type="submit" value="Sign In" class="quiz-btn quiz-btn-long primary-button"
+                            style="display: block; width: 280px" mat-flat-button>Sign In</button>
+                        <div class="forgot-password py-4" [style]="'font-size: 12px;'" (click)="resetForgotPassword()"
+                            style="color:var(--mat-sys-primary);
+            cursor: pointer;">Forgot Password? Reset it here
+                        </div>
+
+                    </form>
+                    @if(
+                    true
+                    ){
+                    <div class="social-login-wrapper">
+                        <div class="social-login-head">
+                            <div class="social-login-head-word">
+                                Or Sign In With
+                            </div>
+                        </div>
+                        <div class="social-login-body">
+                            <a class="colored-icon" (click)="signInWithGoogle()">
+                                <i class="fa-brands fa-google"></i>
+                            </a>
+                            <!-- <a class="colored-icon" (click)="signInWithFacebook()"><i class="fa-brands fa-facebook-f"></i></a> -->
+
+                        </div>
+                    </div>}
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+[
+  {
+    "resourceType": "Patient",
+    "id": "pat1",
+    "name": [
+      {
+        "given": ["John"],
+        "family": "Doe"
+      }
+    ]
+  },
+
+  {
+    "resourceType": "Patient",
+    "id": "123",
+    "name": [
+      {
+        "given": ["Nurein"],
+        "family": "Abubakar"
+      }
+    ]
+  }
+]

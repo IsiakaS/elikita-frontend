@@ -1,0 +1,114 @@
+<ng-template #patientDetails>
+
+    <mat-card class="stretch">
+        <div class="fixed-close">
+            <mat-icon (click)="patientDetailsStripKeyService.closePatientDetailsStrip()">close</mat-icon>
+        </div>
+        <mat-card-header>
+            <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+                <div class="left">
+                    <mat-card-title class="">
+                        <div class="g-just-flex flex-start flex-wrap gap-15 align-items-center">
+                            <div class="rounded-image">
+                                <img style="border-radius: 50%;" width="100" height="100"
+                                    src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                            </div>
+
+                            <div style="flex-direction: column; align-items: start;" class="short-details
+                                        g-just-flex flex-column gap-12 
+                                        ">
+                                <div class="top  g-just-flex justify-content-start" style="flex-direction: column;">
+                                    <div class="mb-0" style="text-align: center;">{{resolvedData.name[0].family |
+                                        titlecase}}
+                                        {{resolvedData.name[0].given[0] |
+                                        titlecase}}</div>
+                                    <div class="gend-age" style="font-size: 12px; color: var(--mat-sys-on-background);">
+                                        <span>{{resolvedData.gender | titlecase}} </span> .
+                                        <span>{{resolvedData.birthDate | age}} years</span>
+                                    </div>
+                                    <div class="mt-12 call-div">
+                                        <a class="rounded-icon" style="text-decoration: none !important;"
+                                            href="tel:{{resolvedData.telecom[0].value}}">
+                                            <mat-icon>phone</mat-icon>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+                                <div class="bottom  g-just-flex gap-10 justify-content-start" style="font-size: 16px;">
+                                    <div class="info-group-title">
+                                        General Info
+                                    </div>
+                                    <div class="g-just-flex gap-10">
+
+
+                                        <!-- <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">person</mat-icon> -->
+                                        <span style="color: var(--mat-sys-on-background); font-size:14px;">Date of
+                                            Birth</span>
+
+                                        <span>{{resolvedData.birthDate | date:'mediumDate'}}</span>
+
+                                    </div>
+
+                                    <div class="g-just-flex gap-10">
+
+
+                                        <!-- <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">Location</mat-icon> -->
+                                        <span style="color: var(--mat-sys-on-background); font-size:14px;">
+                                            Location
+                                        </span>
+
+                                        <span>
+                                            {{resolvedData.address[0].city}},
+                                            {{resolvedData.address[0].state}},
+                                            {{resolvedData.address[0].country}}</span>
+
+                                    </div>
+
+
+
+                                    <span></span>
+                                </div>
+                                <!-- <div class="bottom-last  g-just-flex gap-12 justify-content-start" style="font-size: 16px;">
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">phone</mat-icon>
+
+                                    <span> <a style="text-decoration: none !important;"
+                                            href="tel:{{resolvedData.telecom[0].value}}">
+                                            {{resolvedData.telecom[0].value}}
+                                        </a> </span>
+
+                                </div>
+
+
+
+
+                                <span></span>
+                            </div> -->
+                            </div>
+                        </div>
+                    </mat-card-title>
+                </div>
+                <div class="right gap-10 g-just-flex">
+
+                    <!-- <a mat-flat-button class="">
+                    <mat-icon>edit</mat-icon>
+                    Edit
+                </a> -->
+
+
+                </div>
+            </div>
+        </mat-card-header>
+        <mat-card-content>
+        </mat-card-content>
+    </mat-card>
+</ng-template>

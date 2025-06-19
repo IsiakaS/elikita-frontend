@@ -1,0 +1,180 @@
+<mat-card>
+
+    <mat-card-header>
+        <mat-card-title>
+            {{formMetaData.formName}}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{formMetaData.formDescription}}
+        </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="aForm" class="mt-20">
+            @for(field of formFields; track $index){
+            @if(!field.BackboneElement_Array){
+            <mat-form-field appearance="outline" class="me-30">
+                <mat-label>{{field.fieldLabel??field.fieldName}}</mat-label>
+                @if(field.dataType == "CodeableConcept" && !field.BackboneElement_Array){
+                <input type="text" matInput [formControlName]="field.fieldApiName"
+                    [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                    [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCodeDisplay">
+                    @for(option of fieldAutoCompleteObject[field.fieldApiName] | async; track $index){
+                    <mat-option [value]="option.display" class="mb-8">
+                        <div class="ticket-like">
+                            <div class="text">
+                                {{option.display | titlecase}}
+                            </div>
+                            <div class="code">
+                                {{option.code}}
+                            </div>
+                        </div>
+
+                    </mat-option>
+                    }
+                </mat-autocomplete>
+                }
+                @else if(field.dataType == "Reference" && !field.BackboneElement_Array) {
+                <input type="text" matInput [formControlName]="field.fieldApiName"
+                    [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                    [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                    <!-- @for(option of field.Reference; track $index){ -->
+                    @for(option of fieldAutoCompleteObject[field.fieldApiName] | async; track $index){
+                    <mat-option [value]="option.display">
+
+                        <div class="ticket-like">
+                            <div class="text">
+                                {{option.display | titlecase}}
+                            </div>
+                            <div class="code">
+                                {{option.reference}}
+                            </div>
+                        </div>
+
+                    </mat-option>
+                    }
+                </mat-autocomplete>
+
+                }
+
+                @else if(field.dataType == "code" && !field.BackboneElement_Array) {
+                <input type="text" matInput [formControlName]="field.fieldApiName"
+                    [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                    [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                    @for(option of field.code; track $index){
+                    <mat-option [value]="option">
+
+                        {{option}}
+
+
+                    </mat-option>
+                    }
+                </mat-autocomplete>
+
+                }@else if(field.BackboneElement_Array) {
+
+
+
+
+                }@else {
+                <input type="text" matInput [formControlName]="field.fieldName"
+                    [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`">
+
+
+                }
+
+            </mat-form-field>}@else {
+
+
+
+
+            <div class="form-array my-15" [formArrayName]="field.fieldApiName">
+                <div class="my-10 form-array-title">
+                    {{field.fieldApiName | titlecase}}
+                </div>
+                @for(eachField of getAFormArrayControl(field.fieldApiName).controls; track $index; let i = $index;){
+                <mat-form-field appearance="outline" class="me-30">
+
+                    @if(field.dataType == "CodeableConcept"){
+                    <input type="text" matInput [formControlName]="i"
+                        [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCodeDisplay">
+                        <!--   @for(option of field.codingConcept; track $index){ -->
+                        @for(option of fieldAutoCompleteObject[field.fieldApiName] | async; track $index){
+                        <mat-option [value]="option.display" class="mb-8">
+                            <div class="ticket-like">
+                                <div class="text">
+                                    {{option.display}}
+                                </div>
+                                <div class="code">
+                                    {{option.code}}
+                                </div>
+                            </div>
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                    }@else if(field.dataType == "code") {
+                    <input type="text" matInput [formControlName]="i"
+                        [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <!-- @for(option of field.code; track $index){ -->
+                        @for(option of fieldAutoCompleteObject[field.fieldApiName] | async; track $index){
+                        <mat-option [value]="option">
+
+                            {{option}}
+
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+
+                    }@else if(field.dataType == "Reference") {
+                    <input type="text" matInput [formControlName]="i"
+                        [placeholder]="field.fieldPlaceholder??`${field.fieldLabel??field.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <!-- @for(option of field.Reference; track $index){ -->
+                        @for(option of fieldAutoCompleteObject[field.fieldApiName] | async; track $index){
+                        <mat-option [value]="option.display">
+
+                            <div class="ticket-like">
+                                <div class="text">
+                                    {{option.display}}
+                                </div>
+                                <div class="code">
+                                    {{option.reference}}
+                                </div>
+                            </div>
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+
+                    }
+                </mat-form-field>
+                }
+
+                <a mat-button class="addToArrayField" (click)="addToAFormArray(field.fieldApiName)">
+                    {{'Add '+ field.fieldApiName}}
+                </a>
+            </div>
+
+
+
+
+
+            }
+
+            }
+            <button type="submit" mat-flat-button class="mt-20">
+                {{formMetaData.submitText}}
+            </button>
+
+        </form>
+    </mat-card-content>
+</mat-card>

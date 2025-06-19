@@ -1,0 +1,120 @@
+<mat-card>
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Patients
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and add patients registration data
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button class="secondary-button small-button">
+                    <mat-icon>file_upload</mat-icon> Import
+                </a>
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+                <a mat-flat-button class="">
+                    <mat-icon>add</mat-icon>
+                    Add Patients
+                </a>
+
+
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        <mat-divider></mat-divider>
+        <div class="filter my-15 mb-8 top align-items-center g-just-flex flex-wrap flex-between gap-20">
+            <div class="filter-top-left flex-wrap  g-just-flex gap-10">
+                @for(topFilter of patientsTableFilterArray; track $index){
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>{{topFilter[0] | titlecase}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div [formGroup]="patientsFiltersFormControlObject[topFilter[0]]">
+                        @for(eachOption of topFilter[1]; track $index){
+                        <mat-checkbox class="mb-12 w-100 top-filter-control" formControlName="select">{{
+                            eachOption
+                            }}</mat-checkbox>}
+                    </div>
+                </mat-expansion-panel>
+                }
+            </div>
+
+
+            <div class="filter-top-right">
+                <mat-form-field appearance="outline">
+                    <input type="text" matInput placeholder="Search patients by name, gender, age or location">
+                    <mat-icon matPrefix>search</mat-icon>
+                </mat-form-field>
+
+            </div>
+        </div>
+        <div class="filter active filters bottom mb-12 g-just-flex flex-wrap justify-content-start">
+            <div class="botttom-right g-just-flex flex-wrap justify-content-start">
+                <mat-chip-set>
+                    <mat-chip><span>Gender: Male</span>
+                        <button matChipRemove> <mat-icon>close</mat-icon></button>
+                    </mat-chip>
+                    <mat-chip><span>Gender: Female</span>
+                        <button matChipRemove> <mat-icon>close</mat-icon></button>
+                    </mat-chip>
+                </mat-chip-set>
+            </div>
+            <div class="bottom-left g-just-flex flex-wrap justify-content-end"></div>
+        </div>
+
+
+
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+            <!-- Position Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.name.family | titlecase}} {{element.name.given[0] |
+                    titlecase}}</td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by phone">
+                    Phone
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.telecom.value}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="gender">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by gender">
+                    Gender
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.gender | titlecase}}</td>
+            </ng-container>
+            <ng-container matColumnDef="age">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by age">
+                    Age
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.birthDate | age}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="address">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by adress">
+                    Address
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.address.city}}, {{element.address.state}},
+                    {{element.address.country}}</td>
+            </ng-container>
+
+
+
+            <tr mat-header-row *matHeaderRowDef=" patientsTableDisplayedColumns" matHeaderRowDefSticky="true">
+            </tr>
+            <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns: patientsTableDisplayedColumns;"></tr>
+        </table>
+
+    </mat-card-content>
+</mat-card>

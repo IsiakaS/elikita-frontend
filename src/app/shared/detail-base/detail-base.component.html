@@ -1,0 +1,46 @@
+@if (resource) {
+<mat-card class="profile-card px-15 pb-20 detail-base">
+    <mat-card-header>
+        <mat-card-title>
+            <div class="g-just-flex gap-8">
+                <div class="round-icon-wrapper contrast">
+                    <mat-icon>
+                        medication
+                    </mat-icon>
+                </div>
+                <span> {{resource.resourceType}}</span>
+            </div>
+        </mat-card-title>
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-10">
+            <mat-divider>
+
+            </mat-divider>
+            <div class="my-20"></div>
+
+
+            <div class="other-details">
+                @for(key of fieldKeys(resource); track $index;){
+
+                <div class="field-group">
+                    <div class="field-value" [innerHTML]="renderOtherFields(resource, key)">
+
+                    </div>
+                    <div class="field-title subtitle-text-color" style="font-weight: bold;">
+                        {{key | titlecase}}
+                    </div>
+                </div>
+                }
+
+
+            </div>
+
+        </div>
+    </mat-card-content>
+</mat-card>
+
+}@else {
+<mat-progress-spinner></mat-progress-spinner>
+}

@@ -1,0 +1,11 @@
+[
+  "active",
+  "on-hold",
+  "ended",
+  "stopped",
+  "completed",
+  "cancelled",
+  "entered-in-error",
+  "draft",
+  "unknown"
+]

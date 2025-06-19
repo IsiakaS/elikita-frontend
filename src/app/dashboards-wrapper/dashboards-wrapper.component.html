@@ -1,0 +1,19 @@
+<p class="ms-300">
+
+    @switch (user.role) {
+    @case ( "doctor") {
+
+    <app-doctors-dashboard></app-doctors-dashboard>
+    }
+    @case ( "lab") {
+    <app-lab-dashboard></app-lab-dashboard>
+    }
+    @case('admin'){
+    <app-admin-dashboard>
+
+    </app-admin-dashboard>
+    }
+
+    }
+
+</p>

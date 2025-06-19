@@ -1,0 +1,48 @@
+<mat-sidenav-container>
+    <mat-sidenav #sidenav mode="side" opened="true" class="max-width" fixedInViewport="true">
+        <div class="side-wrapper g-just-flex flex-column">
+            <div class="top-sidenav px-13 py-13">
+                <div>
+
+
+                    <div class="logowrapper g-just-flex gap-12" style="justify-content: space-between;">
+                        <div class="logo">
+                            ELIKITA
+                        </div>
+                        <div class="shrink">
+                            <mat-icon class="small-icon">
+                                chevron_left
+                            </mat-icon>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <mat-divider></mat-divider>
+            <div class="middle-sidenav px-13 py-13">
+                <app-sidemenu></app-sidemenu>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="bottom-sidenav px-13 py-13">
+                <div class="my-profile">
+                    <div class="picture">
+                        <img src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                    </div>
+                    <div class="words">
+                        <div class="name">
+                            {{(auth.user | async)?.['name']}} ({{(auth.user | async)?.role}})
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div>
+            <router-outlet>
+
+            </router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

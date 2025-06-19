@@ -1,0 +1,182 @@
+.igi-woroko {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    opacity: 0.1;
+
+    .mat-icon {
+        color: var(--mat-sys-on-background);
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.rounded-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: var(--mat-sys-surface);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .mat-icon {
+        color: var(--mat-sys-on-surface);
+    }
+}
+
+.top-menu-strip {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 10px 30px;
+
+}
+
+.next-appointments {
+    margin: 30px;
+
+    .next-appointments-title {
+        padding: 5px 0px;
+
+    }
+}
+
+.todays-date-time {
+    display: flex;
+    gap: 50px;
+    justify-content: space-between;
+    width: max-content;
+    flex-wrap: wrap;
+    margin: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px 30px;
+    border-radius: 30px;
+    height: 50px;
+    font-size: 1.2rem;
+    font-weight: medium;
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+
+
+
+}
+
+.cards-wrapper {
+    display: flex;
+
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 20px;
+    background-color: var(--mat-sys-background);
+
+    .card {
+        width: 180px;
+        position: relative;
+        padding: 10px;
+        max-width: 100%;
+        background-color: var(--mat-sys-surface-container-lowest);
+        border-radius: 10px;
+        box-shadow: 2px 2px 7px -1px var(--mat-sys-surface-container-high);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        .title {
+            display: flex;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: medium;
+            align-items: center;
+            color: light-dark(#8a7c7a, #bbb);
+        }
+
+        .bottom {
+            font-size: 1.5rem;
+            margin-top: -10px;
+            color: var(--mat-sys-on-surface-variant);
+            font-weight: bold;
+
+            .bottom-value {
+                padding-left: 10px;
+            }
+
+            .title {
+                align-items: flex-start;
+                font-size: 1.5rem;
+            }
+        }
+
+        .top,
+        .bottom {}
+    }
+
+
+}
+
+.next-appointments>.scrollable-container {
+    overflow: auto;
+}
+
+.next-appointments .cards-wrapper {
+    margin: 20px 0px;
+    margin-top: 25px;
+
+    width: max-content;
+
+    .card {
+        width: 300px;
+        flex: 1 0 300px;
+        max-width: 100%;
+        gap: 18px;
+        padding: 15px;
+        border-radius: 20px;
+
+        .top.btw {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .words {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            .name {
+                font-weight: 500;
+                color: var(--mat-sys-on-surface);
+            }
+
+            .type {
+                color: light-dark(#8a7c7a, #bbb);
+            }
+        }
+
+        .bottom {
+            margin-top: 0px;
+        }
+
+        .bottom-value {
+            display: flex;
+            font-weight: normal;
+            font-size: 1rem;
+            gap: 30px;
+            color: light-dark(#8a7c7a, #bbb);
+
+            .time {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+
+            .icons {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+        }
+    }
+}

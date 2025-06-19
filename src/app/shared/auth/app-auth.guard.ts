@@ -1,0 +1,23 @@
+import { inject } from '@angular/core';
+import { CanActivateChildFn, Router, UrlTree } from '@angular/router';
+import { AuthService } from './auth.service';
+
+
+export const appAuthGuard: CanActivateChildFn = (childRoute, state) => {
+
+  const auth = inject(AuthService);
+  if (auth.user.getValue() !== null) {
+
+    return true;
+
+  }
+
+  const loginUrl: UrlTree = inject(Router).parseUrl('/login');
+  console.log(state.url)
+  if (!state.url.includes('login')) {
+    auth.triedUrl = state.url
+  }
+
+  return loginUrl;
+
+};

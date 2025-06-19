@@ -1,0 +1,367 @@
+@if(resolvedData){
+
+<mat-card>
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    <div class="g-just-flex flex-start flex-wrap gap-15 align-items-center">
+                        <div class="rounded-image">
+                            <img style="border-radius: 50%;" width="100" height="100"
+                                src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                        </div>
+
+                        <div style="flex-direction: column; align-items: start;" class="short-details
+                                        g-just-flex flex-column gap-12 
+                                        ">
+                            <div class="top  g-just-flex gap-12 justify-content-start">
+                                <span style="text-align: center;">{{resolvedData.name[0].family |
+                                    titlecase}}
+                                    {{resolvedData.name[0].given[0] |
+                                    titlecase}}</span><span></span><span></span>
+                            </div>
+                            <div class="bottom  g-just-flex gap-12 justify-content-start" style="font-size: 16px;">
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">person</mat-icon>
+
+                                    <span>{{resolvedData.gender | titlecase}}</span>
+
+                                </div> |
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">cake</mat-icon>
+
+                                    <span>{{resolvedData.birthDate | age}}</span>
+
+                                </div> |
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">location_on</mat-icon>
+
+                                    <span>
+                                        {{resolvedData.address[0].city}},
+                                        {{resolvedData.address[0].state}},
+                                        {{resolvedData.address[0].country}}</span>
+
+                                </div>
+
+
+
+                                <span></span>
+                            </div>
+                            <div class="bottom-last  g-just-flex gap-12 justify-content-start" style="font-size: 16px;">
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">phone</mat-icon>
+
+                                    <span> <a style="text-decoration: none !important;"
+                                            href="tel:{{resolvedData.telecom[0].value}}">
+                                            {{resolvedData.telecom[0].value}}
+                                        </a> </span>
+
+                                </div>
+
+
+
+
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-title>
+            </div>
+            <div class="right gap-10 g-just-flex">
+
+                <a mat-flat-button class="">
+                    <mat-icon>edit</mat-icon>
+                    Edit
+                </a>
+
+
+            </div>
+        </div>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="to-do-tasks my-20">
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>
+                        Sugested Tasks
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        The following are some of the recommended things which you can do for this patient
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="py-15">
+                        <div class="suggested-tasks">
+                            <div class="suggested-tasks-wrapper">
+                                <div class="suggested-task" [ngClass]="{success: (encounterService.getEncounterState(patientId) | async ) == 'in-progress' ||
+                                 (encounterService.getEncounterState(patientId) | async) == 'completed'
+                                 }">
+
+
+                                    <div class="rounded-icon-wrapper me-15">
+                                        <mat-icon>event</mat-icon>
+
+                                    </div>
+                                    <div (click)="encounterService.addEncounter(patientId)"
+                                        class="me-12 panel-description" matTooltip=" An encounter is an engagement with the patient either at the outpatient
+                                            ward on in the admission ward">
+                                        Add an Encounter
+                                    </div>
+                                    <mat-icon>chevron_right</mat-icon>
+
+
+                                    <div class="after-div">
+                                        <mat-icon>check</mat-icon>
+                                    </div>
+
+                                </div>
+
+                                <div class="suggested-task">
+
+
+                                    <div class="rounded-icon-wrapper me-15">
+                                        <mat-icon>insights
+
+                                        </mat-icon>
+
+                                    </div>
+                                    <div (click)="encounterService.addObservation(patientId)"
+                                        class="me-12 panel-description"
+                                        matTooltip=" An observation can be a physical exam findings or lab results">
+                                        Add an Observation
+                                    </div>
+                                    <mat-icon>chevron_right</mat-icon>
+
+
+                                    <div class="after-div">
+                                        <mat-icon>check</mat-icon>
+                                    </div>
+
+                                </div>
+                                <div class="suggested-task">
+
+
+                                    <div class="rounded-icon-wrapper me-15">
+                                        <mat-icon>medication
+
+                                        </mat-icon>
+
+                                    </div>
+                                    <div (click)="encounterService.addMedicationRequest(patientId)"
+                                        class="me-12 panel-description"
+                                        matTooltip="Prescribe a drug / medication to the patient">
+                                        Add a Medication
+                                    </div>
+                                    <mat-icon>chevron_right</mat-icon>
+
+
+                                    <div class="after-div">
+                                        <mat-icon>check</mat-icon>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+        </div>
+        <div class="tables g-just-flex flex-wrap justify-content-start gap-30 my-30 ">
+            <mat-card>
+                <mat-card-header>
+                    <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
+                        <div class="left">
+                            <mat-card-title class="">
+                                Encounter - Last Visit
+                            </mat-card-title>
+                            <!-- <mat-card-subtitle>
+                                                        Find, search and add patients registration data
+                                                    </mat-card-subtitle> -->
+                        </div>
+                        <div class="right gap-10 g-just-flex">
+
+                            <a (click)="encounterService.addEncounter(patientId)" mat-flat-button extended
+                                class="secondary-button small-button">
+                                <mat-icon>add</mat-icon>
+                                Add Encounter
+                            </a>
+                            <a mat-flat-button>
+                                See All <mat-icon>chevron_right</mat-icon>
+                            </a>
+
+
+                        </div>
+                    </div>
+                </mat-card-header>
+
+                <mat-card-content class="my-12">
+                    <mat-divider></mat-divider>
+
+                    <table mat-table matSort [dataSource]="resolvedData.encounter" class="mat-elevation-z8 demo-table">
+                        <!-- Position Column -->
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="date"
+                                sortActionDescription="Sort by date">
+                                Date
+                            </th>
+                            <td mat-cell *matCellDef="let element">{{element.period.start |
+                                date: 'medium'}}</td>
+                        </ng-container>
+
+                        <!-- Name Column -->
+                        <ng-container matColumnDef="reason">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                sortActionDescription="Sort by reason">
+                                Reason
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.reasonCode[0]['text']}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="diagnosis">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                sortActionDescription="Sort by diagnosis">
+                                Diagnosis
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.diagnosis[0].condition.display}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="doctor">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                sortActionDescription="Sort by doctor">
+                                Physician
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.participant[0]['individual']['display']}}
+                            </td>
+                        </ng-container>
+
+
+
+
+
+                        <tr mat-header-row *matHeaderRowDef="summaryTables.encounter.displayedColumns"
+                            matHeaderRowDefSticky="true">
+                        </tr>
+                        <tr mat-row *matRowDef="let row; columns: summaryTables.encounter.displayedColumns;">
+                        </tr>
+                    </table>
+                </mat-card-content>
+            </mat-card>
+            <mat-card>
+                <mat-card-header>
+                    <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
+                        <div class="left">
+                            <mat-card-title class="">
+                                Diagnosis / Condition
+                            </mat-card-title>
+                            <!-- <mat-card-subtitle>
+                                                        Find, search and add patients registration data
+                                                    </mat-card-subtitle> -->
+                        </div>
+                        <div class="right gap-10 g-just-flex">
+
+                            <a (click)="encounterService.addDiagnosis(patientId)" mat-flat-button extended
+                                class="secondary-button small-button">
+                                <mat-icon>add</mat-icon>
+                                Add Diagnosis
+                            </a>
+                            <a mat-flat-button [routerLink]="['/app/patients/', patientId, 'observations']"
+                                routerLinkActive="router-link-active">
+                                See All <mat-icon>chevron_right</mat-icon>
+                            </a>
+
+
+                        </div>
+                    </div>
+                </mat-card-header>
+
+                <mat-card-content class="my-12">
+                    <mat-divider></mat-divider>
+
+                    <table mat-table matSort [dataSource]="resolvedData.condition" class="mat-elevation-z8 demo-table">
+
+                        <!--name - coding.code.display-->
+                        <ng-container matColumnDef="code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="code"
+                                sortActionDescription="Sort by Name">
+                                Name
+                            </th>
+                            <td mat-cell *matCellDef="let element">{{element.code.coding[0].display | titlecase}}</td>
+                        </ng-container>
+
+                        <!--dateRecorded - recordedDateTime -->
+                        <ng-container matColumnDef="recordedDate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="recordedDate"
+                                sortActionDescription="Sort by Date Recorded">
+                                Date Recorded
+                            </th>
+                            <td mat-cell *matCellDef="let element">{{element.recordedDate | date: 'medium'}}</td>
+                        </ng-container>
+
+                        <!--category - category.coding.display -->
+                        <ng-container matColumnDef="category">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
+                                sortActionDescription="Sort by Category">
+                                Category
+                            </th>
+                            <td mat-cell *matCellDef="let element">{{element.category[0].coding[0].code | titlecase}}
+                            </td>
+                        </ng-container>
+                        reference -->
+                        <ng-container matColumnDef="asserter">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="asserter"
+                                sortActionDescription="Sort by Asserter">
+                                Asserter
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{'Abukar Sideeq'}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="severity">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header="severity"
+                                sortActionDescription="Sort by Severity">
+                                Severity
+                            </th>
+                            <td mat-cell *matCellDef="let element">{{element.severity.coding[0].display | titlecase}}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="summaryTables.condition.displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: summaryTables.condition.displayedColumns;"></tr>
+
+                    </table>
+
+
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-card-content>
+
+
+
+    <mat-card-content class="my-12">
+    </mat-card-content>
+</mat-card>
+
+<!-- <div (click)="displayForm();">hey</div> -->
+}

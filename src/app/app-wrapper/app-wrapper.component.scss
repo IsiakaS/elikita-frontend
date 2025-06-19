@@ -1,0 +1,73 @@
+.small-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.mat-sidenav.max-width {
+    width: 230px;
+    height: 100vh;
+}
+
+.side-wrapper {
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    background-color: var(--mat-sys-surface-container-low);
+
+
+    &>* {
+        width: 100%;
+        box-sizing: border-box;
+
+        &:not(.mat-divider) {
+            padding-left: 15px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            padding-left: 15px;
+        }
+
+    }
+
+    .middle-sidenav {
+        flex: 1 1 auto;
+    }
+
+}
+
+.bottom-sidenav {
+
+
+    .my-profile {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .picture {
+        img {
+            display: block;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+        }
+
+        .words {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .name {
+                font-weight: 500;
+
+            }
+        }
+    }
+}
+
+.middle-sidenav {
+    flex: 1 1 100%;
+}

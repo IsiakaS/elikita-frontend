@@ -1,0 +1,46 @@
+<div class="sidemenu-wrapper">
+    <div class="menus">
+        <div class="primary-menus">
+            <div class="menu-group">
+                <div class="menu-group-header">
+
+                </div>
+
+                <div class="menu-group-list">
+                    <ul>
+                        @for (linkObject of menuObjects[userRole]; track $index) {
+                        <li>
+                            <a [routerLink]="[linkObject.link]" routerLinkActive="router-link-active">
+                                {{ linkObject.title}}
+                            </a>
+                        </li>
+                        }
+
+
+                    </ul>
+                </div>
+
+
+
+
+            </div>
+        </div>
+        <div class="secondary-menus">
+            <div class="menu-group">
+                <div class="menu-group-header">
+
+                </div>
+                <div class="menu-group-list">
+                    <ul>
+
+                        <li>
+                            <a (click)="logout()">Logout</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

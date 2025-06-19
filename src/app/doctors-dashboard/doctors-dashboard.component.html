@@ -1,0 +1,389 @@
+<div class="doctors-wrapper">
+    <div class="top-menu-strip">
+
+
+        <a>
+            <mat-icon>notifications</mat-icon>
+
+        </a>
+        <a>
+            <mat-icon>mail</mat-icon>
+        </a>
+        <a>
+            <mat-icon>person</mat-icon>
+        </a>
+    </div>
+    <div class="top-cards-section">
+        <div class="top-cards-title py-10 ms-30">
+            Today's Activities Summaries
+        </div>
+        <div class="cards-wrapper">
+            <div class="card">
+                <div class="top">
+                    <div class="title">
+                        <div class="rounded-icon">
+                            <mat-icon>ramp_right
+
+                            </mat-icon>
+                        </div>
+                        <div class="words">Outpatients</div>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <div class="bottom-value">
+                        10
+                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="igi-woroko">
+                    <mat-icon>vaccines</mat-icon>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="top">
+                    <div class="title">
+                        <div class="rounded-icon">
+                            <mat-icon>local_hotel
+
+                            </mat-icon>
+                        </div>
+                        <div class="words">Inpatients</div>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <div class="bottom-value">
+                        5
+                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="igi-woroko">
+                    <mat-icon>vaccines</mat-icon>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <div class="top">
+                    <div class="title">
+                        <div class="rounded-icon">
+                            <mat-icon>video_call
+
+                            </mat-icon>
+                        </div>
+                        <div class="words">Virtual Encounters</div>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <div class="bottom-value">
+                        2
+                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="igi-woroko">
+                    <mat-icon>vaccines</mat-icon>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <div class="top">
+                    <div class="title">
+                        <div class="rounded-icon">
+                            <mat-icon>masks
+
+                            </mat-icon>
+                        </div>
+                        <div class="words">Surgeries</div>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <div class="bottom-value">
+                        1
+                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="igi-woroko">
+                    <mat-icon>vaccines</mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="my-20 next-appointments">
+        <div class="next-appointments-title">
+            Next 3 Appointments
+        </div>
+        <!-- <div class="todays-date-time">
+            <div class="date">
+                <span class="weekday">Monday </span>
+                <span class="date">27th May, 2025</span>
+            </div>
+            <div class="time">
+                07:21 AM
+            </div>
+
+        </div> -->
+        <div class="scrollable-container">
+            <div class="cards-wrapper">
+                <div class="card">
+                    <div class="top btw">
+                        <div class="left">
+                            <div class="title">
+                                <div class="pics">
+                                    <img style="border-radius: 50%;" width="50" height="50"
+                                        src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                                </div>
+
+                                <div class="words">
+                                    <div class="name">
+                                        James Palmer
+                                    </div>
+                                    <div class="type">
+                                        Outpatient
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <mat-menu #mm=matMenu>
+                                <a (click)="this.encounterService.addEncounter('100001')"
+                                    class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                    <mat-icon>add</mat-icon>
+                                    <span>Initiate Encounter</span>
+                                </a>
+
+                            </mat-menu>
+                            <mat-icon [mat-menu-trigger-for]="mm" style="cursor: pointer;">
+                                more_vert
+                            </mat-icon>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="bottom mb-10">
+                        <div class="bottom-value ">
+                            <div class="time">
+                                <div class="rounded-icon">
+                                    <mat-icon>schedule</mat-icon>
+
+                                </div>
+                                <div class="time">
+                                    7:00 AM - 7:30 AM
+                                </div>
+                            </div>
+                            <div class="icons">
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            phone
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            videocam
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card">
+                    <div class="top btw">
+                        <div class="left">
+                            <div class="title">
+                                <div class="pics">
+                                    <img style="border-radius: 50%;" width="50" height="50"
+                                        src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                                </div>
+
+                                <div class="words">
+                                    <div class="name">
+                                        Yaquub Ishaq
+                                    </div>
+                                    <div class="type">
+                                        Inpatient
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <mat-menu #mm=matMenu>
+                                <a (click)="this.encounterService.addEncounter('100001')"
+                                    class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                    <mat-icon>add</mat-icon>
+                                    <span>Initiate Encounter</span>
+                                </a>
+
+                            </mat-menu>
+                            <mat-icon [mat-menu-trigger-for]="mm" style="cursor: pointer;">
+                                more_vert
+                            </mat-icon>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="bottom mb-10">
+                        <div class="bottom-value ">
+                            <div class="time">
+                                <div class="rounded-icon">
+                                    <mat-icon>schedule</mat-icon>
+
+                                </div>
+                                <div class="time">
+                                    7:00 AM - 7:30 AM
+                                </div>
+                            </div>
+                            <div class="icons">
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            phone
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            videocam
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card">
+                    <div class="top btw">
+                        <div class="left">
+                            <div class="title">
+                                <div class="pics">
+                                    <img style="border-radius: 50%;" width="50" height="50"
+                                        src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                                </div>
+
+                                <div class="words">
+                                    <div class="name">
+                                        Shwneger Mahmud
+                                    </div>
+                                    <div class="type">
+                                        Virtual
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <mat-menu #mm=matMenu>
+                                <a (click)="this.encounterService.addEncounter('100001')"
+                                    class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                    <mat-icon>add</mat-icon>
+                                    <span>Initiate Encounter</span>
+                                </a>
+
+                            </mat-menu>
+                            <mat-icon [mat-menu-trigger-for]="mm" style="cursor: pointer;">
+                                more_vert
+                            </mat-icon>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="bottom mb-10">
+                        <div class="bottom-value ">
+                            <div class="time">
+                                <div class="rounded-icon">
+                                    <mat-icon>schedule</mat-icon>
+
+                                </div>
+                                <div class="time">
+                                    7:00 AM - 7:30 AM
+                                </div>
+                            </div>
+                            <div class="icons">
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            phone
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                                <div class="rounded-icon">
+                                    <a>
+                                        <mat-icon>
+                                            videocam
+                                        </mat-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="todays-appointments my-30 ms-30 me-30">
+        <div class="title">
+
+            <span>Today's Appointments</span>
+        </div>
+
+    </div>
+
+</div>

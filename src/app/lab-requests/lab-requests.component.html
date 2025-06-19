@@ -1,0 +1,156 @@
+<mat-card>
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Lab Test Requests
+
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and filter requested lab tests
+                </mat-card-subtitle>
+            </div>
+
+        </div>
+    </mat-card-header>
+    <!-- 
+    status - https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-status&_format=json
+
+    intent - https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-intent&_format=json
+
+    priority -
+    https://hapi.fhir.org/baseR4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-priority&_format=json
+
+    code - filter -
+    http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/procedure-code&_FORMAT=JSON&filter=blood%20sugar
+
+    orderDetail.parameter.code - (form your own)
+
+    orderDetail.parameter.valueString - textarea
+
+    subject
+
+    authoredOn
+
+    requester
+
+    performer-type -
+    http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/participant-role&_FORMAT=JSON -->
+
+    <mat-card-content class="my-12">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  labRequestsTableFilterArray"
+            [patientsFiltersFormControlObject]=" labRequestsFiltersFormControlObject">
+
+        </app-table-header>
+
+
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+
+            <!--name - coding.code.display-->
+            <ng-container matColumnDef="authoredOn">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="authoredOn" sortActionDescription="Sort by Date">
+                    Date Requested
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.authoredOn | date : "mediumDate"}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="status" sortActionDescription="Sort by status">
+                    Status
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{
+                    element.status
+                    }} </td>
+            </ng-container>
+
+            <!--dateRecorded - recordedDateTime -->
+            <ng-container matColumnDef="subject">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="subject" sortActionDescription="Sort by Subject">
+                    Patient
+                </th>
+                <td mat-cell *matCellDef="let element">{{element.subject.display}}
+                </td>
+            </ng-container>
+
+
+
+            <!--category - category.coding.display -->
+
+
+
+            <ng-container matColumnDef="priority">
+
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="priority"
+                    sortActionDescription="Sort by Priority">
+                    Priority
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @let priority = element.priority?.display || element.priority;
+                    <span
+                        [ngClass]="{'grey': true, 'round': true, 'yellowbg':priority === 'ASAP', 'redbg':priority=== 'emergency'}">
+                        {{priority | titlecase}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!--verificationStatus - verificationStatus.coding[0].code   -->
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="code" sortActionDescription="Sort by code">
+                    Test
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @for(each of element.code.coding; track $index;){
+                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
+                        <span>{{each.display}}</span>
+
+                    </div>
+
+                    }
+
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    Actions
+                </th>
+                <td mat-cell *matCellDef="let element">
+
+                    <mat-menu #mm="matMenu">
+                        <a mat-menu-item>
+                            <a mat-button (click)="encounterService.addSpecimen('123')">
+                                Add Specimen Record
+                            </a>
+                        </a>
+                        <a mat-menu-item>
+                            <a mat-button (click)="encounterService.addSpecimen('123')">
+                                Add Results for this Test
+                            </a>
+                        </a>
+
+                    </mat-menu>
+                    <a [mat-menu-trigger-for]="mm">
+                        <mat-icon style="color: var(--mat-sys-primary)">more_vert</mat-icon>
+                    </a>
+
+
+                </td>
+            </ng-container>
+
+
+
+
+
+            <!--clinicalStatus - clinicalStatus.coding[0].code -->
+
+
+            <tr mat-header-row *matHeaderRowDef="labRequestsDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns:labRequestsDisplayedColumns;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>
+
+<!-- (click)="showRow(row)" -->

@@ -1,0 +1,22 @@
+[
+  {
+    "resourceType": "Practitioner",
+    "id": "prac1",
+    "name": [
+      {
+        "given": ["Sodiq"],
+        "family": "Adegboyega"
+      }
+    ]
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "456",
+    "name": [
+      {
+        "given": ["Salman"],
+        "family": "Adegboyega"
+      }
+    ]
+  }
+]

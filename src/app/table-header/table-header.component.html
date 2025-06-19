@@ -1,0 +1,41 @@
+<div class="filter my-15 mb-8 top align-items-center g-just-flex flex-wrap flex-between gap-20">
+    <div class="filter-top-left flex-wrap  g-just-flex gap-10">
+        @for(topFilter of patientsTableFilterArray; track $index){
+        <mat-expansion-panel style="width:min-content" class="table-header-panels">
+            <mat-expansion-panel-header>
+                <mat-panel-title>{{topFilter[0] | titlecase}}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [formGroup]="patientsFiltersFormControlObject[topFilter[0]]">
+                @for(eachOption of topFilter[1]; track $index){
+                <mat-checkbox class="mb-12 w-100 top-filter-control" [formControlName]="eachOption">{{
+                    eachOption | titlecase
+                    }}</mat-checkbox>}
+            </div>
+        </mat-expansion-panel>
+        }
+    </div>
+
+
+    <div class="filter-top-right">
+        <mat-form-field appearance="outline">
+            <input type="text" matInput placeholder="Search patients by name, gender, age or location">
+            <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+    </div>
+</div>
+<div class="filter active filters bottom mb-12 g-just-flex flex-wrap justify-content-start">
+    <div class="botttom-right g-just-flex flex-wrap justify-content-start">
+        <mat-chip-set>
+            @for(topFilter of patientsTableFilterArray; track $index){
+
+            <mat-chip><span>{{topFilter[0] | titlecase}}: {{topFilter[1][0] | titlecase}}</span>
+                <button matChipRemove> <mat-icon>close</mat-icon></button>
+            </mat-chip>}
+            <!-- <mat-chip><span>Gender: Female</span>
+                <button matChipRemove> <mat-icon>close</mat-icon></button>
+            </mat-chip> -->
+        </mat-chip-set>
+    </div>
+    <div class="bottom-left g-just-flex flex-wrap justify-content-end"></div>
+</div>

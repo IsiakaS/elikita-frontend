@@ -1,0 +1,125 @@
+{
+  "system": "http://loinc.org",
+  "concept": [
+    {
+      "code": "8310-5",
+      "display": "Body temperature"
+    },
+    {
+      "code": "85354-9",
+      "display": "Blood pressure panel with all children optional"
+    },
+    {
+      "code": "8462-4",
+      "display": "Diastolic blood pressure"
+    },
+    {
+      "code": "8480-6",
+      "display": "Systolic blood pressure"
+    },
+    {
+      "code": "8867-4",
+      "display": "Heart rate"
+    },
+    {
+      "code": "59408-5",
+      "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+    },
+    {
+      "code": "15074-8",
+      "display": "Glucose [Moles/volume] in Capillary blood"
+    },
+    {
+      "code": "2339-0",
+      "display": "Glucose [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "4548-4",
+      "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+    },
+    {
+      "code": "718-7",
+      "display": "Hemoglobin [Mass/volume] in Blood"
+    },
+    {
+      "code": "789-8",
+      "display": "Erythrocytes [#/volume] in Blood"
+    },
+    {
+      "code": "777-3",
+      "display": "Leukocytes [#/volume] in Blood"
+    },
+    {
+      "code": "6690-2",
+      "display": "Leukocytes [#/volume] in Blood by Automated count"
+    },
+    {
+      "code": "26464-8",
+      "display": "Creatinine [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "3094-0",
+      "display": "Urea nitrogen [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "1751-7",
+      "display": "Albumin [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "24323-8",
+      "display": "Lipid panel"
+    },
+    {
+      "code": "2093-3",
+      "display": "Cholesterol [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "2085-9",
+      "display": "Cholesterol in HDL [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "13457-7",
+      "display": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by calculation"
+    },
+    {
+      "code": "2571-8",
+      "display": "Triglyceride [Mass/volume] in Serum or Plasma"
+    },
+    {
+      "code": "2951-2",
+      "display": "Sodium [Moles/volume] in Serum or Plasma"
+    },
+    {
+      "code": "2823-3",
+      "display": "Potassium [Moles/volume] in Serum or Plasma"
+    },
+    {
+      "code": "8315-3",
+      "display": "Respiratory rate"
+    },
+    {
+      "code": "8302-2",
+      "display": "Body height"
+    },
+    {
+      "code": "3141-9",
+      "display": "Body weight Measured"
+    },
+    {
+      "code": "39156-5",
+      "display": "Body mass index (BMI) [Ratio]"
+    },
+    {
+      "code": "9279-1",
+      "display": "Respiratory rate"
+    },
+    {
+      "code": "8310-5",
+      "display": "Temperature Oral"
+    },
+    {
+      "code": "1988-5",
+      "display": "Thyroid stimulating hormone (TSH) [Units/volume] in Serum or Plasma"
+    }
+  ]
+}

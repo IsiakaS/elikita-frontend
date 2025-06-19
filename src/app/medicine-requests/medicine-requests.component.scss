@@ -1,0 +1,34 @@
+.small-chips {
+    width: max-content;
+    border-radius: 30px;
+    padding: 0.05rem 0.5rem;
+    font-size: 1rem;
+    font-weight: normal;
+    align-items: center;
+    text-transform: capitalize;
+    font-weight: 500;
+    margin-bottom: 8px;
+    background-color: transparent !important;
+    border: 1px solid var(--mat-sys-outline) !important;
+
+
+    color: var(--mat-sys-on-background);
+
+
+    mat-icon {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        background-color: transparent !important;
+        border: none !important;
+        // margin-left: -0.5rem;
+    }
+
+}
+
+tr td {
+    z-index: 9999999999999;
+    position: relative;
+    overflow: visible;
+    max-width: 200px;
+}

@@ -1,0 +1,52 @@
+$teal: #008080;
+$teal-light: #e0f7f7;
+$teal-dark: #006666;
+
+.not-found-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, $teal-light, #f0fdfd);
+
+    .content {
+        text-align: center;
+        padding: 2.5rem;
+        background-color: #ffffff;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 128, 128, 0.1);
+        max-width: 420px;
+        width: 90%;
+
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: $teal;
+            font-weight: 700;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .message {
+            font-size: 1.15rem;
+            color: #004d4d;
+            margin: 1.2rem 0 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: $teal;
+            color: #ffffff;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: $teal-dark;
+            }
+        }
+    }
+}

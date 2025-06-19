@@ -1,0 +1,425 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-1",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "860975",
+              "display": "Lisinopril 10 MG Oral Tablet"
+            }
+          ],
+          "text": "Lisinopril 10mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-05-09",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet by mouth daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 10,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-2",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "1049630",
+              "display": "Metformin Hydrochloride 500 MG Oral Tablet"
+            }
+          ],
+          "text": "Metformin 500mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2024-12-16",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet by mouth twice daily with meals",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 500,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-3",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "197361",
+              "display": "Albuterol 90 MCG/ACT Inhalation Aerosol"
+            }
+          ],
+          "text": "Albuterol Inhaler"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-03-10",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Inhale two puffs every 4–6 hours as needed",
+            "timing": {
+              "repeat": {
+                "frequency": 4,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "46713006",
+                  "display": "Inhalation route"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-4",
+        "status": "completed",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617314",
+              "display": "Amoxicillin 500 MG Oral Capsule"
+            }
+          ],
+          "text": "Amoxicillin 500mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2024-10-05",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one capsule by mouth every 8 hours for 7 days",
+            "timing": {
+              "repeat": {
+                "frequency": 3,
+                "period": 1,
+                "periodUnit": "d",
+                "count": 21
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 500,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-5",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617312",
+              "display": "Atorvastatin 20 MG Oral Tablet"
+            }
+          ],
+          "text": "Atorvastatin 20mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-01-15",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet by mouth at bedtime",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-6",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617320",
+              "display": "Omeprazole 20 MG Oral Capsule"
+            }
+          ],
+          "text": "Omeprazole 20mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-03-20",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one capsule by mouth once daily before meals",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-7",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617314",
+              "display": "Ibuprofen 200 MG Oral Tablet"
+            }
+          ],
+          "text": "Ibuprofen 200mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-04-05",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet every 6 hours as needed for pain",
+            "timing": {
+              "repeat": {
+                "frequency": 4,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-8",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617311",
+              "display": "Sertraline 50 MG Oral Tablet"
+            }
+          ],
+          "text": "Sertraline 50mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-01-10",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet every morning",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-9",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617321",
+              "display": "Levothyroxine Sodium 50 MCG Oral Tablet"
+            }
+          ],
+          "text": "Levothyroxine 50mcg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-01-01",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet by mouth daily on an empty stomach",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-10",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "617315",
+              "display": "Hydrochlorothiazide 25 MG Oral Tablet"
+            }
+          ],
+          "text": "Hydrochlorothiazide 25mg"
+        },
+        "subject": {
+          "reference": "Patient/123"
+        },
+        "authoredOn": "2025-05-02",
+        "requester": {
+          "reference": "Practitioner/456"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Take one tablet by mouth every morning",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
