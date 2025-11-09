@@ -518,14 +518,273 @@
                     </div>
                 </mat-tab>
                 <mat-tab label="Guardian">
-                    @if(data.contact && data.contact.length > 0) {}@else {
+                    @if(data.contact && data.contact.length > 0) {
+                    <div class="cards-wrapper my-30">
+                        @for(contact of data.contact; track $index) {
+                        <mat-card>
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <div class="header-words  ">
+                                        <div class="title-flex g-just-flex gap-8" style="
+                    align-items: flex-start;        
+                    justify-content: flex-start;
+                    ">
+                                            <mat-icon>
+                                                groups
+                                            </mat-icon>
+                                            <mat-card-title>
+                                                Guardian Details</mat-card-title>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+                                            @if(contact.name){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.name.family || 'N/A'}} {{contact.name.given?.join('
+                                                        ')}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Guardian Name' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(contact.relationship && contact.relationship.length > 0){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        @let rel = contact.relationship[0];
+                                                        {{rel.text || rel.coding?.[0]?.display || rel.coding?.[0]?.code
+                                                        || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Relationship' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(contact.gender){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.gender | titlecase}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Gender' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(contact.telecom && contact.telecom.length > 0){
+                                            <div class="field-group" style="min-width: 250px;">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        @for(t of contact.telecom; track $index){
+                                                        <div>
+                                                            {{t.value || 'N/A'}}
+                                                            <span class="subtitle-text-color-2">
+                                                                @if(t.system){ ({{t.system | titlecase}})}
+                                                                @if(t.use){ - {{t.use | titlecase}} }
+                                                            </span>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Contact(s)' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(contact.address){
+                                            <div class="field-group" style="min-width: 280px;">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.line?.join(', ') || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Address Line' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.city || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'City' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.state || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'State' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.district || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'District' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.country || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Country' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{contact.address.postalCode || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Postal Code' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+                    </div>
+                    }@else {
                     <div class="g-just-flex flex-column gap-15" style="align-items: center; justify-content: center;">
                         <mat-icon class="icon" style="font-size: 3rem;">info</mat-icon>
                         <span class="subtitle-text-color-2">No Guardian Details Found</span>
                     </div>}
                 </mat-tab>
                 <mat-tab label="Attachment">
-                    @if(data.photo && data.photo.length > 0) {}@else {
+                    @if(data.photo && data.photo.length > 0) {
+                    <div class="cards-wrapper my-30">
+                        @for(att of data.photo; track $index) {
+                        <mat-card>
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <div class="header-words  ">
+                                        <div class="title-flex g-just-flex gap-8" style="
+                    align-items: flex-start;        
+                    justify-content: flex-start;
+                    ">
+                                            <mat-icon>attach_file</mat-icon>
+                                            <mat-card-title>Attachment</mat-card-title>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+                                            <div class="field-group" style="min-width: 280px;">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        @if(att.url){
+                                                        <img [src]="att.url" alt="attachment"
+                                                            style="max-height: 160px; border-radius: 6px;" />
+                                                        }@else if(att.data && att.contentType){
+                                                        <img [src]="'data:' + att.contentType + ';base64,' + att.data"
+                                                            alt="attachment"
+                                                            style="max-height: 160px; border-radius: 6px;" />
+                                                        }@else {
+                                                        <mat-icon>insert_drive_file</mat-icon>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Preview' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.title || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Title' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.contentType || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Content Type' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            @if(att.creation){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.creation | date: 'medium'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Created' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(att.url){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        <a [href]="att.url" target="_blank">Open</a>
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Link' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+                    </div>
+                    }@else {
                     <div class="g-just-flex flex-column gap-15" style="align-items: center; justify-content: center;">
                         <mat-icon class="icon" style="font-size: 3rem;">info</mat-icon>
                         <span class="subtitle-text-color-2">No Attachment Found</span>

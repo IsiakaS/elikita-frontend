@@ -100,6 +100,12 @@ body {
 :root {
   @include mat.table-overrides((header-headline-size: 1rem,
       row-item-label-text-size: 15px));
+
+  /* Table header sizing variables */
+  --table-th-min-width: 120px;
+  /* prevent overly narrow headers */
+  --table-th-max-width: 260px;
+  /* clip long headers and ellipsize */
 }
 
 .physical-exam-cat,
@@ -315,18 +321,24 @@ table tr {
     z-index: 999999999;
   }
 
-  a {
-    color: black;
+  // Ensure links inside table cells inherit the surrounding text color
+  // and appear in lowercase as requested
+  td a,
+  td a:link,
+  td a:visited,
+  td a:hover,
+  td a:active {
+    color: inherit;
     text-decoration: none;
     border-radius: 2px;
     padding: 4px 6px;
     position: relative;
-
+    text-transform: lowercase;
     z-index: 9999999999;
+  }
 
-    &:hover {
-      background-color: #0001;
-    }
+  td a:hover {
+    background-color: #0001;
   }
 
 
@@ -350,12 +362,6 @@ table tr {
 
 .tables .mat-mdc-card {
   border: 1px solid var(mat-sys-outline) !important;
-}
-
-table.mat-mdc-table {
-  // display: block;
-  // width: 100%;
-  // overflow: auto;
 }
 
 .mdc-snackbar__label {
@@ -1018,9 +1024,7 @@ table:not(.mat-calendar-table) {
 
 }
 
-.visible-overflow .mat-mdc-dialog-surface.mdc-dialog__surface {
-  // overflow-x: auto;
-}
+
 
 .over-other-group {
   z-index: 999999;
@@ -1103,6 +1107,39 @@ table tr td {
     white-space: nowrap;
   }
 
+}
+
+/*
+  Header width + ellipsis rules
+  - Works for Angular Material MDC tables and generic tables
+  - Keeps headers readable without letting long titles break layouts
+*/
+.mat-mdc-table .mat-mdc-header-cell {
+  min-width: var(--table-th-min-width);
+  max-width: var(--table-th-max-width);
+}
+
+/* Allow flex children to shrink so ellipsis can take effect */
+.mat-mdc-table .mat-mdc-header-cell .mat-sort-header-container {
+  min-width: 0;
+}
+
+/* Apply ellipsis to the header text content */
+.mat-mdc-table .mat-mdc-header-cell .mat-sort-header-content {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Generic tables (non-Material) */
+table thead th {
+  min-width: var(--table-th-min-width);
+  max-width: var(--table-th-max-width);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 

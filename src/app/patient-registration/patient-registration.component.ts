@@ -1323,7 +1323,11 @@ export class PatientRegistrationComponent {
       return;
     }
 
-    console.log('✅ Validation passed! Ready to submit:', this.fhirPatient);
+    console.log('✅ Validation passed! Ready to submit (before prune):', this.fhirPatient);
+
+    // Clean up array entries: remove empty elements and empty nested objects before submit
+    this.fhirPatient = this.pruneFHIRArrays(structuredClone ? structuredClone(this.fhirPatient) : JSON.parse(JSON.stringify(this.fhirPatient)));
+    console.log('🧹 After FHIR prune:', this.fhirPatient);
 
     // TODO: Implement actual FHIR server submission
     // this.fhirService.createPatient(this.fhirPatient).subscribe({
@@ -1361,6 +1365,55 @@ export class PatientRegistrationComponent {
         this.errorService.openandCloseError('Failed to register patient. Please try again.');
       }
     });
+  }
+
+  /**
+   * Recursively prune empty entries in FHIR arrays and objects.
+   * Rules:
+   *  - In arrays: drop elements that are primitives with empty string/null/undefined; or objects that become empty after pruning
+   *  - In objects: remove properties that become empty (empty arrays/objects/empty strings/null/undefined)
+   *  - Booleans and numbers are kept as-is (false/0 are valid values)
+   */
+  private pruneFHIRArrays<T>(input: T): T {
+    const isPrimitive = (v: any) => v === null || v === undefined || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+
+    const isEmptyPrimitive = (v: any) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
+
+    const prune = (val: any): any => {
+      if (Array.isArray(val)) {
+        const pruned = val
+          .map(item => prune(item))
+          .filter(item => {
+            if (Array.isArray(item)) return item.length > 0;
+            if (item && typeof item === 'object') return Object.keys(item).length > 0;
+            return !isEmptyPrimitive(item);
+          });
+        return pruned;
+      }
+      if (val && typeof val === 'object') {
+        const result: any = {};
+        for (const [k, v] of Object.entries(val)) {
+          const pv = prune(v);
+          // Keep numbers and booleans regardless of falsy-ness
+          const keepNumberBoolean = typeof pv === 'number' || typeof pv === 'boolean';
+          if (keepNumberBoolean) { result[k] = pv; continue; }
+          if (Array.isArray(pv)) {
+            if (pv.length > 0) result[k] = pv;
+            continue;
+          }
+          if (pv && typeof pv === 'object') {
+            if (Object.keys(pv).length > 0) result[k] = pv;
+            continue;
+          }
+          if (!isEmptyPrimitive(pv)) result[k] = pv;
+        }
+        return result;
+      }
+      // primitives
+      return val;
+    }
+
+    return prune(input);
   }
 
   /**

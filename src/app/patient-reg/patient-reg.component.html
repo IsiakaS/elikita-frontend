@@ -11,7 +11,7 @@
                     {{pageSubtitle}}
                 </mat-card-subtitle>
             </div>
-            <div class="right gap-10 g-just-flex">
+            <div class="right gap-10 g-just-flex" style="justify-content: flex-end; flex-wrap: wrap;">
                 <a mat-flat-button extended class="secondary-button small-button">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
@@ -51,20 +51,15 @@
                 </th>
                 <td mat-cell *matCellDef="let element; let i = index;">
                     <mat-icon [mat-menu-trigger-for]="mem">more_vert</mat-icon>
-                    <mat-menu #mem="matMenu" class="action-menu">
-                        <a (click)="viewDetails(element)">
-
-                            <span>
-                                View Details
-                            </span>
-                            <mat-icon class="">
-                                chevron_right
-                            </mat-icon>
-                        </a>
-                        <a (click)="editPatient(element)">
-                            <span>Edit</span>
+                    <mat-menu #mem="matMenu" class="action-menu compact-menu">
+                        <button mat-menu-item (click)="viewDetails(element)">
+                            <mat-icon>visibility</mat-icon>
+                            <span>View Details</span>
+                        </button>
+                        <button mat-menu-item (click)="editPatient(element)">
                             <mat-icon>edit</mat-icon>
-                        </a>
+                            <span>Edit</span>
+                        </button>
                         <!-- Removed legacy approve() menu item to avoid confusion; approval happens via dialog -->
 
                     </mat-menu>
