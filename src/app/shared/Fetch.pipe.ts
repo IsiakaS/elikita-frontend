@@ -12,7 +12,9 @@ export class fetchFromReferencePipe implements PipeTransform {
   sanitizer = inject(DomSanitizer);
   http = inject(HttpClient);
   transform(value: any, ...args: any[]): Observable<string | SafeHtml> {
-
+    if (args.length == 1) {
+      args = [...args[0].split('$#$')]
+    }
     if (!value) return of('');
 
 

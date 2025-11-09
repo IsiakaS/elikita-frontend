@@ -1,0 +1,35 @@
+@if(medicineDetailsFormFields){
+<mat-stepper #stepper>
+
+    <mat-step label="Medicine Details">
+        <app-dynamic-forms-v2 [formFields]="medicineDetailsFormFields" [formMetaData]="undefined">
+
+        </app-dynamic-forms-v2>
+        <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+            <button mat-flat-button matStepperPrevious>Back</button>
+            <button mat-flat-button matStepperNext>Next</button>
+
+        </div>
+    </mat-step>
+    <mat-step label="Inventory Details">
+        <app-dynamic-forms-v2 [formFields]="InventoryDetailsFormFields" [formMetaData]="undefined">
+
+        </app-dynamic-forms-v2>
+        <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+            <button mat-flat-button matStepperPrevious>Back</button>
+            <button mat-flat-button matStepperNext>Next</button>
+
+        </div>
+    </mat-step>
+    <mat-step label="Price Details">
+        <app-dynamic-forms-v2 [formFields]="PriceDetailsFormFields" [formMetaData]="undefined">
+
+        </app-dynamic-forms-v2>
+        <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+            <button mat-flat-button matStepperPrevious>Back</button>
+            <button mat-flat-button matStepperNext>Next</button>
+
+        </div>
+    </mat-step>
+</mat-stepper>
+}

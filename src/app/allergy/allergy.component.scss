@@ -1,0 +1,17 @@
+.low-criticality {
+    background-color: light-dark(#e8f5e9, #1b5e20);
+    // border-left: 4px solid light-dark(#4caf50, #66bb6a);
+    color: light-dark(#2e7d32, #a5d6a7);
+    padding: 0px 8px;
+    border-radius: 30px;
+}
+
+.high-criticality {
+    background-color: light-dark(#ffebee, #b71c1c);
+    // border-left: 4px solid light-dark(#f44336, #ef5350);
+    color: light-dark(#c62828, #ffcdd2);
+    padding: 0px 8px;
+    border-radius: 30px;
+}
+
+// Medium criticality styling (if needed)

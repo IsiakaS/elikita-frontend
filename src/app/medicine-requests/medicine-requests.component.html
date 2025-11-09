@@ -1,4 +1,4 @@
-<mat-card class="ms-30 me-30">
+<mat-card class="py-20" style="width: max-content; max-width: 100%; box-sizing: border-box;">
     <mat-card-header>
         <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
             <div class="left">
@@ -16,12 +16,22 @@
                 </a>
 
 
+                @if(capacityObject['medicationRequest']['request'].includes(user.role)
+
+                ) {
+                <a mat-flat-button extended (click)="encounterService.addMedicationRequest(patientId || '')">
+                    <mat-icon>add</mat-icon> Add Med. Request
+                </a>
+
+                }
+
+
 
             </div>
         </div>
     </mat-card-header>
 
-    <mat-card-content class="my-12">
+    <mat-card-content class="my-12 ">
         <mat-divider></mat-divider>
         <app-table-header [patientsTableFilterArray]="  tableFilter"
             [patientsFiltersFormControlObject]=" tableFilterFormControlObject">
@@ -56,7 +66,7 @@
                                 chevron_right
                             </mat-icon>
                         </a>
-                        <a (click)="administer(element)">
+                        <!-- <a (click)="administer(element)">
 
                             <mat-icon class="">
                                 vaccines
@@ -64,6 +74,16 @@
                             <span>
                                 Administer
                             </span>
+                        </a> -->
+                        <a>
+                            <a (click)="encounterService.addObservation(patientId || '')">
+                                <mat-icon class="">
+                                    assignment
+                                </mat-icon>
+                                <span>
+                                    Generate Order
+                                </span>
+                            </a>
                         </a>
 
                     </mat-menu>
@@ -77,8 +97,10 @@
                     MedicationId
                 </th>
                 <td mat-cell *matCellDef="let element; let i = index;" #td>
-                    <div class="g-just-flex gap-0 my-12" style="justify-content: flex-start; align-items: center;">
-                        <div class="g-just-flex gap-5"
+                    @if( element.medication ){
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
                             style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
                             <div class="top">
                                 {{element.medication | codeableRef2}}
@@ -86,7 +108,7 @@
 
                             </div>
                             @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
-                            <div class="bottom subtitle-text-color-2">
+                            <div class="bottom subtitle-text-color-2 link-group-icon">
                                 @if((element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display'
                                 )| async){
                                 {{element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display' |
@@ -113,22 +135,151 @@
                                 <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
                                     <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
                                         <mat-panel-title style="margin-right: 0px;">
-                                            <mat-icon style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                            <mat-icon color="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
                                         </mat-panel-title>
                                     </mat-expansion-panel-header>
                                     <ng-template matExpansionPanelContent>
                                         <!-- <span>jjjj</span> -->
-                                        <app-detail-base [url]="isLinkObj['medication'].get(i)"></app-detail-base>
+                                        <div style="width: 250px;">
+                                            <app-detail-base [url]="isLinkObj['medication'].get(i)"></app-detail-base>
+                                        </div>
                                     </ng-template>
                                 </mat-expansion-panel>
                             </div>
                             }
                         </div>
                     </div>
+                    }@else{
+                    @if(element.medicationCodeableConcept){
+                    <!-- //replace all above with medicationCodeableConcept instead of medication -->
+
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                            <div class="top">
+
+                                {{element.medicationCodeableConcept | codeableConcept2}}
+
+
+                            </div>
+
+                        </div>
+                        <div>
+                            @if(isLinkObj['medicationCodeableConcept'] && isLinkObj['medicationCodeableConcept'].get(i))
+                            {
+                            <div (click)="alltds(td)">
+
+
+                                <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                                    <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                        <mat-panel-title style="margin-right: 0px;">
+                                            <mat-icon color="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <ng-template matExpansionPanelContent>
+                                        <!-- <span>jjjj</span> -->
+                                        <div style="width: 250px;">
+                                            <app-detail-base
+                                                [url]="isLinkObj['medicationCodeableConcept'].get(i)"></app-detail-base>
+                                        </div>
+                                    </ng-template>
+                                </mat-expansion-panel>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+
+
+                    }
                 </td>
             </ng-container>
 
             <!--category - category.coding.display -->
+
+
+            <ng-container matColumnDef="groupIdentifier">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="groupIdentifier"
+                    sortActionDescription="Sort by groupIdentifier">
+                    Group Id
+                </th>
+
+                <td mat-cell *matCellDef="let element ; let i = index;"
+                    style="max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [ngClass]="{'nob':element.groupIdentifier && sortedWithRequisitionKeys.length &&
+                    sortedWithRequisitionKeys.includes(element.groupIdentifier?.value),
+                    'not': (element.groupIdentifier && sortedWithRequisitionKeys.length) && (  i == tableDataLevel2.getValue().length - 1 || 
+                    !(tableDataLevel2.getValue()[i+1].groupIdentifier) ||
+                    sortedWithRequisition[element.groupIdentifier.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i+1].groupIdentifier?.value])
+                    
+                    }">
+                    @if(element.groupIdentifier && element.groupIdentifier.value) {
+                    {{
+                    i == 0 || !(tableDataLevel2.getValue()[i-1].groupIdentifier) ||
+                    sortedWithRequisition[element.groupIdentifier.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i-1].groupIdentifier?.value]
+                    ? element.groupIdentifier.value : ""
+                    }}
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+
+            </ng-container>
+
+            <ng-container matColumnDef="groupReport">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="groupReport"
+                    sortActionDescription="Sort by group report">
+                    Group Report
+                </th>
+
+                <td mat-cell *matCellDef="let element ; let i = index;" [ngClass]="{'nob-last':element.groupIdentifier && sortedWithRequisitionKeys.length &&
+                    sortedWithRequisitionKeys.includes(element.groupIdentifier?.value),
+                    'not-last': (element.groupIdentifier && sortedWithRequisitionKeys.length) && (  i == tableDataLevel2.getValue().length - 1 || 
+                    !(tableDataLevel2.getValue()[i+1].groupIdentifier) ||
+                    sortedWithRequisition[element.groupIdentifier.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i+1].groupIdentifier?.value])
+                    
+                    }">
+                    @if(element.groupIdentifier && element.groupIdentifier.value) {
+                    @if(
+                    i == 0 || !(tableDataLevel2.getValue()[i-1].groupIdentifier) ||
+                    sortedWithRequisition[element.groupIdentifier.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i-1].groupIdentifier?.value]
+                    )
+                    {
+
+                    <!--mat-menu for report and generating order -->
+                    <a mat-button [matMenuTriggerFor]="groupMenu">Group Actions</a>
+                    <mat-menu #groupMenu="matMenu">
+                        <button mat-menu-item>
+                            <mat-icon>edit</mat-icon>
+                            Enter Diagnostic Report
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>assignment</mat-icon>
+                            Generate Order
+                        </button>
+
+                    </mat-menu>
+
+
+                    }@else{}
+
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+
+            </ng-container>
+
+
             <ng-container matColumnDef="dosage_instruction">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="dosage_instruction"
                     sortActionDescription="Sort by Dosage">
@@ -163,16 +314,19 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="staus" sortActionDescription="Sort by Subject">
                     PatientId
                 </th>
-                <td mat-cell *matCellDef="let element; let i = index;" #td>
-                    <div class="g-just-flex gap-0 my-12" style="justify-content: flex-start; align-items: center;">
-                        <div class="g-just-flex gap-5"
-                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                <td mat-cell *matCellDef="let element; let i = index;" #td class="restrict-width">
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words" style="
+                            
+                            justify-content: flex-start; align-items: flex-start; flex-direction: column;">
                             <div class="top">
                                 {{element.subject | references2}}
 
 
                             </div>
-                            @if(isLinkObj['subject'].get(i)) {
+                            @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
+                            !element.subject.display))) {
                             <div class="bottom subtitle-text-color-2">
                                 @if((element.subject | fetchFromReference : 'name': 0 : 'family' )| async){
                                 {{element.subject | fetchFromReference : 'name': 0 : 'family' | async}}
@@ -190,19 +344,24 @@
                             }
                         </div>
                         <div>
-                            @if(isLinkObj['subject'].get(i)) {
-                            <div (click)="alltds(td)">
+                            @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
+                            !element.subject.display))) {
+                            <div (click)="alltds(td)" class="link-group-icon">
 
 
                                 <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
                                     <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
                                         <mat-panel-title style="margin-right: 0px;">
-                                            <mat-icon style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                            <mat-icon class="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
                                         </mat-panel-title>
                                     </mat-expansion-panel-header>
                                     <ng-template matExpansionPanelContent>
                                         <!-- <span>jjjj</span> -->
-                                        <app-detail-base [url]="isLinkObj['subject'].get(i)"></app-detail-base>
+                                        <div style="width: 250px;">
+
+                                            <app-detail-base [url]="isLinkObj['subject'].get(i)"></app-detail-base>
+                                        </div>
                                     </ng-template>
                                 </mat-expansion-panel>
                             </div>

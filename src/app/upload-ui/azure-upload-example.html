@@ -1,0 +1,146 @@
+<!-- Example usage of the upload component with Azure configuration -->
+
+<div class="upload-section">
+    <h3>File Upload to Azure Blob Storage</h3>
+
+    <!-- Basic Azure upload with SAS token -->
+    <app-upload-ui [allowedFiles]="/\.(jpg|jpeg|png|gif|pdf|docx|xlsx)$/i"
+        [allowedFilesCategoryLabel]="'Images, PDFs, and Office documents'" [maxFileSize]="10485760" [maxFiles]="5"
+        [azureStorageAccountName]="'yourstorageaccount'" [azureContainerName]="'uploads'" [azureSasToken]="sasToken">
+    </app-upload-ui>
+</div>
+
+<!-- FRONTEND-ONLY SOLUTIONS (No Backend Required) -->
+
+<div class="upload-section">
+    <h3>🔥 Option 1: Pre-Generated SAS Token (Recommended)</h3>
+    <p>Generate a long-term SAS token from Azure Portal and use it directly</p>
+
+    <app-upload-ui [allowedFiles]="/\.(jpg|jpeg|png|gif|pdf|docx|xlsx)$/i"
+        [allowedFilesCategoryLabel]="'Images, PDFs, and Office documents'" [maxFileSize]="10485760" [maxFiles]="5"
+        [azureStorageAccountName]="'yourstorageaccount'" [azureContainerName]="'uploads'"
+        [azureSasToken]="preGeneratedSasToken">
+    </app-upload-ui>
+</div>
+
+<div class="upload-section">
+    <h3>⚠️ Option 2: Direct Upload (Less Secure)</h3>
+    <p>Use storage account connection string directly in frontend (dev/testing only)</p>
+
+    <app-upload-ui [allowedFiles]="/\.(jpg|jpeg|png|gif|pdf|docx|xlsx)$/i" [maxFileSize]="10485760" [maxFiles]="5"
+        [azureStorageAccountName]="'yourstorageaccount'" [azureContainerName]="'uploads'"
+        [azureSasToken]="longTermSasToken">
+    </app-upload-ui>
+</div>
+
+<!-- TypeScript Component Examples -->
+<!--
+OPTION 1: Pre-Generated SAS Token (RECOMMENDED)
+============================================
+
+export class YourComponent {
+  // Get this from Azure Portal: Storage Account > Shared Access Signature
+  // Set expiry to 1-6 months, permissions: Create, Write, Add, Delete
+  preGeneratedSasToken = 'sv=2020-08-04&ss=b&srt=sco&sp=cwad&se=2026-01-01T00:00:00Z&st=2025-11-06T00:00:00Z&spr=https&sig=YourSignatureHere';
+  
+  constructor() {
+    console.log('Using pre-generated SAS token for uploads');
+  }
+}
+
+OPTION 2: Long-term SAS Token
+=============================
+
+export class YourComponent {
+  longTermSasToken = '';
+  
+  ngOnInit() {
+    // Generate a long-term SAS token (valid for several months)
+    this.generateLongTermSAS();
+  }
+  
+  private generateLongTermSAS() {
+    // Use Azure Portal to generate:
+    // 1. Go to Storage Account > Shared Access Signature
+    // 2. Set Services: Blob
+    // 3. Set Resource types: Service, Container, Object
+    // 4. Set Permissions: Read, Add, Create, Write, Delete
+    // 5. Set expiry to 3-6 months from now
+    // 6. Generate SAS token and copy here
+    
+    this.longTermSasToken = 'YOUR_LONG_TERM_SAS_TOKEN_HERE';
+  }
+}
+
+OPTION 3: Environment-based Configuration
+=========================================
+
+// In your environment.ts files:
+export const environment = {
+  production: false,
+  azure: {
+    storageAccountName: 'yourstorageaccount',
+    containerName: 'uploads',
+    sasToken: 'sv=2020-08-04&ss=b&srt=sco&sp=cwad&se=2026-01-01T00:00:00Z...'
+  }
+};
+
+export class YourComponent {
+  azureConfig = environment.azure;
+}
+
+OPTION 4: Configuration Service
+==============================
+
+@Injectable({providedIn: 'root'})
+export class AzureConfigService {
+  private readonly config = {
+    storageAccountName: 'yourstorageaccount',
+    containerName: 'uploads',
+    // Rotate this token every few months
+    sasToken: 'sv=2020-08-04&ss=b&srt=sco&sp=cwad&se=2026-01-01T00:00:00Z...'
+  };
+  
+  getConfig() {
+    return this.config;
+  }
+  
+  updateSasToken(newToken: string) {
+    this.config.sasToken = newToken;
+  }
+}
+-->
+
+<!-- HOW TO GET PRE-GENERATED SAS TOKEN -->
+<!--
+STEP-BY-STEP: Generate SAS Token in Azure Portal
+===============================================
+
+1. Go to Azure Portal (portal.azure.com)
+2. Navigate to your Storage Account
+3. Click "Shared access signature" in left menu
+4. Configure settings:
+   - Allowed services: ✅ Blob
+   - Allowed resource types: ✅ Service ✅ Container ✅ Object  
+   - Allowed permissions: ✅ Create ✅ Write ✅ Add ✅ Delete
+   - Start time: Now (or slightly in past)
+   - Expiry time: 3-6 months from now
+   - Allowed protocols: HTTPS only
+5. Click "Generate SAS and connection string"
+6. Copy the "SAS token" (starts with sv=...)
+7. Use this token in your component
+
+ALTERNATIVE: Azure CLI
+=====================
+az storage container generate-sas \
+  --account-name yourstorageaccount \
+  --name uploads \
+  --permissions racwd \
+  --expiry 2026-01-01T00:00:00Z \
+  --https-only
+
+ALTERNATIVE: Azure PowerShell  
+============================
+$ctx = New-AzStorageContext -StorageAccountName "yourstorageaccount" -StorageAccountKey "yourkey"
+New-AzStorageContainerSASToken -Name "uploads" -Permission "racwd" -ExpiryTime (Get-Date).AddMonths(6) -Context $ctx
+-->

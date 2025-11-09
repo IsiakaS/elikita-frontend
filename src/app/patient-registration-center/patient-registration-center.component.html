@@ -1,0 +1,22 @@
+<div class="patient-registration-center">
+    <div class=" px-20" style="  
+   ">
+        <div class="rounded-buttons-group center">
+            <button [routerLink]="['./pending']" routerLinkActive="selected"
+                [attr.aria-current]="rla1.isActive ? 'page' : null" #rla1="routerLinkActive">
+                Pending
+            </button>
+            <button [routerLink]="['./approved']" routerLinkActive="selected"
+                [attr.aria-current]="rla2.isActive ? 'page' : null" #rla2="routerLinkActive">
+                Approved
+            </button>
+            <button [routerLink]="['./deceased']" routerLinkActive="selected"
+                [attr.aria-current]="rla3.isActive ? 'page' : null" #rla3="routerLinkActive">
+                Deceased
+            </button>
+        </div>
+    </div>
+    <div class="pt-20">
+        <router-outlet></router-outlet>
+    </div>
+</div>

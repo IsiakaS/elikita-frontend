@@ -1,0 +1,265 @@
+<!-- this.tableColumns = [
+        'occurenceDateTime',
+      'status',
+      'site',
+      'targetedDisease',
+      'vaccineCode', -->
+@if(immutableLevelTableData){
+<mat-card class="py-20" style="width: max-content; max-width: 100%; box-sizing: border-box;">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
+            <div class="left">
+                <mat-card-title class="">
+                    Vaccination / Immunization
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and add vaccination for this patient
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+
+
+                @if(capacityObject['medicationRequest']['request'].includes(user.role)
+
+                ) {
+                <a mat-flat-button extended (click)="addAllergy()">
+                    <mat-icon>add</mat-icon> Add Immunization
+                </a>
+
+                }
+
+
+
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12 ">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  tableFilter"
+            [patientsFiltersFormControlObject]=" tableFilterFormControlObject">
+
+        </app-table-header>
+
+
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+
+            <!--name - coding.code.display-->
+
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="action">
+                    Action
+                </th>
+                <td mat-cell *matCellDef="let element; let i = index;">
+                    <mat-icon [mat-menu-trigger-for]="mem">more_vert</mat-icon>
+                    <mat-menu #mem="matMenu" class="action-menu">
+                        <a mat-menu-item>
+
+                            <span>
+                                View Details
+                            </span>
+                            <mat-icon class="">
+                                chevron_right
+                            </mat-icon>
+                        </a>
+                        <!-- <a (click)="administer(element)">
+
+                            <mat-icon class="">
+                                vaccines
+                            </mat-icon>
+                            <span>
+                                Administer
+                            </span>
+                        </a> -->
+                        <a>
+                            <a>
+                                <mat-icon class="">
+                                    edit
+                                </mat-icon>
+                                <span>
+                                    Edit
+                                </span>
+                            </a>
+                        </a>
+
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <!--dateRecorded - recordedDateTime -->
+
+
+            <!--category - category.coding.display -->
+
+
+
+
+
+            <ng-container matColumnDef="vaccineCode">
+                <th mat-header-cell *matHeaderCellDef>
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="restrict-length">
+
+                        {{element.vaccineCode?(element.vaccineCode | codeableConcept2):"N/A"}}
+                    </span>
+
+                </td>
+            </ng-container>
+
+            <!-- //unitprice -->
+            <ng-container matColumnDef="occurenceDateTime">
+                <th mat-header-cell *matHeaderCellDef>
+                    Date Administered
+                </th>
+                <td mat-cell *matCellDef="let element">
+
+                    @if(element.occurenceDateTime)
+                    {
+                    <span class="restrict-length">
+                        {{element.occurenceDateTime | date : "mediumDate"}}</span>
+                    } @else {
+                    <span class="restrict-length">N/A</span>
+                    }
+
+                </td>
+            </ng-container>
+
+
+
+            <ng-container matColumnDef="site">
+                <th mat-header-cell *matHeaderCellDef>
+                    Body Site Administered
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @if(element.site){
+                    <span class="restrict-length">
+
+                        {{element.site | codeableConcept2}}</span>
+                    } @else {
+                    <span class="restrict-length">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="targetedDisease">
+                <th mat-header-cell *matHeaderCellDef>
+                    For - (Targeted Disease)
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @if(element.targetedDisease){
+                    <span class="restrict-length">
+                        {{element.targetedDisease | codeableConcept2}}
+                    </span>
+                    } @else {
+                    <span class="restrict-length">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ingredientItems">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="ingredientItems"
+                    sortActionDescription="Sort by Ingredient Items">
+                    Ingredients
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="g-just-flex flex-column gap-5" style="align-items: start;">
+                        @for(ingredient of (element.ingredient || []); track $index){
+                        <!-- {{ingredient | json}} -->
+                        <div class="g-just-flex gap-5 justify-content-start">
+                            <span class="restrict-length">{{(ingredient.item | codeableRef2) || 'N/A'}}</span>
+                            @if(ingredient.strengthCodeableConcept){
+                            <br>
+                            <span class="restrict-length">{{(ingredient.strengthCodeableConcept | codeableConcept2) ||
+                                'N/A'}}</span>
+                            }
+                        </div>
+                        }@empty {
+                        {{'N/A'}}
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!--verificationStatus - verificationStatus.coding[0].code   -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="verificationStatus"
+                    sortActionDescription="Sort by Status">
+                    Status
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @if(element.status){
+                    <div #sc style="margin: 0px !important;"
+                        [attr.class]="'small-chips'+' '+'status-'+statusStyles[element.status | lowercase]?.color || ''+' g-just-flex gap-8'">
+
+                        <span> {{element.status}}
+
+                        </span>
+                        <!-- {{statusStyles[(element.verificationStatus | codeableConcept2 | lowercase)]?.['icon']}}
+                        {{element.verificationStatus | codeableConcept2}} -->
+                        <mat-icon>
+                            {{statusStyles[element.status | lowercase]?.['icon'] || "" }}
+                        </mat-icon>
+
+                    </div>
+                    } @else {
+                    <span class="restrict-length">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
+                    sortActionDescription="Sort by Category">
+                    Category
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    @if(element.category){
+                    <div #sc style="margin: 0px !important;"
+                        [attr.class]="'small-chips'+' '+'status-'+`${statusStyles[element.category]?.['color'] || ''}`+' g-just-flex gap-8'">
+
+                        <span> {{element.category }}
+
+                        </span>
+                        <mat-icon>
+                            {{statusStyles[element.category]['icon']}}
+                        </mat-icon>
+
+                    </div>
+                    } @else {
+                    <span class="restrict-length">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="criticality">
+                <th mat-header-cell *matHeaderCellDef>
+                    Critical Level
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="restrict-length" [ngClass]="{ 'low-criticality': element.criticality === 'low',
+                        'high-criticality': element.criticality === 'high',
+
+                        'restrict-length': true
+                    }">{{element.criticality}}</span>
+                </td>
+            </ng-container>
+
+
+
+            <!--clinicalStatus - clinicalStatus.coding[0].code -->
+
+
+            <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+            <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: tableColumns" (click)="showRow(row)">
+            </tr>
+        </table>
+    </mat-card-content>
+</mat-card>
+}

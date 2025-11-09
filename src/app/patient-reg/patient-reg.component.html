@@ -1,1 +1,232 @@
-<p>patient-reg works!</p>
+<mat-card class="mag" style="    width: max-content;
+    box-sizing: border-box;
+    max-width: calc(100% - 40px);">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    {{pageTitle}}
+                </mat-card-title>
+                <mat-card-subtitle>
+                    {{pageSubtitle}}
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+                <a *ngIf="canAddPatientRegistration()" mat-flat-button extended class="primary-button small-button"
+                    [routerLink]="['/register']">
+                    <mat-icon>person_add</mat-icon> New Registration
+                </a>
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12 ">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  tableFilter"
+            [patientsFiltersFormControlObject]=" tableFilterFormControlObject" [searchBoxTitle]="'Search Registration'"
+            [hasData]="(tableDataLevel2 | async)?.length > 0">
+
+        </app-table-header>
+        @if((tableDataLevel2 | async)?.length === 0){
+        <app-empty-state [title]="'No ' + (pageTitle || 'Patient Registrations')" icon="hourglass_empty"
+            [subtitle]="pageTitle === 'Pending Patient Registrations' ? 'All patient registrations have been processed. Newly registered inactive patients will appear here until approved.' : 'There are currently no records in this category.'">
+        </app-empty-state>
+        }@else {
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table my-30">
+
+            <!--name - coding.code.display-->
+            <ng-container matColumnDef="number">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="number" sortActionDescription="Sort by Number">
+
+                </th>
+                <td mat-cell *matCellDef="let element; let i  = index">{{i}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="action">
+                    Action
+                </th>
+                <td mat-cell *matCellDef="let element; let i = index;">
+                    <mat-icon [mat-menu-trigger-for]="mem">more_vert</mat-icon>
+                    <mat-menu #mem="matMenu" class="action-menu">
+                        <a (click)="viewDetails(element)">
+
+                            <span>
+                                View Details
+                            </span>
+                            <mat-icon class="">
+                                chevron_right
+                            </mat-icon>
+                        </a>
+                        <a (click)="editPatient(element)">
+                            <span>Edit</span>
+                            <mat-icon>edit</mat-icon>
+                        </a>
+                        <!-- Removed legacy approve() menu item to avoid confusion; approval happens via dialog -->
+
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <!--dateRecorded - recordedDateTime -->
+            @for(column of [
+
+            'name',
+            'gender',
+            'contact',
+            'date of birth',
+            'address',
+            'status'
+
+
+            ]; let j = $index; track $index){
+            <ng-container matColumnDef="{{column}}">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{column | titlecase}}
+                </th>
+                <td mat-cell *matCellDef="let element; let i = index;">
+                    @if(column == "name"){
+                    @if(element.name && element.name.length > 0){
+                    {{element.name?.[0]?.family}} {{element.name?.[0]?.given[0]}}
+                    }@else {
+                    <span class="subtitle-text-color-2">N / A</span>}
+                    }@else if(column == 'contact'){
+                    @if(element.telecom && element.telecom.length > 0){
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                            @for(ct of element.telecom; track $index){
+                            @if(ct.system=='phone'){
+                            <div class="top">
+
+
+                                <a href="tel:+{{ct.value}}">{{ct.value}}</a>
+
+
+
+
+                            </div>
+                            }
+                            @else if(ct.system=='email'){
+                            <div class="bottom subtitle-text-color-2 link-group-icon">
+                                <a href="mailto:{{ct.value}}">
+                                    {{ct.value}}
+                                </a>
+
+
+                            </div>
+                            }
+                            }
+
+                        </div>
+
+                    </div>}@else {
+                    <span class="subtitle-text-color-2">N / A</span>}
+                    }@else if(column == 'gender'){
+                    @if(element.gender){
+                    {{element.gender | titlecase}}
+                    }@else {
+                    <span class="subtitle-text-color-2">N / A</span>}}
+                    @else if(column == 'date of birth'){
+                    @if(element.birthDate){
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+
+
+                            <div class="top" style="text-align: center; width: 100%">
+
+
+                                {{element.birthDate | date : "shortDate"}}
+
+
+
+
+                            </div>
+
+
+                            <div class="bottom subtitle-text-color-2 link-group-icon" style="text-align: center;">
+                                {{element.birthDate | age }} Years
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                    }@else {
+                    <span class="subtitle-text-color-2">N / A</span>}
+                    }
+                    @else if(column == 'address'){
+                    @if(element.address){
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+
+
+                            <div class="top">
+
+
+                                {{element.address?.[0]?.line}}
+
+
+
+
+                            </div>
+
+
+                            <div class="bottom  link-group-icon"
+                                [ngClass]="{'subtitle-text-color-2': element.address?.[0]?.line}">
+
+                                {{element.address?.[0]?.city?element.address?.[0]?.city+".":""}}
+                                {{element.address?.[0]?.state?element.address?.[0]?.state+".":""}}
+                                {{element.address?.[0]?.district?element.address?.[0]?.district+".":""}}
+                                {{element.address?.[0]?.country?element.address?.[0]?.country+".":""}}
+                                {{element.address?.[0]?.postalCode}}
+
+
+                            </div>
+
+
+                        </div>
+
+                    </div>}
+                    @else {
+                    <span class="subtitle-text-color-2">N / A</span>
+                    }
+                    }@else if(column == 'status'){
+                    <div #sc style="margin: 0px !important;"
+                        [attr.class]="'small-chips'+' '+'status-'+statusStyles[element.status.toLowerCase()]['color']+' g-just-flex gap-8'">
+
+                        <span> {{element.status}}
+
+                        </span>
+                        <mat-icon>
+                            {{statusStyles[element.status.toLowerCase()]['icon']}}
+                        </mat-icon>
+
+                    </div>
+                    }
+                </td>
+
+            </ng-container>
+
+            }
+
+
+            <!--clinicalStatus - clinicalStatus.coding[0].code -->
+
+
+            <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+            <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: tableColumns" (click)="showRow(row)">
+            </tr>
+        </table>
+        }
+    </mat-card-content>
+</mat-card>

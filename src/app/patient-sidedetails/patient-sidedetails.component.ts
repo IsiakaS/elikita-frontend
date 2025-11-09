@@ -4,13 +4,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { AgePipe } from '../age.pipe';
 import { PatientDetailsKeyService } from './patient-details-key.service';
+import { baseStatusStyles } from '../shared/statusUIIcons';
 
 @Component({
   selector: 'app-patient-sidedetails',
   imports: [MatIconModule, MatCardModule, TitleCasePipe, AgePipe, DatePipe],
   templateUrl: './patient-sidedetails.component.html',
   host: {
-    class: 'container-bg'
+    class: 'container-bg',
+
   },
   styleUrl: './patient-sidedetails.component.scss'
 })

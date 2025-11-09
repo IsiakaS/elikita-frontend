@@ -1,0 +1,9 @@
+.out-of-stock {
+    padding: 0px 0.25rem;
+    border-radius: 30px;
+    font-size: 14px;
+    //alert-danger
+    background-color: light-dark(#f8d7da, #4a1e1e);
+    color: light-dark(#721c24, #f8d7da);
+    border: 1px solid light-dark(#f5c6cb, #6b2c2c);
+}

@@ -121,11 +121,12 @@ export class AppointmentComponent {
         console.log(data)
 
         data['appointment'].filter((e: any) => {
-          if (!e.requestedPeriod) {
-            return false
-          } else {
-            return true;
-          }
+          // if (!e.requestedPeriod) {
+          //   return false
+          // } else {
+          //   return true;
+          // }
+          return true;
         }).forEach((element: any) => {
           this.referenceObject[element.participant[0].actor.display] = this.http.get(`https://hapi.fhir.org/baseR4/${element.participant[0].actor.reference}`).pipe(
             map((e: any) => {
@@ -143,11 +144,12 @@ export class AppointmentComponent {
     ).subscribe((allData) => {
 
       this.appointmentData = allData['appointment'].filter((e: any) => {
-        if (!e.requestedPeriod) {
-          return false
-        } else {
-          return true;
-        }
+        // if (!e.requestedPeriod) {
+        //   return false
+        // } else {
+        //   return true;
+        // }
+        return true;
       })
       //  this.references = new Map(allData['patMed']['references']);
       //  console.log(this.references);

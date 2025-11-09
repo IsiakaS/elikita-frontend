@@ -1,0 +1,325 @@
+<div class="fixed-background">
+    <svg class="stethoscope-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 3.87 3.13 7 7 7s7-3.13 7-7c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+        <path
+            d="M12 4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
+        <path
+            d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 10c-.55 0-1 .45-1-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 14c-1.1 0-2 .9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 16c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+    </svg>
+    <svg class="stethoscope-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 3.87 3.13 7 7 7s7-3.13 7-7c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+        <path
+            d="M12 4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
+        <path
+            d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 10c-.55 0-1 .45-1-1s.45-1 1-1h0c.55-.45 1-1 1-1s.45 1 1 1 .45 1 1 1 .45-1 1-1 .45-1 1-1h0c.55 0 1 .45 1 1s-.45 1-1 1h0c-.55.45-1 .45-1 .45s-.45.45-1 .45-.45.45-1 .45z" />
+        <path
+            d="M12 14c-1.1 0-2 .9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 16c-.55 0-1 .45-1 1-1s.45 1 1 1 1-.45 1-1-.45-1-1-1zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+        <path
+            d="M12 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+    </svg>
+    <svg class="stethoscope-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 3.87 3.13 7 7 7s7-3.13 7-7c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+        <path
+            d="M12 4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
+        <path
+            d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2h0c1.1-.45 1-.45 1-.45s.45-.45.45-.45h0c0 .55-.45 .55-.45 .55s-.55 .55-.55 .55h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c-.55 .55-.55 .55-.55 .55s-.45 .45-.45 .45h0c1.1 -.9 -1 -1 -1 -1z" />
+        <path
+            d="M12 10c1.1 -.9 -1 -1 -1 -1s-1 .9 -1 2 1 2 2 2h0c.55 0 1-.45 1-1s-.45-1-1-1zm0 3c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
+        <path
+            d="M12 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
+        <path
+            d="M12 16c-.55 0-1 .45-1 1-1s.45 1 1 1 1-.45 1-1-.45-1-1-1zm0 2c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
+        <path
+            d="M12 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+    </svg>
+
+</div>
+
+<div class="top-nav">
+    <!-- <a [routerLink]="['/home']" routerLinkActive="router-link-active">
+        Home
+    </a> -->
+    <a [routerLink]="['/register']" routerLinkActive="router-link-active">
+        Register
+    </a>
+    <a [routerLink]="['/login']" routerLinkActive="router-link-active">
+        Sign In
+    </a>
+</div>
+
+
+
+<!-- Validation Error Bar (Sticky - Only shown AFTER submit attempt) -->
+@if(showValidationBar && validationErrors.length > 0 && hasAttemptedSubmit){
+<div
+    style="position: sticky; top: 0; z-index: 1000; background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white; padding: 16px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+    <div style="flex: 1;">
+        <div
+            style="font-weight: 700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+            <mat-icon style="font-size: 24px; width: 24px; height: 24px;">error_outline</mat-icon>
+            <span>FHIR Patient Validation</span>
+            <div style="display: flex; gap: 12px; margin-left: 12px; font-size: 13px;">
+                @if(getRequiredErrorCount() > 0){
+                <span
+                    style="background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 12px; font-weight: 600;">
+                    ❌ {{getRequiredErrorCount()}} Required
+                </span>
+                }
+                @if(getRecommendedErrorCount() > 0){
+                <span
+                    style="background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; font-weight: 500;">
+                    ⚠️ {{getRecommendedErrorCount()}} Recommended
+                </span>
+                }
+            </div>
+        </div>
+        <div style="font-size: 13px; opacity: 0.95; line-height: 1.6; margin-left: 34px;">
+            @for(error of validationErrors; track error){
+            <div style="margin: 4px 0;">• {{error}}</div>
+            }
+        </div>
+        <div style="margin-top: 8px; margin-left: 34px; font-size: 12px; opacity: 0.85; font-style: italic;">
+            This validation bar will automatically disappear once all required fields are completed.
+        </div>
+    </div>
+    <button mat-icon-button (click)="dismissValidationBar()" style="color: white; flex-shrink: 0;"
+        title="Temporarily dismiss (will reappear on next change)">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+}
+
+@if(designatedFormFields && designatedRegForm && guardianFormFields && guardianRegForm){
+<div class="" style="max-width: 1200px; margin: 30px auto; position: relative;
+display:flex; justify-content: center;
+">
+    <!-- Main content area with tabs -->
+    <div style="position: relative; padding-bottom: 80px;">
+    <!-- Conspicuous Submit Button at the Top -->
+@if(fhirPatient){
+<div
+    style="position: sticky; bottom: 0; z-index: 1001; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.15); padding: 16px 24px;">
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 20px;">
+        <button mat-raised-button (click)="submitPatientToServer()" [disabled]="getRequiredErrorCount() > 0"
+            style="flex: 1; max-width: 400px; height: 56px; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"
+            [style.background]="getRequiredErrorCount() > 0 ? '#9e9e9e' : 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)'"
+            [style.color]="'white'">
+            <mat-icon style="font-size: 28px; width: 28px; height: 28px; margin-right: 8px;">
+                {{getRequiredErrorCount() > 0 ? 'lock' : 'send'}}
+            </mat-icon>
+            @if(getRequiredErrorCount() > 0){
+            <span>Complete {{getRequiredErrorCount()}} Required Field(s) to Submit</span>
+            }@else{
+            <span>✓ Submit Patient to FHIR Server</span>
+            }
+        </button>
+        <div style="display: flex; gap: 12px; align-items: center; font-size: 14px; font-weight: 600;">
+            @if(getRequiredErrorCount() > 0){
+            <span
+                style="background: #f44336; color: white; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                <mat-icon style="font-size: 20px; width: 20px; height: 20px;">error</mat-icon>
+                {{getRequiredErrorCount()}} Required
+            </span>
+            }@else{
+            <span
+                style="background: #4caf50; color: white; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                <mat-icon style="font-size: 20px; width: 20px; height: 20px;">check_circle</mat-icon>
+                Ready to Submit
+            </span>
+            }
+            @if(getRecommendedErrorCount() > 0){
+            <span
+                style="background: #ff9800; color: white; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                <mat-icon style="font-size: 20px; width: 20px; height: 20px;">warning</mat-icon>
+                {{getRecommendedErrorCount()}} Recommended
+            </span>
+            }
+        </div>
+    </div>
+</div>
+}
+        <!-- Tab Group -->
+        <div>
+            <mat-tab-group #tabGroup [mat-stretch-tabs]="false" [mat-align-tabs]="'center'">
+
+                <mat-tab label="Your Details">
+                    <div class="" style="max-width: 900px;">
+                        @if(showForm){
+                        @if(designatedFormFields && designatedRegForm){
+                        <app-dynamic-forms-v2 [formFields]="designatedFormFields" [formMetaData]="designatedRegForm"
+                            [resetOnSubmit]="false" (formSubmitted)="onDesignatedFormSubmit($event)">
+
+                        </app-dynamic-forms-v2>}
+                        }@else{
+                        <!-- Patient Data Review Component - Standalone Mode -->
+                        <app-patient-data-review [formFields]="designatedFormFields" [submittedData]="submittedData"
+                            [showEditButtons]="true" [mode]="'standalone'" (fieldEdited)="onFieldEdited($event)"
+                            (navigateNext)="onNavigateToNext()">
+                        </app-patient-data-review>
+                        }
+
+                    </div>
+                </mat-tab>
+                <mat-tab label="Guardian / Dependent Details">
+                    <div class="" style="max-width: 900px;">
+                        @if(showGuardianForm){
+                        @if(guardianFormFields && guardianRegForm){
+                        <app-dynamic-forms-v2 [formFields]="guardianFormFields" [formMetaData]="guardianRegForm"
+                            [resetOnSubmit]="false" (formSubmitted)="onGuardianFormSubmit($event)">
+                        </app-dynamic-forms-v2>
+                        }
+                        }@else{
+                        <!-- Guardian Data Review Component - Standalone Mode -->
+                        <app-patient-data-review [formFields]="guardianFormFields"
+                            [submittedData]="guardianSubmittedData" [showEditButtons]="true" [mode]="'standalone'"
+                            (fieldEdited)="onGuardianFieldEdited($event)" (navigateNext)="onGuardianNavigateNext()">
+                        </app-patient-data-review>
+                        }
+                    </div>
+
+                </mat-tab>
+                <mat-tab label="Upload Photo & Documents">
+                    <div class="" style="max-width: 900px;">
+                        <div class="tab-title py-15" style="text-align: center;">
+                            Upload Photo & Documents
+                        </div>
+                        <app-upload-ui allowedFilesCategoryLabel="Image" uploadFieldName="Photo"
+                            [allowedFiles]="photoAllowedFiles" [maxFileSize]="photoMaxFileSize"
+                            [maxFiles]="photoMaxFiles" [azureStorageAccountName]="azureStorageAccountName"
+                            [azureContainerName]="azureContainerName" [azureSasToken]="azureSasToken"
+                            (filesChanged)="onPhotosUploaded($event)">
+                        </app-upload-ui>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+
+        <!-- Right column: FHIR Result (collapsible, starts collapsed) -->
+        <div style="position: sticky; top: 80px;">
+            @if(fhirPatient){
+            <div
+                style="background: #e8f5e9; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                <!-- Collapsible Header -->
+                <div (click)="toggleFhirPanel()"
+                    style="padding: 16px 20px; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px;">
+                        <mat-icon style="color: white;">local_hospital</mat-icon>
+                        <span>FHIR R4 Patient Resource</span>
+                    </div>
+                    <mat-icon style="color: white; transition: transform 0.3s ease;"
+                        [style.transform]="isFhirPanelCollapsed ? 'rotate(0deg)' : 'rotate(180deg)'">
+                        expand_more
+                    </mat-icon>
+                </div>
+
+                <!-- Collapsible Content -->
+                @if(!isFhirPanelCollapsed){
+                <div style="padding: 20px;">
+                    <!-- Validation Tracker -->
+                    <div
+                        style="margin-bottom: 12px; padding: 12px; background: white; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                        <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #2e7d32;">
+                            📋 Validation Status
+                        </div>
+                        <div style="display: grid; gap: 6px; font-size: 12px;">
+                            <!-- Required Fields -->
+                            <div style="font-weight: 600; color: #d32f2f; margin-top: 4px;">Required:</div>
+                            <div style="display: flex; align-items: center; gap: 6px; padding-left: 12px;">
+                                @if(validationTracker.required.name.valid){
+                                <mat-icon
+                                    style="color: #4caf50; font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                }@else{
+                                <mat-icon
+                                    style="color: #f44336; font-size: 16px; width: 16px; height: 16px;">cancel</mat-icon>
+                                }
+                                <span [style.color]="validationTracker.required.name.valid ? '#4caf50' : '#f44336'">
+                                    Patient Name
+                                </span>
+                            </div>
+
+                            <!-- Recommended Fields -->
+                            <div style="font-weight: 600; color: #ff9800; margin-top: 8px;">Recommended:</div>
+                            <div style="display: flex; align-items: center; gap: 6px; padding-left: 12px;">
+                                @if(validationTracker.recommended.gender.valid){
+                                <mat-icon
+                                    style="color: #4caf50; font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                }@else{
+                                <mat-icon
+                                    style="color: #ff9800; font-size: 16px; width: 16px; height: 16px;">warning</mat-icon>
+                                }
+                                <span
+                                    [style.color]="validationTracker.recommended.gender.valid ? '#4caf50' : '#ff9800'">
+                                    Gender
+                                </span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; padding-left: 12px;">
+                                @if(validationTracker.recommended.birthDate.valid){
+                                <mat-icon
+                                    style="color: #4caf50; font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                }@else{
+                                <mat-icon
+                                    style="color: #ff9800; font-size: 16px; width: 16px; height: 16px;">warning</mat-icon>
+                                }
+                                <span
+                                    [style.color]="validationTracker.recommended.birthDate.valid ? '#4caf50' : '#ff9800'">
+                                    Birth Date
+                                </span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; padding-left: 12px;">
+                                @if(validationTracker.recommended.telecom.valid){
+                                <mat-icon
+                                    style="color: #4caf50; font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                }@else{
+                                <mat-icon
+                                    style="color: #ff9800; font-size: 16px; width: 16px; height: 16px;">warning</mat-icon>
+                                }
+                                <span
+                                    [style.color]="validationTracker.recommended.telecom.valid ? '#4caf50' : '#ff9800'">
+                                    Contact Info
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <pre
+                        style="background: white; padding: 15px; border-radius: 4px; overflow: auto; max-height: 45vh; font-size: 11px; line-height: 1.4;">{{fhirPatient | json}}</pre>
+
+                    <div
+                        style="margin-top: 15px; padding: 10px; background: rgba(46, 125, 50, 0.1); border-radius: 4px; font-size: 12px;">
+                        <div style="font-weight: 600; margin-bottom: 8px; color: #2e7d32;">� Resource Summary:</div>
+                        <div style="display: grid; gap: 4px; color: #555;">
+                            <div>👤 Name: {{ fhirPatient.name?.[0]?.given?.[0] }} {{ fhirPatient.name?.[0]?.family }}
+                            </div>
+                            <div>⚧ Gender: {{ fhirPatient.gender }}</div>
+                            <div>📞 Contacts: {{ fhirPatient.telecom?.length || 0 }}</div>
+                            <div>📍 Addresses: {{ fhirPatient.address?.length || 0 }}</div>
+                            <div>📸 Photos: {{ fhirPatient.photo?.length || 0 }}</div>
+                            <div>👨‍👩‍👧 Contacts/Guardians: {{ fhirPatient.contact?.length || 0 }}</div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }@else{
+            <div style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center; color: #999;">
+                <mat-icon
+                    style="font-size: 48px; width: 48px; height: 48px; margin-bottom: 10px;">description</mat-icon>
+                <p>FHIR Patient resource will appear here once you submit the form</p>
+            </div>
+            }
+        </div>
+    </div>
+</div>}

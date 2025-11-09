@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card style="width: max-content; max-width: 100%; box-sizing: border-box;">
     <mat-card-header>
         <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
             <div class="left">
@@ -9,6 +9,21 @@
                 <mat-card-subtitle>
                     Find, search and filter requested lab tests
                 </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+
+                @if(user && capacityObject['labRequest']['request'].includes(user.role) && patientId !== null
+                ) {
+                <a mat-flat-button class="" (click)="encounterService.addServiceRequest(patientId)">
+                    <mat-icon>add</mat-icon>
+                    Add Lab Request
+                </a>
+                }
+
+
             </div>
 
         </div>
@@ -49,11 +64,18 @@
 
             <!--name - coding.code.display-->
             <ng-container matColumnDef="authoredOn">
+
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="authoredOn" sortActionDescription="Sort by Date">
                     Date Requested
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.authoredOn | date : "mediumDate"}}</td>
+                    @if(element.authoredOn){
+                    {{element.authoredOn | date : "mediumDate"}}
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+
             </ng-container>
 
             <ng-container matColumnDef="status">
@@ -61,17 +83,154 @@
                     Status
                 </th>
                 <td mat-cell *matCellDef="let element">
+
                     {{
                     element.status
                     }} </td>
             </ng-container>
 
+
+            <ng-container matColumnDef="requisition">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="requisition"
+                    sortActionDescription="Sort by requisition">
+                    Group Id
+                </th>
+
+                <td mat-cell *matCellDef="let element ; let i = index;"
+                    style="max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [ngClass]="{'nob':element.requisition && sortedWithRequisitionKeys.length &&
+                    sortedWithRequisitionKeys.includes(element.requisition?.value),
+                    'not': (element.requisition && sortedWithRequisitionKeys.length) && (  i == tableDataLevel2.getValue().length - 1 || 
+                    !(tableDataLevel2.getValue()[i+1].requisition) ||
+                    sortedWithRequisition[element.requisition.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i+1].requisition?.value])
+                    
+                    }">
+                    @if(element.requisition && element.requisition.value) {
+                    {{
+                    i == 0 || !(tableDataLevel2.getValue()[i-1].requisition) ||
+                    sortedWithRequisition[element.requisition.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i-1].requisition?.value]
+                    ? element.requisition.value : ""
+                    }}
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+
+            </ng-container>
+            <ng-container matColumnDef="groupReport">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="groupReport"
+                    sortActionDescription="Sort by group report">
+                    Group Report
+                </th>
+
+                <td mat-cell *matCellDef="let element ; let i = index;" [ngClass]="{'nob-last':element.requisition && sortedWithRequisitionKeys.length &&
+                    sortedWithRequisitionKeys.includes(element.requisition?.value),
+                    'not-last': (element.requisition && sortedWithRequisitionKeys.length) && (  i == tableDataLevel2.getValue().length - 1 || 
+                    !(tableDataLevel2.getValue()[i+1].requisition) ||
+                    sortedWithRequisition[element.requisition.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i+1].requisition?.value])
+                    
+                    }">
+                    @if(element.requisition && element.requisition.value) {
+                    @if(
+                    i == 0 || !(tableDataLevel2.getValue()[i-1].requisition) ||
+                    sortedWithRequisition[element.requisition.value] !==
+                    sortedWithRequisition[tableDataLevel2.getValue()[i-1].requisition?.value]
+                    )
+                    {
+
+                    <!--mat-menu for report and generating order -->
+                    <a mat-button [matMenuTriggerFor]="groupMenu">Group Actions</a>
+                    <mat-menu #groupMenu="matMenu">
+                        <button mat-menu-item (click)="showReport()">
+                            <mat-icon>book</mat-icon>
+                            Diagnostic Report
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>assignment</mat-icon>
+                            Generate Order
+                        </button>
+
+                    </mat-menu>
+
+
+                    }@else{}
+
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+
+            </ng-container>
+
+
             <!--dateRecorded - recordedDateTime -->
+
             <ng-container matColumnDef="subject">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="subject" sortActionDescription="Sort by Subject">
                     Patient
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.subject.display}}
+                <td mat-cell *matCellDef="let element; let i = index;" #td class="restrict-width">
+                    @if(element.subject){
+                    <!-- {{element.subject | json}} -->
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words" style="
+                            
+                            justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                            <div class="top">
+                                {{element.subject | references2}}
+
+
+                            </div>
+                            @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
+                            !element.subject.display))) {
+                            <div class="bottom subtitle-text-color-2">
+                                @if((element.subject | fetchFromReference : 'name': 0 : 'family' )| async){
+                                {{element.subject | fetchFromReference : 'name': 0 : 'family' | async}}
+                                }@else{
+                                <div style="width:10px; height: 10px;">
+                                    <mat-progress-spinner mode="indeterminate" style="width:10px; height: 10px;">
+
+                                    </mat-progress-spinner>
+                                </div>
+                                pop
+                                }
+
+
+                            </div>
+                            }
+                        </div>
+                        <div>
+                            @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
+                            !element.subject.display))) {
+                            <div (click)="alltds(td)" class="link-group-icon">
+
+
+                                <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                                    <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                        <mat-panel-title style="margin-right: 0px;">
+                                            <mat-icon class="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <ng-template matExpansionPanelContent>
+                                        <!-- <span>jjjj</span> -->
+                                        <div style="width: 250px;">
+
+                                            <app-detail-base [url]="isLinkObj['subject'].get(i)??''"></app-detail-base>
+                                        </div>
+                                    </ng-template>
+                                </mat-expansion-panel>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+
                 </td>
             </ng-container>
 
@@ -101,14 +260,119 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="code" sortActionDescription="Sort by code">
                     Test
                 </th>
-                <td mat-cell *matCellDef="let element">
-                    @for(each of element.code.coding; track $index;){
-                    <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
-                        <span>{{each.display}}</span>
+                <td mat-cell *matCellDef="let element; let i=index;" #td class="restrict-width">
+                    @if(element.code.concept || element.code.reference ){
 
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                            <div class="top">
+                                {{element.code | codeableRef2}}
+
+
+                            </div>
+                            @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                            <div class="bottom subtitle-text-color-2 link-group-icon">
+                                @if((element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display'
+                                )| async){
+                                {{element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display' |
+                                async}}
+                                }@else{
+                                <div style="width:10px; height: 10px;">
+                                    <mat-progress-spinner mode="indeterminate"
+                                        style="width:10px !important; height: 10px; !important">
+
+                                    </mat-progress-spinner>
+                                </div>
+
+                                }
+
+
+                            </div>
+                            }
+                        </div>
+                        <div>
+                            @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                            <div (click)="alltds(td)">
+
+
+                                <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                                    <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                        <mat-panel-title style="margin-right: 0px;">
+                                            <mat-icon color="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <ng-template matExpansionPanelContent>
+                                        <!-- <span>jjjj</span> -->
+                                        <div style="width: 250px;">
+                                            <app-detail-base
+                                                [url]="isLinkObj['medication'].get(i)??''"></app-detail-base>
+                                        </div>
+                                    </ng-template>
+                                </mat-expansion-panel>
+                            </div>
+                            }
+                        </div>
                     </div>
 
-                    }
+                    }@else if(element.code.coding && element.code.coding.length > 0) {
+                    <div class="g-just-flex gap-0 my-12 link-group"
+                        style="justify-content: flex-start; align-items: center;">
+                        <div class="g-just-flex gap-5 link-group-words"
+                            style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                            <div class="top">
+                                {{element.code | codeableConcept2}}
+
+
+                            </div>
+                            @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                            <div class="bottom subtitle-text-color-2 link-group-icon">
+                                @if((element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display'
+                                )| async){
+                                {{element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display' |
+                                async}}
+                                }@else{
+                                <div style="width:10px; height: 10px;">
+                                    <mat-progress-spinner mode="indeterminate"
+                                        style="width:10px !important; height: 10px; !important">
+
+                                    </mat-progress-spinner>
+                                </div>
+
+                                }
+
+
+                            </div>
+                            }
+                        </div>
+                        <div>
+                            <!-- @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                            <div (click)="alltds(td)">
+
+
+                                <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                                    <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                        <mat-panel-title style="margin-right: 0px;">
+                                            <mat-icon color="subtitle-text-color-2"
+                                                style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <ng-template matExpansionPanelContent>
+                                        
+                                        <div style="width: 250px;">
+                                            <app-detail-base
+                                                [url]="isLinkObj['medication'].get(i)??''"></app-detail-base>
+                                        </div>
+                                    </ng-template>
+                                </mat-expansion-panel>
+                            </div>
+                            } -->
+                        </div>
+                    </div>
+                    }@else {
+                    <span class="subtitle-text-color-2">N/A</span>}
 
                 </td>
             </ng-container>
@@ -121,13 +385,28 @@
 
                     <mat-menu #mm="matMenu">
                         <a mat-menu-item>
-                            <a mat-button (click)="encounterService.addSpecimen('123')">
-                                Add Specimen Record
+                            <a mat-button (click)="showDetails(element)">
+                                Details
                             </a>
                         </a>
                         <a mat-menu-item>
-                            <a mat-button (click)="encounterService.addSpecimen('123')">
-                                Add Results for this Test
+                            <a mat-button (click)="showSpecimenForThisTest()">
+                                Specimen
+                            </a>
+                        </a>
+                        <a mat-menu-item>
+                            <a mat-button (click)="addLabResults(patientId || '')">
+                                Add Results
+                            </a>
+                        </a>
+                        <a mat-menu-item (click)="showReport()">
+                            <a mat-button>
+                                Report
+                            </a>
+                        </a>
+                        <a mat-menu-item>
+                            <a mat-button>
+                                Generate Order
                             </a>
                         </a>
 
@@ -148,7 +427,7 @@
 
 
             <tr mat-header-row *matHeaderRowDef="labRequestsDisplayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns:labRequestsDisplayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns:labRequestsDisplayedColumns; let dataIndex = dataIndex;"></tr>
         </table>
     </mat-card-content>
 </mat-card>

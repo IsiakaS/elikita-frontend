@@ -1,0 +1,430 @@
+<mat-card>
+    <mat-card-header class="">
+        <mat-card-title>
+            <div class=" g-just-flex mb-8  gap-20"
+                style="width: max-content; max-width: 100%; align-items: flex-start;">
+                <!-- <div>
+                    Your Appointment
+                </div> -->
+                <!-- <mat-select class="day-select ms-0" value="'today" style="width: 150px;" value="Today">
+                    @for(option of ['Today', 'Tomorrow']; track $index) {
+                    <mat-option [value]="option">
+                        {{ option }}
+                    </mat-option>
+                    }
+                </mat-select> -->
+                <div class="action-top ">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Pick A Date</mat-label>
+                        <input matInput [matDatepicker]="picker">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+
+
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-title>
+        <!-- <mat-card-subtitle class="subtitle-text-color-2">
+            Find, search and confirm Appointments
+        </mat-card-subtitle> -->
+    </mat-card-header>
+    <mat-card-content>
+        <!-- <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="  tableFilter"
+            [patientsFiltersFormControlObject]=" tableFilterFormControlObject">
+
+        </app-table-header> -->
+
+
+        <div class="chips">
+            <mat-chip-listbox>
+                @for(option of ['Today', 'Tomorrow', 'Next Week', 'Next Month']; track $index) {
+                <mat-chip-option class="me-30" [value]="option" [selected]="option === 'Today'">
+                    {{ option }}
+                </mat-chip-option>
+                }
+
+            </mat-chip-listbox>
+        </div>
+        <div class="top-dates">
+            <div class="oval-date-month-title">
+                <span class="oval-date-month">{{topDates[0].date | date : 'MMMM'}}</span>
+                <span class="oval-date-year">{{topDates[0].date | date : 'yyyy'}}</span>
+            </div>
+            <div class="oval-date-wrapper">
+                <!-- <div class="next">
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+                <div class="prev-icon">
+                    <mat-icon>chevron_left</mat-icon>
+                </div> -->
+                @for(date of topDates; track $index) {
+                <div class="oval-date" [ngStyle]="{'background-color': date.date  === todaysDate  ? 'var(--mat-sys-primary) !important' : 'var(--mat-sys-surface-container-high)', 
+                        'color': date.date  === todaysDate  ? 'var(--mat-sys-on-primary) !important' : 'var(--mat-sys-on-surface-container-high)'
+                    }">
+                    <div class="oval-date-text">
+                        <span class="oval-date-day">{{date.date | date : 'EEE'}}</span>
+                        <span class="oval-date-number">{{date.date | date : 'dd'}}</span>
+                    </div>
+                </div>
+                }
+
+            </div>
+        </div>
+        <div class="time-appointments " style="margin: 30px 0px; justify-content: flex-start;">
+            <div class="mat-tab-group">
+                <div class="labels">
+
+
+                </div>
+                <div class="mat-tab">
+                    <div class="label">
+                        AM | MORNING
+                    </div>
+                    <div class="cards-wrapper">
+                        @for(ap of morningHours; track $index){
+                        <div class="card-border">
+                            <div class="absolute-time">
+                                {{ap + ' AM'}}
+                            </div>
+                            @if(appointmentData?.['morningHours']?.[ap]){
+                            <div class="card" style="background-color: var(--mat-sys-surface-container);">
+
+                                <div class="top btw">
+                                    <div class="left">
+                                        <div class="title">
+                                            <div class="pics">
+                                                <img style="border-radius: 50%;" width="50" height="50"
+                                                    src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                                            </div>
+
+                                            <div class="words">
+                                                <div class="name" style="color: var(--mat-sys-on-surface);">
+                                                    {{appointmentData['morningHours'][ap].patientName}}
+                                                </div>
+                                                <div class="type subtitle-text-color-2"
+                                                    style="text-transform: capitalize;">
+                                                    {{appointmentData['morningHours'][ap].appointmentType}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- <mat-divider></mat-divider> -->
+                                <div class=" bottom mb-0">
+                                    <div class="bottom-value g-just-flex " style="justify-content: space-between;">
+
+                                        <div class="icons g-just-flex gap-10">
+                                            <div class="rounded-icon-wrapper">
+
+                                                <mat-icon>
+                                                    phone
+                                                </mat-icon>
+
+                                            </div>
+                                            <a class="rounded-icon-wrapper" style="width: auto; height: auto;">
+
+                                                <mat-icon>
+                                                    videocam
+                                                </mat-icon>
+
+                                            </a>
+                                        </div>
+                                        <div class="right">
+                                            <mat-menu #mm=matMenu>
+                                                <a class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                                    <!-- <mat-icon>add</mat-icon> -->
+                                                    <span>Confirm Appointment</span>
+                                                </a>
+
+                                            </mat-menu>
+                                            <mat-icon [mat-menu-trigger-for]="mm" style="cursor: pointer;">
+                                                more_vert
+                                            </mat-icon>
+                                        </div>
+                                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+
+                </div>
+                <!-- <mat-divider [vertical]="true"></mat-divider> -->
+                <div class="mat-tab">
+                    <div class="label">
+                        PM | AFTERNOON
+                    </div>
+                    <div class="cards-wrapper">
+                        @for(ap of afternoonHours; track $index){
+                        <div class="card-border">
+                            <div class="absolute-time">
+                                {{ap + ' PM'}}
+                            </div>
+                            @if(appointmentData?.['afternoonHours']?.[ap]){
+                            <div class="card" style="background-color: var(--mat-sys-surface-container);">
+
+                                <div class="top btw">
+                                    <div class="left">
+                                        <div class="title">
+                                            <div class="pics">
+                                                <img style="border-radius: 50%;" width="50" height="50"
+                                                    src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                                            </div>
+
+                                            <div class="words">
+                                                <div class="name">
+                                                    {{appointmentData['afternoonHours'][ap].patientName}}
+                                                </div>
+                                                <div class="type subtitle-text-color-2">
+                                                    {{appointmentData['afternoonHours'][ap].appointmentType}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- <mat-divider></mat-divider> -->
+                                <div class=" bottom mb-0">
+                                    <div class="bottom-value g-just-flex " style="justify-content: space-between;">
+
+                                        <div class="icons g-just-flex gap-10">
+                                            <div class="rounded-icon-wrapper">
+
+                                                <mat-icon>
+                                                    phone
+                                                </mat-icon>
+
+                                            </div>
+                                            <a class="rounded-icon-wrapper" style="width: auto; height: auto;">
+
+                                                <mat-icon>
+                                                    videocam
+                                                </mat-icon>
+
+                                            </a>
+                                        </div>
+                                        <div class="right">
+                                            <mat-menu #mm=matMenu>
+                                                <a class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                                    <!-- <mat-icon>add</mat-icon> -->
+                                                    <span>Confirm Appointment</span>
+                                                </a>
+                                                <a class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                                    <!-- <mat-icon>add</mat-icon> -->
+                                                    <span>Reject Appointment</span>
+                                                </a>
+                                                <a class="mat-menu-item g-just-flex px-10" style="cursor: pointer;">
+                                                    <!-- <mat-icon>add</mat-icon> -->
+                                                    <span>Cancel Appointment</span>
+                                                </a>
+
+
+                                            </mat-menu>
+                                            <mat-icon [mat-menu-trigger-for]="mm" style="cursor: pointer;">
+                                                more_vert
+                                            </mat-icon>
+                                        </div>
+                                        <!-- <div class="title">
+                            <div class="rounded-icon" style="visibility: hidden;">
+                                <mat-icon>ramp_right
+
+                                </mat-icon>
+                            </div>
+                            <div class="words">10</div>
+                        </div> -->
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+
+<style>
+    .mat-tab-group {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: transparent;
+
+        .mat-tab {
+            flex: 0 1 calc(50% - 10px);
+
+            .cards-wrapper {
+                background-color: transparent !important;
+                flex-direction: column;
+                gap: 0px;
+
+                .rounded-icon-wrapper {
+                    background-color: var(--mat-sys-surface-container-low) !important;
+                }
+            }
+
+            .label {
+                width: max-content;
+                margin: auto;
+                position: relative;
+
+                &::after {
+                    content: "";
+                    left: 0px;
+                    border-radius: 20px;
+                    height: 2px;
+                    background-color: var(--mat-sys-primary);
+
+                    bottom: -4px;
+                    position: absolute;
+                    width: 100%;
+                }
+            }
+        }
+
+    }
+
+    .oval-date-month-title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .oval-date-month {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .oval-date-year {
+        font-size: 0.9rem;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    .oval-date-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .oval-date {
+        width: 45px;
+
+        height: 70px;
+        border-radius: 15px;
+        background-color: var(--mat-sys-surface-container-high);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+    }
+
+    .oval-date-text {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+    }
+
+    .oval-date-day {
+        font-size: 0.8rem;
+    }
+
+    .oval-date-number {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .oval-date-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    /* .oval-date {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--mat-sys-surface-container-high);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+    } */
+
+    .oval-date-text {
+        text-align: center;
+    }
+
+    .oval-date-day {
+        font-size: 0.8rem;
+    }
+
+    .oval-date-number {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .chips {
+        margin: 20px 0;
+    }
+
+    .chips mat-chip-listbox {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chips mat-chip-option {
+        background-color: var(--mat-sys-surface-container-high);
+        color: var(--mat-sys-on-surface);
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+
+    .chips mat-chip-option.selected {
+        background-color: var(--mat-sys-primary);
+        color: var(--mat-sys-on-primary);
+    }
+
+    .action-top {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .day-select {
+        margin-left: 10px;
+        background-color: var(--mat-sys-surface-container-high);
+        padding: 5px 8px;
+        border-radius: 20px;
+    }
+</style>

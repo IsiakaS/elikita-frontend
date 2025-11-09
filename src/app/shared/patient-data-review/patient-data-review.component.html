@@ -1,0 +1,123 @@
+<div class="patient-data-review-container">
+    <!-- Sections Grid - displays sections side by side when space allows -->
+    <div class="sections-grid">
+        <!-- Simple/Non-Array Fields Section -->
+        @if (simpleFields.length > 0) {
+        <mat-card class="section-card">
+            <mat-card-header>
+                <mat-card-title>Personal Information</mat-card-title>
+                @if (showEditButtons) {
+                <button mat-icon-button class="edit-all-btn" (click)="editSimpleFields()" title="Edit all fields">
+                    <mat-icon>edit_outline</mat-icon>
+                </button>
+                }
+            </mat-card-header>
+            <mat-card-content>
+                <div class="fields-list">
+                    @for (field of simpleFields; track field.fieldApiName) {
+                    <div class="field-row">
+                        <span class="field-label">{{ field.fieldLabel }}</span>
+                        <span class="field-value">{{ formatFieldValue(field, field.data) | formatDisplayValue }}</span>
+                    </div>
+                    }
+                </div>
+            </mat-card-content>
+        </mat-card>
+        }
+
+        <!-- Array Fields Sections - each grouped field is its own section -->
+        @for (fieldApiName of getGroupedArrayKeys(); track fieldApiName) {
+        <mat-card class="section-card">
+            <mat-card-header>
+                <mat-card-title>
+                    {{ getFieldDefinition(fieldApiName)?.generalProperties?.fieldLabel ||
+                    getFieldDefinition(fieldApiName)?.generalProperties?.fieldName ||
+                    fieldApiName }}
+                </mat-card-title>
+                @if (showEditButtons) {
+                <button mat-raised-button color="primary" class="add-btn" (click)="addArrayItem(fieldApiName)">
+                    ➕ Add New
+                </button>
+                }
+            </mat-card-header>
+            <mat-card-content>
+                @if (getArrayItemsForField(fieldApiName).length === 0) {
+                <div class="empty-state">
+                    <p>No {{ getFieldDefinition(fieldApiName)?.generalProperties?.fieldLabel ||
+                        getFieldDefinition(fieldApiName)?.generalProperties?.fieldName ||
+                        fieldApiName }} added yet.
+                    </p>
+                    @if (showEditButtons) {
+                    <button mat-raised-button color="primary" (click)="addArrayItem(fieldApiName)">
+                        Add First Entry
+                    </button>
+                    }
+                </div>
+                } @else {
+                <div class="array-items-list">
+                    @for (arrayItem of getArrayItemsForField(fieldApiName); track arrayItem.index) {
+                    <div class="array-item">
+                        <div class="array-item-header">
+                            <span class="item-number">#{{ arrayItem.index + 1 }}</span>
+                            @if (showEditButtons) {
+                            <div class="action-buttons">
+                                <button mat-icon-button class="edit-btn" (click)="editArrayItem(arrayItem)"
+                                    title="Edit this item">
+                                    <mat-icon>edit_outline</mat-icon>
+                                </button>
+                                <button mat-icon-button class="delete-btn" (click)="deleteArrayItem(arrayItem)"
+                                    title="Delete this item">
+                                    <mat-icon>delete_outline</mat-icon>
+                                </button>
+                            </div>
+                            }
+                        </div>
+                        <div class="array-item-content">
+                            @if (arrayItem.field.generalProperties.isGroup) {
+                            <!-- Group field - show all subfields as inline rows -->
+                            <div class="fields-list">
+                                @for (key of objectKeys(arrayItem.data); track key) {
+                                @if (!isSubfieldHidden(arrayItem, key) &&
+                                arrayItem.data[key] !== null &&
+                                arrayItem.data[key] !== undefined &&
+                                arrayItem.data[key] !== '') {
+                                <div class="field-row">
+                                    <span class="field-label">{{ getSubfieldLabel(arrayItem, key) }}</span>
+                                    <span class="field-value">{{ arrayItem.data[key] | formatDisplayValue }}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                            } @else {
+                            <!-- Simple array field -->
+                            <div class="field-row">
+                                <span class="field-value single-value">{{ arrayItem.data }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </mat-card-content>
+        </mat-card>
+        }
+    </div>
+
+    <!-- Navigation Button -->
+    @if (mode === 'standalone') {
+    <div class="navigation-section">
+        <button mat-raised-button color="primary" class="next-btn" (click)="onNavigateNext()">
+            Next →
+        </button>
+    </div>
+    }
+
+    <!-- Dialog Mode Buttons -->
+    @if (mode === 'dialog') {
+    <div class="dialog-actions">
+        <button mat-button (click)="closeDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="onNavigateNext()">Continue</button>
+    </div>
+    }
+</div>

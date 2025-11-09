@@ -1,0 +1,22 @@
+td>.link-group>.link-group-words {
+    width: 100%;
+
+}
+
+tbody tr {
+    gap: 20px;
+}
+
+td {
+    padding-right: 30px;
+}
+
+.mag {
+    margin-left: 25px;
+    margin-right: 25px;
+
+    @media (max-width: 552px) {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+}

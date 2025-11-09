@@ -1,0 +1,128 @@
+<div class="forms">
+
+    <div class="my-15"></div>
+    <!-- <app-dynamic-forms-v2 [formFields]="data!.formFieldsToUse.reason" (formSubmitted)="populateSymptoms($event)"
+        [formMetaData]="symptomsFormMetaData">
+
+    </app-dynamic-forms-v2> -->
+
+</div>
+<div [formGroup]="encounterReasonForm" class="symptoms-wrapper g-just-flex gap-12 justify-content-start mb-30 ">
+
+    <!-- @for(symptom of patientPresentedSymptoms; track $index;
+                let index = $index;
+                ){ -->
+    <div formArrayName="symptoms" class="symptom-array">
+        @for(eachSymptom of symptoms.controls; track $index;
+        let index = $index;
+        ){
+
+        @if(patientPresentedSymptoms.length){
+        @let symptom = patientPresentedSymptoms[index];
+        <div class="justify-content-start gap-12 g-just-flex indicator-text">
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <span class="category-text">
+
+                            {{(symptom.symptom.code+'$#$'+symptom.symptom.display+'$#$'+symptom.symptom.system)
+                            | splitHash
+                            : "1"}}
+                        </span>
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <div class="forms" [formGroupName]="index">
+                    <!-- {{symptoms.controls[index].value | json}} -->
+                    <label for="severity" style="display: block; margin-bottom: 8px;">Symptom
+                        Severity</label>
+                    <mat-form-field>
+                        <!-- /  <mat-select [(value)]="symptoms.controls[index].get(['severity'])!.value" matselect>
+                                        @for(option of "mild | moderate | severe".split(" | "); track $index;){
+                                        <option [value]="option">
+                                            {{option}}
+                                        </option>
+                                        }
+                                    </mat-select> -->
+                        <input [formControlName]="'severity'" matInput [matAutocomplete]="auto" />
+                        <mat-autocomplete #auto="matAutocomplete">
+                            @for(option of (matAutocompletei.severity[index] | async); track $index;){
+                            <mat-option [value]="option">
+                                {{ option }}
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+
+                    </mat-form-field>
+                    <!--clinicalStatus-->
+                    <div class="afield">
+                        <label for="clinicalStatus" style="display: block; margin-bottom: 8px;">Clinical
+                            Status</label>
+                        <mat-form-field>
+                            <input type="text" [formControlName]="'clinicalStatus'" matInput [matAutocomplete]="auto" />
+                            <mat-autocomplete #auto="matAutocomplete">
+                                @for(option of (matAutocompletei.clinicalStatus[index] | async); track
+                                $index;){
+                                <mat-option [value]="option">
+                                    {{ option }}
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                    <!--Verification Status-->
+
+                    <div class="afield">
+                        <label for="verificationStatus" style="display: block; margin-bottom: 8px;">Verification
+                            Status</label>
+                        <mat-form-field>
+                            <input type="text" [formControlName]="'verificationStatus'" matInput
+                                [matAutocomplete]="auto" />
+                            <mat-autocomplete #auto="matAutocomplete">
+                                @for(option of (matAutocompletei.verificationStatus[index] | async); track
+                                $index;){
+                                <mat-option [value]="option">
+                                    {{ option }}
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                    <div class="afield">
+                        <!--onsetDateTime-->
+                        <label for="onsetDateTime" style="display: block; margin-bottom: 8px;">Onset
+                            Date/Time</label>
+                        <mat-form-field>
+                            <input matInput [formControlName]="'onsetDateTime'" [matDatepicker]="picker">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+
+                </div>
+            </mat-expansion-panel>
+
+
+
+            <button class="rounded-icon-wrapper g-just-flex" style="border: none; outline: none; width: 20px; height: 20px;
+                        cursor: pointer;"
+                (click)="removeSymptom(symptom.symptom.code+'$#$'+symptom.symptom.display+'$#$'+symptom.symptom.system )">
+                <mat-icon style="font-size: 15px; height: 15px; width: 15px;">close</mat-icon>
+            </button>
+
+        </div>
+        }
+        }
+    </div>
+    <!-- plus button -->
+
+</div>
+@if(forClerkingSheet){
+<div class="add-symptom w-100 g-just-flex " style="justify-content: flex-end;">
+    <button mat-flat-button (click)="addSymptomOnDialog()">
+        <mat-icon>add</mat-icon>
+        <span>Add More Complaints</span>
+    </button>
+</div>
+}

@@ -1,1 +1,430 @@
-<p>encounter-v2 works!</p>
+<div class="eighty-twenty w-100 g-just-flex gap-30
+align-items-start m-auto
+" style="flex-wrap: wrap; max-width: 1280px;
+justify-content: flex-start;
+">
+    <div class="eighty">
+        <mat-card>
+            <mat-card-header class="g-just-flex flex-wrap gap-20 ecbill" style="justify-content: space-between;">
+                <div class="left">
+                    <mat-card-title>
+                        Patient Bill
+                    </mat-card-title>
+                    <mat-card-subtitle class="mb-20  subtitle-text-color-2">
+                        Manage patient bills effectively.
+                    </mat-card-subtitle>
+                </div>
+                <div class="right" style="display: flex; justify-content: flex-end; flex: 1 1 max-content">
+                    <button mat-button (click)="addAnyCharges()">
+                        <mat-icon>add</mat-icon>
+                        <span>Add Charges</span>
+                    </button>
+                </div>
+            </mat-card-header>
+            <mat-card-content>
+                <div class=" all-charges g-just-flex gap-20 mb-20 flex-column w-100 ">
+
+
+
+                    <div class=" encounter-sub-charges w-100 g-just-flex gap-12 flex-column">
+                        <div class="subcharges-wrapper w-100 g-just-flex gap-0 mb-0 flex-column"
+                            style="justify-content: flex-start; align-items: flex-start; margin-top: 20px;">
+
+                            <div class="subcharges-title gap-12 " style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+                                <div class="rounded-icon-wrapper g-just-flex" style="background-color: transparent">
+                                    <mat-icon style="
+                                    background-color: var(--mat-sys-on-primary);
+                                    color: var(--mat-sys-primary);">medication</mat-icon>
+
+                                </div>
+                                <div class="text-details">
+                                    <div class="order-detail-title" style="
+                                        color: var(--mat-sys-primary); font-weight: 500;
+                                        font-size: 1.2rem;">Dispensed Medication
+                                        Bills
+                                    </div>
+                                    <div class="order-detail-items">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="scrollable-table" style="width: 100%; overflow-x: auto;">
+                                <table class="each-charges gap-30 flex-wrap" style="justify-content: space-between; 
+                                
+                               display: table;">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="purchase-details gap-12" style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+
+                                                <!-- <div class="rounded-icon-wrapper g-just-flex"
+                                                    style="background-color: var(--mat-sys-primary)"> -->
+                                                <mat-icon class="subtitle-text-color-2" style="">medication</mat-icon>
+
+                                                <!-- </div> -->
+
+
+                                                <div class=" text-details">
+                                                    <div class="order-detail-title" style="font-size: 1rem;">Medication
+                                                        Dispensed
+                                                    </div>
+                                                    <div class="order-detail-items">
+                                                        Paracetamol 500mg, 10 tablets
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="quantity">
+                                                <button class="plus" (click)="increaseQ()">+</button>
+                                                <input type="number" name="medication-dispensed" id="" value="1" #q
+                                                    [(ngModel)]="quantity1">
+                                                <button class="minus" (click)="decreaseQ()">-</button>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="unit-price">
+                                                <div class="ps">
+                                                    ₦
+                                                </div>
+                                                <input type="number" name="" id="" #up value="50"
+                                                    [(ngModel)]="medicine1UnitPrice">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="total">
+                                                <div>{{ (medicine1UnitPrice * quantity1) | priceFormat}}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-icon [mat-menu-trigger-for]="matMenu">more_vert</mat-icon>
+                                            <mat-menu #matMenu="matMenu">
+                                                <button mat-menu-item>Delete</button>
+                                            </mat-menu>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="purchase-details gap-12" style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+
+                                                <!-- <div class="rounded-icon-wrapper g-just-flex"
+                                                    style="background-color: var(--mat-sys-primary)"> -->
+                                                <mat-icon class="subtitle-text-color-2" style="">medication</mat-icon>
+
+                                                <!-- </div> -->
+
+
+                                                <div class=" text-details">
+                                                    <div class="order-detail-title" style="font-size: 1rem;">Medication
+                                                        Dispensed
+                                                    </div>
+                                                    <div class="order-detail-items">
+                                                        Paracetamol 500mg, 10 tablets
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="quantity">
+                                                <button class="plus" (click)="increaseQ()">+</button>
+                                                <input type="number" name="medication-dispensed" id="" value="1" #q
+                                                    [(ngModel)]="quantity1">
+                                                <button class="minus" (click)="decreaseQ()">-</button>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="unit-price">
+                                                <div class="ps">
+                                                    ₦
+                                                </div>
+                                                <input type="number" name="" id="" #up value="50"
+                                                    [(ngModel)]="medicine1UnitPrice">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="total">
+                                                <div>{{ (medicine1UnitPrice * quantity1) | priceFormat}}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-icon [mat-menu-trigger-for]="matMenu">more_vert</mat-icon>
+                                            <mat-menu #matMenu="matMenu">
+                                                <button mat-menu-item>Delete</button>
+                                            </mat-menu>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="w-100 g-just-flex" style="justify-content: flex-end; align-items: center;">
+                                <button mat-button (click)="addMedicationCharges()">
+                                    <mat-icon>add</mat-icon>
+                                    <span>Add More Medication Charges</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                    <div class="encounter-sub-charges w-100 g-just-flex gap-12 flex-column">
+                        <div class="subcharges-wrapper w-100 g-just-flex gap-0 mb-0 flex-column"
+                            style="justify-content: flex-start; align-items: flex-start; margin-top: 20px;">
+
+                            <div class="subcharges-title gap-12 " style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+                                <div class="rounded-icon-wrapper g-just-flex" style="background-color: transparent">
+                                    <mat-icon style="
+                                    background-color: var(--mat-sys-on-primary);
+                                    color: var(--mat-sys-primary);">biotech</mat-icon>
+
+                                </div>
+                                <div class="text-details">
+                                    <div class="order-detail-title" style="
+                                        color: var(--mat-sys-primary); font-weight: 500;
+                                        font-size: 1.2rem;">Laboratory Bills
+
+                                    </div>
+                                    <div class="order-detail-items">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="scrollable-table" style="width: 100%; overflow-x: auto;">
+                                <table class="each-charges gap-30 flex-wrap" style="justify-content: space-between; 
+                                
+                               display: table;">
+                                    <tr>
+                                        <th>Test</th>
+
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="purchase-details gap-12" style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+
+                                                <!-- <div class="rounded-icon-wrapper g-just-flex"
+                                                    style="background-color: var(--mat-sys-primary)"> -->
+                                                <mat-icon class="subtitle-text-color-2" style="">medication</mat-icon>
+
+                                                <!-- </div> -->
+
+
+                                                <div class=" text-details">
+                                                    <div class="order-detail-title" style="font-size: 1rem;">
+                                                        Malaria Test
+                                                    </div>
+                                                    <div class="order-detail-items">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- <td>
+                                            <div class="quantity">
+                                                <button class="plus" (click)="increaseQ()">+</button>
+                                                <input type="number" name="medication-dispensed" id="" value="1" #q
+                                                    [(ngModel)]="quantity1">
+                                                <button class="minus" (click)="decreaseQ()">-</button>
+                                            </div>
+                                        </td> -->
+
+                                        <!-- <td>
+                                            <div class="unit-price">
+                                                <div class="ps">
+                                                    ₦
+                                                </div>
+                                                <input type="number" name="" id="" #up value="50"
+                                                    [(ngModel)]="medicine1UnitPrice">
+                                            </div>
+                                        </td> -->
+                                        <td>
+                                            <div class="total">
+                                                <div> N/A</div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <mat-icon [mat-menu-trigger-for]="matMenuAll">more_vert</mat-icon>
+                                            <mat-menu #matMenuAll="matMenu">
+                                                <button mat-menu-item (click)="changePrice()">Add Price</button>
+                                                <button mat-menu-item (click)="changePrice()">Edit Price</button>
+                                                <button mat-menu-item>Delete</button>
+                                            </mat-menu>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+
+                            <div class="w-100 g-just-flex" style="justify-content: flex-end; align-items: center;">
+                                <button mat-button (click)="addLabCharges()">
+                                    <mat-icon>add</mat-icon>
+                                    <span>Add More Lab Test Charges</span>
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div class="twenty gap-20 g-just-flex flex-column align-items-start">
+
+        <mat-card class="encounter-summary 
+        p-20 pb-15
+        g-just-flex flex-column align-items-start">
+            <div class="based-on small-subtitle mb-9">
+                Based on
+            </div>
+            <div>
+                <div class="info mb-5" style="font-weight: 500;">
+                    Encounter 12345
+                </div>
+                <div class="info-subtitle subtitle-text-color-2" style="line-height: 24px;">
+                    This bill is based on the patient encounter 12345.
+
+                </div>
+            </div>
+            <!-- <div class="pt-20" style="
+            width: 100%;
+            border-bottom: 1px solid var(--mat-sys-outline)"></div> -->
+
+            <div class="mb-15"></div>
+            <a class="g-just-flex gap-12 w-100 justify-content-end " style="cursor: pointer;
+            color: var(--mat-sys-primary);
+            ">
+                <span style="font-weight: 500">See Encounter Summary </span>
+                <mat-icon style="vertical-align: middle;">chevron_right</mat-icon>
+            </a>
+
+
+        </mat-card>
+
+        <mat-card class="encounter-summary bill-summary">
+            <mat-card-header>
+                <mat-card-title>Summary </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="mt-12">
+                <div class="bill-total-wrapper g-just-flex flex-column gap-12">
+                    <div class="abill w-100
+                    g-just-flex flex-between
+                    ">
+                        <div class="words">
+                            Total
+                        </div>
+                        <div class="amount" style="text-align: flex-end;">
+                            ₦ 1,000,000.00
+                        </div>
+                    </div>
+                    <div style="display:flex; width: 100%;justify-content: flex-end;
+                    padding-top: 20px;
+                    ">
+                        <a class="bill-publish
+                        g-just-flex gap-0 
+                        ">
+                            <div class="px-12 g-just-flex" style="
+                            height: 100%;
+                            border-right:  1px solid var(--mat-sys-surface);">{{'Generate '+invOrClaim
+                                }}
+                            </div>
+
+
+                            <a [mat-menu-trigger-for]="mms" class="g-just-flex mat-select" #se [(ngModel)]="invOrClaim">
+                                <mat-icon>arrow_drop_down</mat-icon>
+
+                            </a>
+                            <mat-menu #mms="matMenu">
+
+                                <a mat-menu-item value="Invoice" (click)="invOrClaim = 'Invoice'">
+                                    Invoice
+                                </a>
+                                <a mat-menu-item value="Insurance Claim" (click)="invOrClaim = 'Insurance Claim'">
+                                    Claim
+                                </a>
+                            </mat-menu>
+                        </a>
+                    </div>
+                    <!-- retAILILEIFE@GTBank.com -->
+
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+
+    </div>
+
+</div>
+
+
+<!-- 
+<div class="each-charges g-just-flex gap-30 flex-wrap"
+                                style="justify-content: space-between;">
+                                <div class="purchase-details gap-12" style="display: flex;
+                        justify-content: flex-start; align-items: center;
+                        ">
+                                    <div class="rounded-icon-wrapper g-just-flex"
+                                        style="background-color: var(--mat-sys-primary)">
+                                        <mat-icon style="color: var(--mat-sys-on-primary);">medication</mat-icon>
+
+                                    </div>
+                                    <div class="text-details">
+                                        <div class="order-detail-title" style="font-size: 1.2rem;">Medication
+                                            Dispensed
+                                        </div>
+                                        <div class="order-detail-items">
+                                            Paracetamol 500mg, 10 tablets
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="quantity">
+                                    <button class="plus" (click)="increaseQ()">+</button>
+                                    <input type="number" name="medication-dispensed" id="" value="1" #q
+                                        [(ngModel)]="quantity1">
+                                    <button class="minus" (click)="decreaseQ()">-</button>
+                                </div>
+
+                                <div class="unit-price">
+                                    <div class="ps">
+                                        ₦
+                                    </div>
+                                    <input type="number" name="" id="" #up value="50" [(ngModel)]="medicine1UnitPrice">
+                                </div>
+
+
+                                <div class="total">
+                                    <div>{{ (medicine1UnitPrice * quantity1) | priceFormat}}</div>
+                                </div> 
+
+</div>-->

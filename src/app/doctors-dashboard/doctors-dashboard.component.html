@@ -1,18 +1,5 @@
-<div class="doctors-wrapper">
-    <div class="top-menu-strip">
-
-
-        <a>
-            <mat-icon>notifications</mat-icon>
-
-        </a>
-        <a>
-            <mat-icon>mail</mat-icon>
-        </a>
-        <a>
-            <mat-icon>person</mat-icon>
-        </a>
-    </div>
+<div class="doctors-wrapper" style="height: max-content;">
+    @if(!isConsultant){
     <div class="top-cards-section">
         <div class="top-cards-title py-10 ms-30">
             Today's Activities Summaries
@@ -137,6 +124,7 @@
             </div>
         </div>
     </div>
+    }
     <div class="my-20 next-appointments">
         <div class="next-appointments-title">
             Next 3 Appointments
@@ -379,10 +367,14 @@
     </div>
 
     <div class="todays-appointments my-30 ms-30 me-30">
-        <div class="title">
+        <div class="title mb-30">
 
             <span>Today's Appointments</span>
         </div>
+
+        <app-appointment-ui>
+
+        </app-appointment-ui>
 
     </div>
 

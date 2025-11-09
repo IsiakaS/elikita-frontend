@@ -1,5 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -21,7 +21,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
     MatTableModule,
     MatChipsModule,
     MatInputModule,
-    MatMenuModule, AgePipe,
+    MatMenuModule,
     MatTableModule, MatIconModule, ReactiveFormsModule],
   templateUrl: './table-header.component.html',
   styleUrl: './table-header.component.scss'
@@ -29,5 +29,13 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 export class TableHeaderComponent {
   @Input() patientsTableFilterArray!: Map<string, string[]>;
   @Input() patientsFiltersFormControlObject!: { [key: string]: FormGroup }
+  @Input() searchBoxTitle?: string;
+  // When false, header renders nothing (used when there is no table data)
+  @Input() hasData: boolean = true;
 
+
+  expand(element: HTMLElement) {
+    element.classList.toggle('expand')
+  }
 }
+

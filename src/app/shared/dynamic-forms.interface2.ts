@@ -5,10 +5,23 @@ export interface generalFieldsData {
     fieldPlaceholder?: string,
     fieldHint?: string,
     moreHint?: string,
+    groupFieldsHint?: string,
     inputType?: string,
     fieldErrorHint?: string,
+    prefixText?: string,
+    suffixText?: string,
+    prefixIcon?: string,
+    suffixIcon?: string,
+
+    isHidden?: boolean,
     value?: any,
     isArray: boolean,
+    dependence_id?: string,
+    controllingField?: {
+        isAControlField: boolean,
+        dependentFieldVisibilityTriggerValue: any,
+        controlledFieldDependencyId: any
+    }[]
     auth?: {
         read: string,
         write: string
@@ -27,6 +40,8 @@ export interface formMetaData {
     formName: string,
     formDescription: string,
     submitText?: string,
+    showSubmitButton?: boolean,
+    closeDialogOnSubmit?: boolean,
 
 }
 
@@ -124,6 +139,9 @@ export interface GroupField {
 
 }
 
+export type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
+
+export type fieldType = 'CodeableConceptFieldFromBackEnd' | 'IndividualField' | 'SingleCodeField' | 'ReferenceFieldArray' | 'CodeableConceptField' | 'CodeField' | 'IndividualReferenceField' | 'CodeableReferenceField';
 // export interface formFields {
 //      IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField
 // }

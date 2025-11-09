@@ -4,10 +4,19 @@ import { AuthService } from '../shared/auth/auth.service';
 import { Router } from '@angular/router';
 import { LabDashboardComponent } from '../lab-dashboard/lab-dashboard.component';
 import { AdminDashboardComponent } from '../admin-dashboard/admin-dashboard.component';
+import { PatientDashboardComponent } from '../patient-dashboard/patient-dashboard.component';
+import { PharmacyDashboardComponent } from '../pharmacy-dashboard/pharmacy-dashboard.component';
+import { NurseDashboardComponent } from '../nurse-dashboard/nurse-dashboard.component';
+import { ConsultantDashboardComponent } from '../consultant-dashboard/consultant-dashboard.component';
+import { CashierDashboardComponent } from '../cashier-dashboard/cashier-dashboard.component';
 
 @Component({
   selector: 'app-dashboards-wrapper',
-  imports: [DoctorsDashboardComponent, LabDashboardComponent, AdminDashboardComponent],
+  imports: [DoctorsDashboardComponent, CashierDashboardComponent,
+    NurseDashboardComponent,
+    LabDashboardComponent, AdminDashboardComponent,
+    ConsultantDashboardComponent,
+    PatientDashboardComponent, PharmacyDashboardComponent],
   templateUrl: './dashboards-wrapper.component.html',
   styleUrl: './dashboards-wrapper.component.scss'
 })
@@ -18,7 +27,10 @@ export class DashboardsWrapperComponent {
   user: any;
 
   ngOnInit() {
-    this.user = this.auth.user.getValue();
+    this.auth.user.subscribe((e) => {
+      this.user = e;
+      // getValue();
+    })
     if (this.user == null) {
       this.router.navigate(["/login"]);
     }

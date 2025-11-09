@@ -1,1 +1,131 @@
-<p>pharmacy-dashboard works!</p>
+<section id="appointments-summaries" class="scrolld-parent">
+    <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+    <div class="secction-header g-just-flex flex-between">
+        <div class="words g-just-flex.flex-column.gap-12">
+            <div class="title g-just-flex">
+                <div class="me-15"> Quick Actions </div>
+
+
+
+            </div>
+            <div class="subtitle">
+
+
+            </div>
+        </div>
+
+
+        <div class="controls g-just-flex gap-15" [scrolld]="'action-button'">
+            <div class=" rounded-icon-wrapper prev-btn">
+                <mat-icon>
+                    chevron_left
+                </mat-icon>
+
+            </div>
+            <div class="rounded-icon-wrapper next-btn">
+                <mat-icon>
+                    chevron_right
+                </mat-icon>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section-wrapper scrollable-container pt-30">
+        <div class="overflow-container g-just-flex justify-content-start gap-30">
+            <div class="action-button" (click)="addMedicine()">
+                <div class="rounded-icon-wrapper">
+                    <mat-icon>local_pharmacy</mat-icon>
+                </div>
+
+                <span>Add Medication to Stock</span>
+                <mat-icon>chevron_right</mat-icon>
+            </div>
+
+            <div class="action-button">
+                <div class="rounded-icon-wrapper">
+                    <mat-icon>medication</mat-icon>
+                </div>
+
+                <span>Check Expired Drugs in Stock</span>
+                <mat-icon>chevron_right</mat-icon>
+            </div>
+
+
+            <div class="action-button">
+                <div class="rounded-icon-wrapper">
+                    <mat-icon>access_time</mat-icon>
+                </div>
+
+                <span>Send Low Stock Alert</span>
+                <mat-icon>chevron_right</mat-icon>
+            </div>
+
+        </div>
+    </div>
+</section>
+<section id="appointments-summaries" class="scrolld-parent">
+    <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+    <div class="secction-header g-just-flex flex-between">
+        <div class="words g-just-flex.flex-column.gap-12">
+            <div class="title g-just-flex">
+
+                <div class="mb-15"> Med. Request & Low Stock Medicines </div>
+
+
+            </div>
+            <div class="subtitle">
+
+
+            </div>
+        </div>
+        <div class="controls g-just-flex gap-15" [scrolld]="lowStockLoaded?'smallTableCard':''">
+            <div class=" rounded-icon-wrapper prev-btn">
+                <mat-icon>
+                    chevron_left
+                </mat-icon>
+
+            </div>
+            <div class="rounded-icon-wrapper next-btn">
+                <mat-icon>
+                    chevron_right
+                </mat-icon>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="section-wrapper scrollable-container pt-30">
+        <div class="overflow-container g-just-flex justify-content-start gap-30" style="align-items: stretch;">
+            @if(testingTabeledOption.rawTableData){
+            <mat-card class="smallTableCard">
+                <mat-card-header>
+                    <mat-card-title>
+                        <div class="me-15"> Today Med. Request </div>
+                    </mat-card-title>
+                </mat-card-header>
+
+                <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData"
+                    (selectedRow)="processSelectedRow($event)" [isToBeSelected]="true"
+                    [columns]="testingTabeledOption.columns" [rawTableData]="testingTabeledOption.rawTableData">
+
+                </app-tabled-option>
+            </mat-card>
+            }
+            <div class="smallTableCard">
+                <mat-card-header>
+
+                </mat-card-header>
+
+                <app-cardz-details-check (loaded)="processLoaded();"
+                    [resourceType]="'medicine'"></app-cardz-details-check>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<DIV class="mb-30">Appointment</DIV>
+<app-appointment-ui></app-appointment-ui>

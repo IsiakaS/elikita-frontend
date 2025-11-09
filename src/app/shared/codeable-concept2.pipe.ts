@@ -13,7 +13,8 @@ export class CodeableConcept2Pipe implements PipeTransform {
       if (value.hasOwnProperty('text')) {
         return value.text as string;
       } else {
-        return value?.coding?.[0].display as string;
+        console.log(value, value?.coding, (value?.coding?.[0], value?.coding?.[0].display || value?.coding?.[0].code) as string)
+        return (value?.coding?.[0].display || value?.coding?.[0].code) as string;
       }
     }
     else {

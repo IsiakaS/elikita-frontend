@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 
 export const appointmentResolver: ResolveFn<any> = (route, state) => {
   const http = inject(HttpClient);
-  return http.get("http://hapi.fhir.org/baseR4/Appointment?_format=json").pipe(map((e: any) => {
+  return http.get("https://server.fire.ly/r5/Appointment?_format=json").pipe(map((e: any) => {
     return e.entry.map((f: any) => f.resource);
   }))
 };

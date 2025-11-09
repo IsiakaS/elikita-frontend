@@ -1,0 +1,139 @@
+@if(formMetaData && formFieldsToUse){
+
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+            Patient Admission Form
+        </mat-card-title>
+        <mat-card-subtitle>
+            Please fill the form below to admit the patient
+        </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="forms">
+            <div class="form-segment">
+                <div class="segment-title my-15">
+
+                </div>
+                <app-dynamic-forms-v2 [formFields]="formFieldsToUse.encounter.formFields"
+                    [formMetaData]="undefined"></app-dynamic-forms-v2>
+            </div>
+            <div class="form-segment mt-20">
+                <!-- <div class="segment-title my-15">
+                    Bed Allocation
+                </div>
+                <app-dynamic-forms-v2 [formFields]="formFieldsToUse.encounter.location"
+                    [formMetaData]="undefined"></app-dynamic-forms-v2> -->
+
+
+                @if(formFieldsToUse.location && locationForm) {
+                <mat-card>
+                    <mat-card-header>
+
+                        <mat-card-title>
+
+                            Allocate BedSpace to Patient
+
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            Choose a ward, room and bed.
+                        </mat-card-subtitle>
+
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <form [formGroup]="locationForm" class="mt-20 aform">
+                            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                                <mat-label>Ward</mat-label>
+                                <input type="text" formControlName="ward" [matAutocomplete]="auc" matInput>
+                                <mat-autocomplete #auc="matAutocomplete" [displayWith]="displayDisplay">
+                                    @for(value of (wardFormFilter | async) || []; track $index){
+                                    <mat-option [value]="value">
+                                        <div class="ticket-like">
+                                            <div class="text">
+                                                {{value | splitHash:1 | titlecase}}
+                                            </div>
+                                            <div class="code">
+                                                {{value | splitHash: 0}}
+                                            </div>
+                                        </div>
+                                    </mat-option>
+                                    }
+                                </mat-autocomplete>
+
+                            </mat-form-field>
+                            <!-- Room -->
+                            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                                <mat-label>Room</mat-label>
+                                <input type="text" formControlName="room" [matAutocomplete]="auc2" matInput>
+                                <mat-autocomplete #auc2="matAutocomplete" [displayWith]="displayDisplay">
+                                    @for(value of (roomFormFilter | async) || []; track $index){
+                                    <mat-option [value]="value">
+                                        <div class="ticket-like">
+                                            <div class="text">
+                                                {{value | splitHash:1 | titlecase}}
+                                            </div>
+                                            <div class="code">
+                                                {{value | splitHash: 0}}
+                                            </div>
+                                        </div>
+                                    </mat-option>
+                                    }
+                                </mat-autocomplete>
+                            </mat-form-field>
+                            <!-- Bed -->
+                            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                                <mat-label>Bed</mat-label>
+                                <input type="text" formControlName="bed" [matAutocomplete]="auc3" matInput>
+                                <mat-autocomplete #auc3="matAutocomplete" [displayWith]="displayDisplay">
+                                    @for(value of (bedFormFilter | async) || []; track $index){
+                                    <mat-option [value]="value">
+                                        <div class="ticket-like">
+                                            <div class="text">
+                                                {{value | splitHash:1 | titlecase}}
+                                            </div>
+                                            <div class="code">
+                                                {{value | splitHash: 0}}
+                                            </div>
+                                        </div>
+                                    </mat-option>
+                                    }
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </form>
+                    </mat-card-content>
+                </mat-card>
+
+                }
+
+            </div>
+            <div class="action my-15">
+                <button mat-raised-button (click)="showCarePlanForm = !showCarePlanForm">
+                    <mat-icon>{{showCarePlanForm? 'remove' : 'add'}}</mat-icon>
+                    <span>{{showCarePlanForm ? 'Hide Care Plan' : 'Add A Care Plan'}}</span>
+                </button>
+            </div>
+            @if (showCarePlanForm) {
+            <div class="form-segment mt-20">
+                <div class="segment-title my-15">
+                    Care Plan
+                </div>
+                @if (formFieldsToUse.carePlan) {
+                <app-dynamic-forms-v2 [formFields]="formFieldsToUse.carePlan.formFields"
+                    [formMetaData]="undefined"></app-dynamic-forms-v2>
+                }
+                <button mat-raised-button (click)="showTaskForm()" class="action my-15">Add Tasks</button>
+                @if(displayTaskForm) {
+                <app-testing-tasks></app-testing-tasks>
+                <!-- <app-dynamic-forms-v2 [formFields]="formFieldsToUse.tasks.formFields"
+                    [formMetaData]="undefined"></app-dynamic-forms-v2> -->
+
+
+                }
+            </div>
+            }
+
+        </div>
+    </mat-card-content>
+</mat-card>
+}

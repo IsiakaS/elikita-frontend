@@ -1,0 +1,419 @@
+<div class="check-sheet-wrapper p-20">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                Doctor's Clerking Sheet - Patient ID: 12345
+            </mat-card-title>
+            <mat-card-subtitle>
+                Verify and edit the records entered for this encounter.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="mt-18">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Patient Information
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <div>
+                    @if(resolvedData && resolvedData.name && resolvedData.name.length > 0) {
+                    <div class="g-just-flex justify-content-start flex-wrap gap-15 align-items-center">
+                        <div class="rounded-image">
+                            <img style="border-radius: 50%;" width="100" height="100"
+                                src="https://www.dummyimg.in/placeholder" alt="" srcset="">
+                        </div>
+
+                        <div style="flex-direction: column; align-items: start;" class="short-details
+                                        g-just-flex flex-column gap-12 
+                                        ">
+                            <div class="top  g-just-flex gap-12 justify-content-start">
+                                <span style="text-align: center;">{{resolvedData.name[0].family |
+                                    titlecase}}
+                                    {{resolvedData.name[0].given[0] |
+                                    titlecase}}</span><span></span><span></span>
+                            </div>
+                            <div class="bottom  g-just-flex gap-12 justify-content-start" style="font-size: 16px;">
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">person</mat-icon>
+
+                                    <span>{{resolvedData.gender | titlecase}}</span>
+
+                                </div> |
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">cake</mat-icon>
+
+                                    <span>{{resolvedData.birthDate | age}}</span>
+
+                                </div> |
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">location_on</mat-icon>
+
+                                    <span>
+                                        {{resolvedData.address[0].city}},
+                                        {{resolvedData.address[0].state}},
+                                        {{resolvedData.address[0].country}}</span>
+
+                                </div>
+
+
+
+                                <span></span>
+                            </div>
+                            <div class="bottom-last  g-just-flex gap-12 justify-content-start" style="font-size: 16px;">
+                                <div class="g-just-flex gap-8">
+
+
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;
+                                                       
+                                                        ">phone</mat-icon>
+
+                                    <span> <a style="text-decoration: none !important;"
+                                            href="tel:{{resolvedData.telecom[0].value}}">
+                                            {{resolvedData.telecom[0].value}}
+                                        </a> </span>
+
+                                </div>
+
+
+
+
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="g-just-flex gap-20 mt-30 justify-content-start flex-wrap" style="align-items: unset;">
+                        <mat-card style="width: max-content; max-width: 100%;">
+                            <mat-card-header>
+                                <div class="g-just-flex flex-between w-100 flex-wrap gap-30 ">
+                                    <div class="left">
+                                        <mat-card-title style="font-size: 1.05rem">
+                                            Current Medication
+                                        </mat-card-title>
+                                        <!-- <mat-card-subtitle>
+                                                        Find, search and add patients registration data
+                                                    </mat-card-subtitle> -->
+                                    </div>
+                                    <div class="right gap-10 g-just-flex justify-content-end">
+
+
+                                        <a mat-button
+                                            style="flex-direction: row-reverse; gap: 12px; padding: 8px 12px; border-radius: 4px;"
+                                            [routerLink]="['/app/patients/', patientId, 'medications']"
+                                            routerLinkActive="router-link-active">
+                                            See All <mat-icon>chevron_right</mat-icon>
+                                        </a>
+
+
+                                    </div>
+                                </div>
+                            </mat-card-header>
+
+                            <mat-card-content class="mb-20 mt-10">
+
+
+                                <div class="red-pill-wrapper gap-20 mt-20 g-just-flex flex-wrap justify-content-start">
+                                    <div class="red-pills g-just-flex gap-16 py-8">
+                                        <div class="position-absolute severity high-criticality">
+
+                                            <mat-icon class="me-8">chevron_right</mat-icon>
+                                        </div>
+                                        <div class="g-just-flex gap-8" style="flex-direction: row;">
+                                            <mat-icon>medication</mat-icon>
+                                            <span class="allergy">Linosopril</span>
+
+
+                                        </div>
+
+
+                                    </div>
+                                    <div class="red-pills g-just-flex gap-16 py-8">
+                                        <div class="position-absolute severity low-criticality">
+
+                                            <mat-icon class="me-8"
+                                                style="font-size: 16px; height: 16px; width: 16px;">chevron_right</mat-icon>
+                                        </div>
+                                        <div class="g-just-flex gap-8" style="flex-direction: row;">
+                                            <mat-icon>medication</mat-icon>
+                                            <span class="allergy">Arthemeter</span>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+
+                            </mat-card-content>
+                        </mat-card>
+                        <mat-card style="width: max-content; max-width: max-content;">
+                            <div class="bottom  g-just-flex gap-12 justify-content-start p-15" style="
+                                flex-direction: column;
+                                align-items: flex-start;
+                                font-size: 16px;">
+                                <div class="info-group-title high-criticality mb-20" style="padding: 0rem 0.5rem;
+                                    border-radius: 2px;
+                                    ">
+                                    Allergies
+                                </div>
+                                <div class="red-pill-wrapper gap-20 g-just-flex flex-wrap justify-content-start">
+                                    <div class="red-pills g-just-flex gap-8">
+                                        <div class="position-absolute severity high-criticality">
+
+                                            <mat-icon class="me-8">report_problem</mat-icon>
+                                        </div>
+                                        <div class="g-just-flex gap-8" style="flex-direction: row;">
+                                            <mat-icon>medication</mat-icon>
+                                            <span class="allergy">Penicillin</span>
+
+
+                                        </div>
+
+
+                                    </div>
+                                    <div class="red-pills g-just-flex gap-8">
+                                        <div class="position-absolute severity low-criticality">
+
+                                            <mat-icon class="me-8">trending_down</mat-icon>
+                                        </div>
+                                        <div class="g-just-flex gap-8" style="flex-direction: row;">
+                                            <mat-icon>fastfood</mat-icon>
+                                            <span class="allergy">Soybean</span>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <span></span>
+                            </div>
+
+                        </mat-card>
+                    </div>
+                    }
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Patient Vitals
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <app-add-vitals [dummySamples]="true"></app-add-vitals>
+            </mat-expansion-panel>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Physical Examination
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <app-obs-res></app-obs-res>
+            </mat-expansion-panel>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Patient Chief Complaints
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <app-pat-symp [forClerkingSheet]="true"></app-pat-symp>
+            </mat-expansion-panel>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Lab Tests
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+
+                <div class="g-just-flex gap-30 flex-wrap justify-content-start">
+                    @for(eachlab of
+                    labRequestAndValue;
+                    track $index;){ <div class=" field-group" style="border-left: 2px solid var(--mat-sys-primary);
+                    padding: 1px 12px; border-top-right-radius: 4px;
+                     border-top-left-radius: 4px;
+                    background-color: var(--mat-sys-surface-container-low);
+                    flex: 0 1 max-content">
+                        <div class="field-value">
+                            {{eachlab.value}}
+                        </div>
+                        <div class="field-title subtitle-text-color-2">
+                            {{eachlab.name}}
+                        </div>
+                    </div>
+                    }
+                    <div class="g-just-flex gap-30 flex-wrap justify-content-start">
+
+                        <button mat-flat-button color="primary" (click)="requestLabTest()" style="border-left: 2px solid var(--mat-sys-primary);
+                    padding: 4px 12px; border-radius: 4px;
+                     
+                    background-color: var(--mat-sys-on-surface);
+                    color: var( --mat-sys-surface-container-low);
+                    flex: 0 1 max-content">
+                            <mat-icon>add</mat-icon>
+                            Request Another Lab Test</button>
+                    </div>
+                </div>
+                <!--Add a Lab test request button-->
+
+            </mat-expansion-panel>
+            <!--Diagnosis Panel-->
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Diagnosis
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-card>
+                    <mat-card-header>
+                        <mat-card-title>
+                            Provide A Diagnosis
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            You can seek help from the AI Chat at the side or consult with a remote doctor to provide
+                            Diagnosis
+                        </mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content class="px-15 mt-20 diag-fields">
+                        <mat-form-field appearance="outline" [floatLabel]="'always'">
+                            <mat-label>Diagnosis</mat-label>
+                            <span stretch></span>
+                            <input type="text" matInput>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Severity</mat-label>
+                            <mat-select>
+                                @for(option of ['Mild', 'Moderate', 'Severe']; track $index){
+                                <mat-option [value]="option">{{option}}</mat-option>
+                                }
+                            </mat-select>
+
+                        </mat-form-field>
+                        <!--additional notes-->
+                        <mat-form-field appearance="outline">
+                            <mat-label>Additional Notes</mat-label>
+                            <textarea matInput></textarea>
+                        </mat-form-field>
+                    </mat-card-content>
+
+                </mat-card>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Treatment Plan
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Medications
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if(medRequestAndValue && medRequestAndValue.length > 0) {
+                    <div class="g-just-flex flex-wrap gap-30 " style="align-items: unset; gap:50px;">
+
+                        @for(eachMed of medRequestAndValue; track $index;){
+                        <div class="each-medicine p-12 g-just-flex gap-10 justify-content-start"
+                            style="border-radius: 8px; min-height: 80px; position: relative;">
+                            <!-- <div class="rounded-icon-wrapper">
+                                <span class="material-symbols-outlined">
+                                    pill
+                                </span>
+                            </div> -->
+                            <div class="med-details g-just-flex gap-0 flex-column ">
+                                <div class="rounded-icon-wrapper"
+                                    style="position: absolute; right: calc(50% - 15px); top: -15px;">
+                                    <span class="material-symbols-outlined">
+                                        pill
+                                    </span>
+                                </div>
+                                <div class="med-name" style="font-weight: 500; font-size: 16px;
+                                max-width: 250px;
+                                ">
+                                    <app-codeable-reference-display
+                                        [referenceDeepPath]="['code', 'coding', '0', 'display'].join('$#$')"
+                                        [data]="eachMed.name"></app-codeable-reference-display>
+                                </div>
+                                <mat-divider style="width: 100%;"></mat-divider>
+                                <div class="dose-inst g-just-flex gap-8 pt-14 flex-wrap">
+                                    <!-- @if(eachMed.dosage[0].route){
+                                    <div class="med-route inst-unit">
+                                        <span class="material-symbols-outlined">
+                                            arrow_forward
+                                        </span>
+                                        <span class="med-route-amount">
+                                            {{eachMed.dosage[0].route | codeableConcept2}}
+                                        </span>
+                                    </div>
+                                    } -->
+                                    @if(eachMed.dosage?.[0]?.doseAndRate?.[0]?.doseQuantity?.value){
+                                    <div class="med-dose inst-unit">
+                                        <span class="material-symbols-outlined">
+                                            grain
+                                        </span>
+                                        <span class="med-dose-amount">
+                                            {{eachMed.dosage?.[0]?.doseAndRate?.[0]?.doseQuantity?.value+"
+                                            "+eachMed.dosage?.[0]?.doseAndRate?.[0]?.doseQuantity?.unit ||
+                                            eachMed.dosage?.[0]?.doseAndRate?.[0]?.doseQuantity?.code}}
+                                        </span>
+                                    </div>
+                                    }
+
+                                    @if(eachMed.timing){
+                                    <div class="med-dose inst-unit">
+                                        <span class="material-symbols-outlined">
+                                            timer
+                                        </span>
+                                        <span class="med-dose-amount">
+                                            {{eachMed.timing}}
+                                        </span>
+                                    </div>
+                                    }
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+                        }
+
+                    </div>
+                    }
+
+
+
+
+                </mat-expansion-panel>
+            </mat-expansion-panel>
+        </mat-card-content>
+
+        <mat-card-actions [align]="'end'">
+            <button class="py-10" mat-flat-button>Save Encounter Details</button>
+        </mat-card-actions>
+    </mat-card>
+</div>

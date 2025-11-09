@@ -1,0 +1,114 @@
+<div class="upload-arena g-just-flex gap-12" (click)="selectFileToUpload($event)">
+    <div class="rounded-icon-wrapper"><mat-icon>book</mat-icon></div>
+    <div class="g-title-subtitle-under-without-h1 g-title-subtitle-on-white">
+        <div class="g-title">
+            Upload File
+        </div>
+        <div class="g-subtitle subtitle-text-color-2">
+            click here to upload "{{uploadFieldName}}" file
+            @if(allowedFilesCategoryLabel){
+            in
+            {{allowedFilesCategoryLabel}} Format
+            }
+        </div>
+    </div>
+</div>
+<input type="file" multiple style="display: none;" #fileToUpload>
+<div class="progress-done-arena upload-arena" style="margin-bottom: 40px;">
+
+    @for(upload of allUploadingFiles; track $index){
+    <div class="file" style="margin-bottom: 15px;">
+        <div class="file-details-delete g-just-flex mb-12">
+            <div class="file-details">
+                <div class="g-icon-title-subtitle g-just-flex gap-12">
+                    <div class="rounded-icon-wrapper g-just-flex">
+                        <mat-icon>book</mat-icon>
+                    </div>
+                    <div class="g-title-subtitle-under-without-h1
+                                        g-title-subtitle-on-white
+                                        " style="align-items: flex-start; gap: 6px ">
+                        <div class="g-title" style="font-size: 14px;">
+                            {{upload.uploadFileName}}
+                        </div>
+                        <div class="g-subtitle g-just-flex gap-40
+                        subtitle-text-color-2" style=" font-size: 12px; max-width: 100%; width: 100%;
+                            justify-content: space-between; ">
+                            <span class=" file-format">
+                                {{upload.uploadFileType}}
+                            </span>
+                            <span class="file-size" style="flex: 0 0 max-content;">
+                                {{upload.uploadFileSize | bytetounit}}
+                            </span>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="delete">
+                                    <mat-icon>delete</mat-icon>
+                                </div> -->
+
+
+        </div>
+        <div class="file-progress g-w-100 g-just-flex gap-15">
+            <div class="meter-background" [style]="'flex: 1 1 max-content'">
+                <div class="meter-foreground">
+
+                </div>
+            </div>
+            @if(upload.uploadPerc >= 0 && upload.uploadPerc <= 100){ <div class="percentage"
+                [style]="'flex: 0 1 max-content'">
+                {{upload.uploadPerc.toFixed(1)}}%
+        </div>
+        }
+
+    </div>
+</div>
+
+}
+</div>
+
+<div class="progress-done-arena upload-arena">
+    @if(allUploadedFiles && allUploadedFiles.length > 0){
+    @for(file of allUploadedFiles; track $index){
+    <div class="file" style="margin-bottom: 15px;">
+        <div class="file-details-delete g-just-flex mb-12" style="align-items: center;">
+            <div class="file-details" style="flex: 1;">
+                @let upload = file;
+                <div class="g-icon-title-subtitle g-just-flex gap-12">
+                    <div class="rounded-icon-wrapper g-just-flex">
+                        <mat-icon>{{getFileIcon(upload.uploadFileType)}}</mat-icon>
+                    </div>
+                    <div class="g-title-subtitle-under-without-h1 g-title-subtitle-on-white"
+                        style="align-items: flex-start; gap: 4px; flex: 1;">
+                        <div class="g-title" style="font-size: 14px; font-weight: 500;">
+                            {{upload.uploadFileName}}
+                        </div>
+                        <div class="g-subtitle subtitle-text-color-2"
+                            style="font-size: 12px; display: flex; gap: 8px; align-items: center;">
+                            <span class="file-format" style="text-transform: uppercase; 
+                                         font-weight: 600; 
+                                         padding: 2px 6px; 
+                                         background: rgba(0,0,0,0.05); 
+                                         border-radius: 4px;">
+                                {{getFileExtension(upload.uploadFileType)}}
+                            </span>
+                            <span class="file-size">
+                                {{upload.uploadFileSize | bytetounit}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="delete" style="cursor: pointer; padding: 8px;" (click)="deleteFile(upload.fileLink, $event)"
+                title="Delete file">
+                <mat-icon color="warn">delete</mat-icon>
+            </div>
+        </div>
+    </div>
+    }
+    }
+</div>

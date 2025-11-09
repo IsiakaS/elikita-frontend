@@ -1,0 +1,22 @@
+@if(formFieldsToUse){
+<div class="mat-card-header mb-20">
+
+    <div class="mat-card-title">
+
+        Add Immunization
+
+    </div>
+    <div class="mat-card-subtitle">
+        Add patients Immunization
+    </div>
+
+</div>
+<app-dynamic-forms-v2 [formFields]="formFieldsToUse" [formMetaData]="undefined">
+
+</app-dynamic-forms-v2>
+
+<div class="py-15 g-just-flex
+" style="justify-content: flex-end;">
+    <button mat-flat-button>Save</button>
+</div>
+}

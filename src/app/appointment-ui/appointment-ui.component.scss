@@ -1,0 +1,42 @@
+.day-select {
+    margin-left: 10px;
+    background-color: var(--mat-sys-surface-container-high);
+    // border-radius: 20px;
+    padding: 5px 8px;
+}
+
+.next-appointments .cards-wrapper {
+    margin: 20px 0px;
+    margin-top: 25px;
+
+    width: max-content;
+
+
+}
+
+.cards-wrapper {
+    width: 100%;
+}
+
+.card-border {
+    position: relative;
+    margin-left: 20px;
+    min-height: 30px;
+    padding: 20px 0px;
+    border-left: 1px solid var(--mat-sys-outline);
+    padding-left: 70px;
+
+    .absolute-time {
+        position: absolute;
+        width: max-content;
+        font-size: 0.875rem;
+        font-weight: bold;
+        padding: 0.2rem;
+        top: 50%;
+        background-color: var(--mat-sys-surface-container);
+        border: 1px solid var(--mat-sys-outline);
+        border-radius: 2px;
+        left: -20px;
+        z-index: 100;
+    }
+}

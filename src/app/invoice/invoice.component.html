@@ -1,0 +1,46 @@
+@if(testingTabeledOption.rawTableData){
+<mat-card class="py-20" style="width: max-content; max-width: 100%; box-sizing: border-box;">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap" style="gap:20px">
+            <div class="left me-30">
+                <mat-card-title class="">
+                    Invoice
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Find, search and add new invoice here.
+
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+
+
+                <!-- @if(capacityObject['medicationRequest']['request'].includes(user.role)
+
+                ) { -->
+                <a mat-flat-button extended (click)="addClaim()">
+                    <mat-icon>add</mat-icon> Add New Invoice
+                </a>
+
+                <!-- } -->
+
+
+
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12 ">
+        <mat-divider></mat-divider>
+
+
+        <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData"
+            (selectedRow)="processSelectedRow($event)" [isToBeSelected]="true" [columns]="testingTabeledOption.columns"
+            [rawTableData]="testingTabeledOption.rawTableData">
+            [tableHeaderMetaData]="testingTabeledOption.headerFilter"
+        </app-tabled-option>
+    </mat-card-content>
+</mat-card>
+}

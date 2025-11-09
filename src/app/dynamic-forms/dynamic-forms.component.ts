@@ -1,4 +1,4 @@
-import { Component, inject, Inject, Input, Optional } from '@angular/core';
+import { Component, EventEmitter, inject, Inject, Input, Optional, Output } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { formFields, formMetaData } from '../shared/dynamic-forms.interface';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class DynamicFormsComponent {
   @Input() formMetaData!: formMetaData;
   @Input() formFields!: formFields[];
+  @Output() formSubmitted = new EventEmitter<any>();
   fb = inject(FormBuilder);
   fieldAutoCompleteObject: { [key: string]: Observable<any> | undefined } = {};
   aForm!: FormGroup;
@@ -124,5 +125,11 @@ export class DynamicFormsComponent {
     }
   }
 
+  submitForm() {
+    if (this.aForm.valid) {
+      this.formSubmitted.emit(this.aForm.value);
+      console.log('Form submitted:', this.aForm.value);
+    }
+  }
 
 }

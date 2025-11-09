@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject, Input } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table'
@@ -18,6 +18,7 @@ import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppointmentComponent } from '../appointment/appointment.component';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
+import { AppointmentUiComponent } from '../appointment-ui/appointment-ui.component';
 
 
 @Component({
@@ -28,13 +29,14 @@ import { EncounterServiceService } from '../patient-wrapper/encounter-service.se
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
     MatChipsModule,
-    MatInputModule,
+    MatInputModule, AppointmentUiComponent,
     MatMenuModule,
     MatTableModule, MatIconModule, ReactiveFormsModule],
   templateUrl: './doctors-dashboard.component.html',
   styleUrl: './doctors-dashboard.component.scss'
 })
 export class DoctorsDashboardComponent {
+  @Input() isConsultant: boolean = false;
   encounterService = inject(EncounterServiceService);
 
 

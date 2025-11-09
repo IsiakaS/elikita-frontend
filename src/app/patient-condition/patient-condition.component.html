@@ -4,8 +4,8 @@
             <div class="left">
                 <mat-card-title class="">
                     Diagnoses for
-                    <a (click)="patientOpenAndClose.openPatientDetailsStrip()" style="text-decoration: none;"
-                        [routerLink]="['/patients', patientId]" routerLinkActive="router-link-active">
+                    <a (click)="patientOpenAndClose.openPatientDetailsStrip()" style="text-decoration: none; 
+                    cursor: pointer; color: var(--mat-sys-primary);" routerLinkActive="router-link-active">
                         {{patientName | async}}
                     </a>
                 </mat-card-title>

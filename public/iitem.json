@@ -1,0 +1,436 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:inventoryitem-001",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-001",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "A123",
+              "display": "Standard Syringe 10ml"
+            }
+          ],
+          "text": "Standard Syringe 10ml"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "piece",
+              "display": "piece"
+            }
+          ],
+          "text": "piece"
+        },
+        "netContent": {
+          "value": 10,
+          "unit": "mL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-002",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-002",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "B456",
+              "display": "Alcohol Wipes"
+            }
+          ],
+          "text": "Alcohol Wipes"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "consumable",
+              "display": "Consumable"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "pack",
+              "display": "pack"
+            }
+          ],
+          "text": "pack"
+        },
+        "netContent": {
+          "value": 5,
+          "unit": "cm2",
+          "system": "http://unitsofmeasure.org",
+          "code": "cm2"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-003",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-003",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "C789",
+              "display": "IV Drip Set"
+            }
+          ],
+          "text": "IV Drip Set"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "set",
+              "display": "set"
+            }
+          ],
+          "text": "set"
+        },
+        "netContent": {
+          "value": 1000,
+          "unit": "mL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-004",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-004",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "D321",
+              "display": "Blood Collection Tube"
+            }
+          ],
+          "text": "Blood Collection Tube"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "tube",
+              "display": "tube"
+            }
+          ],
+          "text": "tube"
+        },
+        "netContent": {
+          "value": 7,
+          "unit": "mL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-005",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-005",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "E654",
+              "display": "Insulin Pen"
+            }
+          ],
+          "text": "Insulin Pen"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "pen",
+              "display": "pen"
+            }
+          ],
+          "text": "pen"
+        },
+        "netContent": {
+          "value": 3,
+          "unit": "mL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-006",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-006",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "F987",
+              "display": "Surgical Mask"
+            }
+          ],
+          "text": "Surgical Mask"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "consumable",
+              "display": "Consumable"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "box",
+              "display": "box"
+            }
+          ],
+          "text": "box"
+        },
+        "netContent": {
+          "value": 50,
+          "unit": "piece",
+          "system": "http://unitsofmeasure.org",
+          "code": "piece"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-007",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-007",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "G543",
+              "display": "Thermometer"
+            }
+          ],
+          "text": "Thermometer"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "piece",
+              "display": "piece"
+            }
+          ],
+          "text": "piece"
+        },
+        "netContent": {
+          "value": 1,
+          "unit": "piece",
+          "system": "http://unitsofmeasure.org",
+          "code": "piece"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-008",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-008",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "H210",
+              "display": "Stethoscope"
+            }
+          ],
+          "text": "Stethoscope"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "unit",
+              "display": "unit"
+            }
+          ],
+          "text": "unit"
+        },
+        "netContent": {
+          "value": 1,
+          "unit": "unit",
+          "system": "http://unitsofmeasure.org",
+          "code": "unit"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-009",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-009",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "I765",
+              "display": "Glucose Monitor"
+            }
+          ],
+          "text": "Glucose Monitor"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "device",
+              "display": "Device"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "unit",
+              "display": "unit"
+            }
+          ],
+          "text": "unit"
+        },
+        "netContent": {
+          "value": 1,
+          "unit": "unit",
+          "system": "http://unitsofmeasure.org",
+          "code": "unit"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:inventoryitem-010",
+      "resource": {
+        "resourceType": "InventoryItem",
+        "id": "inventoryitem-010",
+        "status": "active",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/inventory-items",
+              "code": "J432",
+              "display": "Latex Gloves"
+            }
+          ],
+          "text": "Latex Gloves"
+        },
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/device-kind",
+              "code": "consumable",
+              "display": "Consumable"
+            }
+          ]
+        },
+        "baseUnit": {
+          "coding": [
+            {
+              "system": "http://unitsofmeasure.org",
+              "code": "box",
+              "display": "box"
+            }
+          ],
+          "text": "box"
+        },
+        "netContent": {
+          "value": 100,
+          "unit": "pair",
+          "system": "http://unitsofmeasure.org",
+          "code": "pair"
+        }
+      }
+    }
+  ]
+}

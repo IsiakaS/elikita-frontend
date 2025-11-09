@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table'
@@ -24,6 +24,7 @@ import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-form
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
+import { AuthService } from '../shared/auth/auth.service';
 
 @Component({
   selector: 'app-patients-record',
@@ -45,6 +46,7 @@ export class PatientsRecordComponent {
   resolvedData: any
   summaryTables: any = {}
   dialog = inject(MatDialog)
+  auth = inject(AuthService);
 
   constructor() {
 
@@ -52,6 +54,12 @@ export class PatientsRecordComponent {
   }
   patientId!: string
   encounterService = inject(EncounterServiceService);
+  @Input() hardCodedResolvedData: any;
+  ngOnChanges() {
+    if (this.hardCodedResolvedData) {
+      this.resolvedData = this.hardCodedResolvedData;
+    }
+  }
   ngOnInit() {
 
 
@@ -61,9 +69,14 @@ export class PatientsRecordComponent {
 
 
     this.route.data.subscribe((allData) => {
-      this.resolvedData = allData['patientData'];
-      console.log(this.resolvedData);
+
+      if (allData && allData['patientData']) {
+        this.resolvedData = allData['patientData'];
+        console.log(this.resolvedData);
+      }
     })
+
+
 
     this.resolvedData.encounter = [{
       "resourceType": "Encounter",
@@ -250,6 +263,50 @@ export class PatientsRecordComponent {
     })
   }
 
+  vitals: Map<string, {
+    icon: string,
+    title: string,
+    value: string
+  }> = new Map<string, {
+    icon: string,
+    title: string,
+    value: string
+  }>([
+    [
+      'height', {
+        icon: "height",
+        title: "Height",
+        value: '124.5cm'
+      }
+    ],
+    ['weight', {
+      icon: "monitor_weight",
+      title: "Weight",
+      value: '70kg'
+    }],
+    ['bmi', {
+      icon: "monitor_weight",
+      title: "BMI",
+      value: '22.5'
+    }],
+
+    ['blood_presure', {
+      icon: "",
+      title: "Blood Pressure",
+      value: "130/90"
+    }],
+    ['heart_rate', {
+      icon: "heart_broken",
+      title: "Heart Rate",
+      value: '80bpm'
+    }],
+    ['temperature', {
+      icon: "thermostat",
+      title: "Temperature",
+      value: '36.6°C'
+    }],
+
+  ])
 
 
 }

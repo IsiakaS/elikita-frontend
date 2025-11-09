@@ -1,0 +1,113 @@
+<mat-card class="sidechat" [ngClass]="{'hide': !opened, 'show': opened}">
+    <div class="rounded-icon-wrapper" style="position: absolute;
+    right: 5px; top: 5px;
+    width: 25px; height: 25px;
+    border-radius: 50%;
+    " (click)="closeAi()">
+        <mat-icon>
+            close
+        </mat-icon>
+    </div>
+    <mat-card-header>
+
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="chat-me-stage" style="height: 100%;
+        max-height: 100vh;
+        box-sizing: border-box;
+    padding-bottom: 300px;
+    overflow: auto;" [innerHTML]="chat_me_resp" #stage>
+
+        </div>
+        <div class="chat-interface d-flex flex-column ">
+            <div class="chat-top d-flex uploaded-items" id="uploaded-items">
+                <span style="vertical-align: middle;">Context: </span>
+                <mat-select style="
+                 border: 1px solid var(--mat-sys-outline);
+                    display: inline-block;
+                    width: max-content;
+                    
+                padding: 3px 12px; border-radius: 20px;" name="patient" id="" value="Patient/789 - John Odogwu"
+                    class="me-12">
+                    <mat-option value="Patient/789 - John Odogwu">John Odogwu</mat-option>
+                    <mat-option value="Patient/456 - Jane Smith">Jane Smith</mat-option>
+                </mat-select>
+                <mat-select name="health-resource" multiple id="" [value]="['Medication Prescription']" style="
+                    border: 1px solid var(--mat-sys-outline);
+                    display: inline-block; padding: 3px 8px; border-radius: 20px;">
+                    @for(option of ['Medication Prescription', 'Diagnosis', 'Lab Test', 'Lab Report']; track $index;){
+                    <mat-option value="{{option}}">{{option}}</mat-option>
+                    }
+
+                </mat-select>
+            </div>
+            <div class="chat-middle" id="chat-middle">
+                <textarea (input)="responseToInput($event)" (keyup.enter)="sendChat(ta.value); ta.value = '';" #ta
+                    name="text-response" id="chat-input" class="chat-input"
+                    placeholder="Interact with AI for Suggestions"></textarea>
+            </div>
+            <div class="chat-bottom d-flex justify-content-between" style="justify-content: flex-end;">
+                <!-- <div class="others d-flex gap-2">
+                    <div class="attachment">
+                        <span style="width: 25px; height: 25px; font-weight: bold;">
+                            <mat-icon>send</mat-icon>
+                        </span>
+                    </div>
+                    <input type="file" name="file-response" id="fileResponse" multiple class="d-none">
+                </div> -->
+                <div class="send" (click)="sendChat(ta.value); ta.value = '';">
+                    <button [disabled]="!ta.value" class="g-just-flex" style="width: 30px; height: 30px; border: none; outline: none;
+                        border-radius: 50%;
+                        ">
+                        <span class="g-just-flex">
+                            <mat-icon>send</mat-icon>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </mat-card-content>
+</mat-card>
+
+
+<!-- console.log(`${this.scrollHeight}px`);
+      
+
+      if (
+        (String(
+          $(this).parents('.chat-interface').find('.chat-top')[0].innerHTML
+        ).trim() === '' &&
+          $(this).val().trim() !== '') ||
+        (String(
+          $(this).parents('.chat-interface').find('.chat-top')[0].innerHTML
+        ).trim() !== '' &&
+          $(this)
+            .parents('.chat-interface')
+            .find('.other-file-holder')
+            .find('.loader-background').length == 0 &&
+          $(this)
+            .parents('.chat-interface')
+            .find('.imageHolder')
+            .find('.loader-background').length == 0)
+      ) {
+        $(this)
+          .parents('.chat-interface')
+          .find('.send')
+          .find('button')
+          .removeAttr('disabled');
+      } else if (
+        String(
+          $(this).parents('.chat-interface').find('.chat-top')[0].innerHTML
+        ).trim() === '' &&
+        $(this).val().trim() == ''
+      ) {
+        $(this)
+          .parents('.chat-interface')
+          .find('.send')
+          .find('button')
+          .attr('disabled', true);
+      } else {
+      }
+    }; -->

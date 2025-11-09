@@ -1,0 +1,918 @@
+@if( !!formFields){
+<!-- <div class="px-20"> -->
+<div>
+    <mat-card>
+        @if(formMetaData && formMetaData.formName && formMetaData.formDescription) {
+        <mat-card-header>
+
+            <mat-card-title>
+
+                {{formMetaData.formName}}
+
+            </mat-card-title>
+            <mat-card-subtitle>
+                {{formMetaData.formDescription}}
+            </mat-card-subtitle>
+
+        </mat-card-header>
+        }
+        <mat-card-content>
+            <form [formGroup]="aForm" class="mt-20 aform">
+                @for(field of formFields; track $index){
+                @if(!field.generalProperties.hasOwnProperty('isHidden') ||
+                (field.generalProperties.hasOwnProperty('isHidden')
+                && !field.generalProperties.isHidden)){
+
+                @if(!field.generalProperties.isArray && !field.generalProperties.isGroup){
+
+                <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                    <mat-label>{{field.generalProperties.fieldLabel??field.generalProperties.fieldName}}</mat-label>
+                    @if(field.generalProperties.fieldHint){
+                    <mat-hint>{{field.generalProperties.fieldHint}}</mat-hint>
+                    }
+
+                    @if(field.generalProperties.suffixIcon){
+                    <mat-icon matSuffix>{{field.generalProperties.suffixIcon}}</mat-icon>
+                    }
+                    @if(field.generalProperties.prefixIcon){
+                    <mat-icon matPrefix>{{field.generalProperties.prefixIcon}}</mat-icon>
+                    }
+                    @if(field.generalProperties.prefixText){
+                    <span matPrefix class="prefix-text">{{field.generalProperties.prefixText}}</span>
+                    }
+                    @if(field.generalProperties.suffixText){
+                    <span matSuffix class="suffix-text">{{field.generalProperties.suffixText}}</span>
+                    }
+
+                    <!-- {{field.generalProperties.fieldType}} -->
+                    @if(field.generalProperties.fieldType == "CodeableConceptField"){
+
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                        @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
+                        $index){
+                        <mat-option [value]="option.display || option" class="mb-8">
+                            <div class="ticket-like">
+                                <div class="text">
+                                    {{(option.display || (option | splitHash:1))| titlecase}}
+                                </div>
+                                <div class="code">
+                                    {{(option.code || (option | splitHash: 0))}}
+                                </div>
+                            </div>
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                    }@else if(field.generalProperties.fieldType == "CodeableConceptFieldFromBackEnd"){
+                    <ng-container>
+
+                        <div class="below g-just-flex" stretch
+                            (click)="searchCodeableConceptFromBackEnd(`${field.generalProperties.fieldApiName}`, `${ccfb.value}`)">
+                            <mat-icon matSuffix class="me-10">search</mat-icon>
+                            <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                Click to search
+                            </span>
+
+                        </div>
+
+
+
+                        <input type="text" [matAutocomplete]="auto" #ccfb matInput
+                            [formControlName]="field.generalProperties.fieldApiName">
+
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                            @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
+                            $index){
+                            <mat-option [value]="option.display || option" class="mb-8">
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{(option.display || (option | splitHash:1))| titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{(option.code || (option | splitHash: 0))}}
+                                    </div>
+                                </div>
+
+                            </mat-option>
+
+                            }
+                        </mat-autocomplete>
+                    </ng-container>
+                    } @else if(field.generalProperties.fieldType == "IndividualReferenceField") {
+
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                        <!-- @for(option of field.Reference; track $index){ -->
+                        @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
+                        $index){
+                        <mat-option [value]="option.display || option">
+
+                            <div class="ticket-like">
+                                <div class="text">
+                                    {{(option.display || (option | splitHash:1))| titlecase}}
+                                </div>
+                                <div class="code">
+                                    {{(option.reference || (option | splitHash: 0))}}
+                                </div>
+                            </div>
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+
+                    }@else if(field.generalProperties.fieldType == "SingleCodeField" ) {
+                    @if(field.generalProperties.inputType !== 'checkbox'){
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
+                        $index){
+                        <mat-option [value]="option">
+
+                            {{option}}
+
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+
+                    }@else {
+
+                    <div class="g-just-flex justify-content-start gap-15" style="flex-wrap:wrap; flex: 1 1 100%;"
+                        stretch>
+                        @for(option of field.data; track $index; let i =
+                        $index
+                        ){
+
+                        <mat-checkbox value="{{option}}" style="flex: 1 1 auto"
+                            formControlName={{field.generalProperties!.fieldApiName}}
+                            id="{{field.generalProperties.fieldApiName+i}}">
+                            {{option}}
+
+                        </mat-checkbox>
+
+
+
+                        }
+                    </div>
+                    <input type="text" matInput style="display: none;"
+                        value="{{aForm.get([ getGroupField(field).generalProperties.fieldApiName])!.value | json}}">
+                    } }@else if(field.generalProperties.fieldType == "CodeField" ) {
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                        [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
+                        $index){
+                        <mat-option [value]="option">
+
+                            {{option}}
+
+
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+
+                    }@else{
+                    @if(field.generalProperties.inputType && field.generalProperties.inputType == 'toggle') {
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        style="display: none;"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    <mat-slide-toggle formControlName="{{field.generalProperties.fieldApiName}}" class="me-10">
+                        {{ field.generalProperties.fieldName}}
+                    </mat-slide-toggle>
+                    } @else if(field.generalProperties.inputType && field.generalProperties.inputType == 'radio') {
+                    <mat-radio-group>
+                        @for(opt of field.data;track $index; let i = $index;){
+
+                        <mat-radio-button value="opt" class="m-15">
+                            {{opt}}
+                        </mat-radio-button>
+
+                        <!-- <input type="radio" id="{{field.generalProperties.fieldApiName+i}}"> -->
+
+
+
+
+                        }
+                    </mat-radio-group>
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        style="display: none;" id="{{field.generalProperties.fieldApiName}}"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    }@else if(field.generalProperties.inputType && field.generalProperties.inputType == 'textarea') {
+
+                    <textarea stretch matInput [formControlName]="field.generalProperties.fieldApiName" rows="4"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    </textarea>
+
+                    }@else if (field.generalProperties.inputType && field.generalProperties.inputType ==
+                    'toggle') {
+
+
+                    }@else if (field.generalProperties.inputType && field.generalProperties.inputType ==
+                    'datetime-local') {
+                    <mat-datepicker-toggle matSuffix [for]=" picker"></mat-datepicker-toggle>
+                    <input matInput [matDatepicker]="picker" [formControlName]="field.generalProperties.fieldApiName"
+                        matTooltip="Please enter date in Month/Day/Year format (MM/DD/YYYY)" matTooltipPosition="above"
+                        [matTooltipShowDelay]="0" matTooltipClass="date-format-tooltip">
+                    <mat-hint>MM/DD/YYYY</mat-hint>
+
+                    <mat-datepicker #picker></mat-datepicker>
+
+
+                    }@else if (field.generalProperties.inputType && field.generalProperties.inputType ==
+                    'photo_upload'){
+                    <div class="photo-wrapper" stretch>
+                        <app-upload-ui></app-upload-ui>
+                    </div>
+                    <input type="text" hidden="true" name="" matInput>
+                    }
+                    <!-- // number fields -->
+                    @else if (field.generalProperties.inputType && field.generalProperties.inputType == 'number') {
+                    <input type="number" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    }
+
+                    @else{
+                    <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
+                        [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    }
+
+                    }
+
+                </mat-form-field>}@else if(field.generalProperties.isArray && !field.generalProperties.isGroup) {
+
+
+
+                <div class="form-array my-15" [formArrayName]="field.generalProperties.fieldApiName">
+                    <div class="my-10 form-array-title">
+                        <span style="color:var(--mat-sys-primary)">
+                            {{field.generalProperties.fieldName | titlecase}}
+                        </span>
+                    </div>
+                    @for(eachField of getAFormArrayControl(field.generalProperties.fieldApiName).controls; track $index;
+                    let
+                    i = $index;){
+
+                    <!-- {{ eachField | json }} -->
+
+                    @let arInd =
+                    i===0?field.generalProperties.fieldApiName:`${field.generalProperties.fieldApiName}-${i}`;
+
+                    <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                        <mat-label>{{field.generalProperties.fieldLabel??field.generalProperties.fieldName}}</mat-label>
+                        @if(field.generalProperties.fieldType == "CodeableConceptField"){
+                        <input type="text" matInput [formControlName]="i"
+                            [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                            [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                            @for(option of fieldAutoCompleteObject[arInd] | async; track
+                            $index){
+                            <mat-option [value]="option.display || option" class="mb-8">
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{(option.display || (option | splitHash:1))| titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{(option.code || (option | splitHash: 0))}}
+                                    </div>
+                                </div>
+
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+                        }
+                        @else if(field.generalProperties.fieldType == "CodeableConceptFieldFromBackEnd"){
+                        <ng-container>
+
+                            <div class="below g-just-flex"
+                                (click)="searchCodeableConceptFromBackEnd(`${field.generalProperties.fieldApiName}`, `${ccfb.value}`)">
+                                <mat-icon matSuffix class="me-10">search</mat-icon>
+                                <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                    Click to search
+                                </span>
+
+                            </div>
+
+
+
+                            <input type="text" [matAutocomplete]="auto" #ccfb matInput
+                                [formControlName]="field.generalProperties.fieldApiName">
+
+                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                                @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async;
+                                track
+                                $index){
+                                <mat-option [value]="option.display || option" class="mb-8">
+                                    <div class="ticket-like">
+                                        <div class="text">
+                                            {{(option.display || (option | splitHash:1))| titlecase}}
+                                        </div>
+                                        <div class="code">
+                                            {{(option.code || (option | splitHash: 0))}}
+                                        </div>
+                                    </div>
+
+                                </mat-option>
+
+                                }
+                            </mat-autocomplete>
+                        </ng-container>
+                        }
+                        @else if(field.generalProperties.fieldType == "IndividualReferenceField") {
+                        <input type="text" matInput [formControlName]="i"
+                            [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                            [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                            <!-- @for(option of field.Reference; track $index){ -->
+                            @for(option of fieldAutoCompleteObject[arInd] | async; track
+                            $index){
+                            <mat-option [value]="option.display || option">
+
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{(option.display || (option | splitHash:1))| titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{(option.code || (option | splitHash: 0))}}
+                                    </div>
+                                </div>
+
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+
+                        }
+
+
+                        @else if(field.generalProperties.fieldType == "CodeField" ) {
+                        <input type="text" matInput [formControlName]="i"
+                            [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
+                            [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                            @for(option of fieldAutoCompleteObject[arInd] | async; track
+                            $index){
+                            <mat-option [value]="option">
+
+                                {{option}}
+
+
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+
+                        }@else {
+                        <input type="text" matInput [formControlName]="i"
+                            [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+
+
+                        }
+
+                    </mat-form-field>}
+
+
+
+                    <a mat-button class="addToArrayField"
+                        (click)="addToAFormArray(field.generalProperties.fieldApiName)">
+                        {{'Add '+ field.generalProperties.fieldApiName}}
+                    </a>
+                </div>
+
+
+
+
+
+                }@else if(field.generalProperties.isArray && field.generalProperties.isGroup){
+                <div class="form-array my-15" [formArrayName]="field.generalProperties.fieldApiName">
+                    <div class="my-10 form-array-title">
+                        <span style="color:var(--mat-sys-primary)">
+                            {{field.generalProperties.fieldName | titlecase}}
+                        </span>
+                        @if(field.generalProperties.groupFieldsHint){
+                        <div style="font-size: 12px; color: var(--mat-sys-on-surface-variant); margin-top: 4px;">
+                            {{field.generalProperties.groupFieldsHint}}
+                        </div>
+                        }
+                    </div>
+
+                    @for(eachField of getAFormArrayControl(field.generalProperties.fieldApiName).controls; track $index;
+                    let
+                    i = $index;){
+                    <div class="form-group my-15" [formGroupName]="i">
+
+                        @for(fieldKey of getGroupFieldKeys(field); track $index;){
+                        <!-- // @let field = getGroupField(field).groupFields[fieldKey]; -->
+                        @if(!getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden') ||
+                        (getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden')
+                        && !getGroupField(field).groupFields[fieldKey].generalProperties.isHidden)){
+
+                        @let arInd =
+                        i===0?`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}`:`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}-${i}`;
+                        <!-- {{arInd}} -->
+
+                        <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always"
+                            [ngClass]="{'d-none': getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id}"
+                            [attr.dependency-id]="getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id??'none'">
+                            <mat-label>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}</mat-label>
+                            @if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                            "CodeableConceptField"){
+
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                                [matAutocomplete]="auto">
+                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                                @for(option of
+                                fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                                | async; track
+                                $index){
+                                <mat-option [value]="option.display || option" class="mb-8">
+                                    <div class="ticket-like">
+                                        <div class="text">
+                                            {{((option.display || option | splitHash: 1) | titlecase)}}
+                                        </div>
+                                        <div class="code">
+                                            {{option.code || option | splitHash : 0}}
+                                        </div>
+                                    </div>
+
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+                            }
+                            @else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                            "IndividualReferenceField") {
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                                [matAutocomplete]="auto">
+                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                                <!-- @for(option of field.Reference; track $index){ -->
+                                @for(option of
+                                fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                                | async; track
+                                $index){
+                                <mat-option [value]="option.display || option">
+
+                                    <div class="ticket-like">
+                                        <div class="text">
+                                            {{option.display?(option.display | titlecase): option | splitHash : 1 |
+                                            titlecase}}
+                                        </div>
+                                        <div class="code">
+                                            {{option.reference??option | splitHash:0 }}
+                                        </div>
+                                    </div>
+
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+
+                            }
+
+                            @else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                            "CodeField" )
+                            {
+
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                                [matAutocomplete]="auto">
+                            <mat-autocomplete #auto="matAutocomplete">
+
+                                @for(option of fieldAutoCompleteObject[arInd] | async; track
+                                $index){
+                                <mat-option [value]="option">
+
+                                    {{option}}
+
+
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+
+                            } @else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                            "SingleCodeField"
+                            ) {
+                            <!-- {{getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}}
+                            {{
+                            fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                            | async}} {{'dkddkdkdk'}} -->
+                            <!-- {{getGroupField(field).groupFields[fieldKey].generalProperties.inputType}} -->
+                            @if(getGroupField(field).groupFields[fieldKey].generalProperties.inputType !== 'checkbox'){
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                                [matAutocomplete]="auto">
+                            <mat-autocomplete #auto="matAutocomplete">
+                                @for(option of
+                                fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                                | async; track
+                                $index){
+                                <mat-option [value]="option">
+
+                                    {{option}}
+
+
+                                </mat-option>
+                                }
+                            </mat-autocomplete>
+                            }@else {
+                            <div class="g-just-flex justify-content-start gap-15"
+                                style="flex-wrap:wrap; flex: 1 1 100%;" stretch>
+                                @for(option of getGroupField(field).groupFields[fieldKey].data; track $index; let i =
+                                $index
+                                ){
+
+                                <mat-checkbox value="{{option}}" style="flex: 1 1 auto"
+                                    formControlName={{getGroupField(field).groupFields[fieldKey]!.generalProperties!.fieldApiName}}
+                                    id="{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName+i}}">
+                                    {{option}}
+
+                                </mat-checkbox>
+
+
+
+                                }
+                            </div>
+                            <input type="text" matInput style="display: none;"
+                                value="{{aForm.get([ getGroupField(field).generalProperties.fieldApiName])!.value | json}}">
+                            }}
+
+
+
+
+
+
+
+
+
+                            @else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                            "CodeableConceptFieldFromBackEnd")
+                            {
+
+                            <ng-container>
+
+                                <div class="below g-just-flex"
+                                    (click)="searchCodeableConceptFromBackEnd(`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}`, `${ccfb.value}`)">
+                                    <mat-icon matSuffix class="me-10">search</mat-icon>
+                                    <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                        Click to search
+                                    </span>
+
+                                </div>
+
+
+
+                                <input type="text" [matAutocomplete]="auto" #ccfb matInput
+                                    [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName">
+
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                                    @for(option of
+                                    fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                                    | async;
+                                    track
+                                    $index){
+                                    <mat-option [value]="option.display || option" class="mb-8">
+                                        <div class="ticket-like">
+                                            <div class="text">
+                                                {{(option.display || (option | splitHash:1))| titlecase}}
+                                            </div>
+                                            <div class="code">
+                                                {{(option.code || (option | splitHash: 0))}}
+                                            </div>
+                                        </div>
+
+                                    </mat-option>
+
+                                    }
+                                </mat-autocomplete>
+                            </ng-container>
+                            }
+
+
+
+
+
+
+
+                            @else {
+
+                            @if(getGroupField(field).groupFields[fieldKey].generalProperties.inputType == 'time'){
+                            <!-- <div class="icon-rounded-wrapper" matPrefix>
+                                <mat-icon>access_time</mat-icon>
+                            </div> -->
+
+
+                            <div class="selects g-just-flex gap-10">
+                                <div class="hour-select" style="position: relative; width: 50px" #hsel>
+                                    <div class="real-hour">
+                                        @for(hour of ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
+                                        '12']; track $index;){
+                                        <input class="each-hour" value="{{hour}}" readonly="true" #me type="number"
+                                            (click)="me.readOnly=false;" min="0" max="12">
+                                        }
+                                    </div>
+
+                                    <div class="control">
+                                        <span class="inc">
+                                            <mat-icon>arrow_drop_up</mat-icon>
+                                        </span>
+                                        <span class="dec">
+                                            <mat-icon>arrow_drop_down</mat-icon>
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <span>:</span>
+                                <div name="" id="" class="minute-select" #msel>
+                                    <div class="real-minute">
+                                        @for(minute of minutes; track $index;){
+                                        <input class="each-minute" value="{{minute}}" readonly="true" #me
+                                            (click)="me.readOnly=false;" type="number" min="0" max="60">
+                                        }
+                                    </div>
+                                    <div class="control">
+                                        <span class="inc">
+                                            <mat-icon>arrow_drop_up</mat-icon>
+                                        </span>
+                                        <span class="dec">
+                                            <mat-icon>arrow_drop_down</mat-icon>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <select name="" id="" class="ampm-select" [value]="'AM'" mat-select>
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
+                            <input type="time" style="display: none;" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName">
+
+                            } @else if (getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                            getGroupField(field).groupFields[fieldKey].generalProperties.inputType == 'number') {
+                            <input type="number" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`">
+                            }
+                            @else if(getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                            getGroupField(field).groupFields[fieldKey].generalProperties.inputType == 'toggle')
+                            {
+
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                style="display: none;"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`">
+                            <mat-slide-toggle
+                                formControlName="{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}}"
+                                class="me-10">
+                                {{ getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}
+                            </mat-slide-toggle>
+                            }
+
+                            @else{
+
+                            <input type="text" matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                                [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`">
+                            }
+
+                            }
+
+                        </mat-form-field>}}
+
+
+
+
+                    </div>
+
+                    }
+
+                    <a mat-button class="addToArrayField"
+                        (click)="addToAFormArray(field.generalProperties.fieldApiName)">
+                        {{'Add '+ field.generalProperties.fieldName}}
+                    </a>
+                </div>
+
+                }
+                @else if(!field.generalProperties.isArray && field.generalProperties.isGroup){
+                <!-- kkkkkkk -->
+                <div class="form-group my-15" [formGroupName]="field.generalProperties.fieldApiName">
+                    <div class="my-10 form-array-title">
+                        <span style="color:var(--mat-sys-primary)">
+                            {{field.generalProperties.fieldName | titlecase}}
+                        </span>
+                        @if(field.generalProperties.groupFieldsHint){
+                        <div style="font-size: 12px; color: var(--mat-sys-on-surface-variant); margin-top: 4px;">
+                            {{field.generalProperties.groupFieldsHint}}
+                        </div>
+                        }
+                    </div>
+                    @for(fieldKey of getGroupFieldKeys(field); track $index;){
+                    <!-- // @let field = getGroupField(field).groupFields[fieldKey]; -->
+
+
+                    @if(!getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden') ||
+                    (getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden')
+                    && !getGroupField(field).groupFields[fieldKey].generalProperties.isHidden)){
+                    @let arInd =
+                    `${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}`;
+
+                    <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always"
+                        [ngClass]="{'d-none': getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id}"
+                        [attr.dependency-id]="getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id??'none'">
+                        @if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint){
+                        <mat-hint>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint}}</mat-hint>
+
+                        }
+                        <mat-label>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}</mat-label>
+                        @if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType == "SingleCodeField"
+                        ) {
+                        @if(getGroupField(field).groupFields[fieldKey].generalProperties.inputType !== 'checkbox'){
+                        <input type="text" matInput
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                            [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                            @for(option of
+                            fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                            | async; track
+                            $index){
+                            <mat-option [value]="option">
+
+                                {{option}}
+
+
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+                        }@else {
+                        <mat-checkbox>
+                            Yes
+                        </mat-checkbox>
+                        }
+
+                        }@else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                        "CodeableConceptField"){
+                        <input type="text" matInput
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`"
+                            [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                            @for(option of
+                            fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                            | async; track
+                            $index){
+                            <mat-option [value]="option">
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{option | splitHash:1 | titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{option | splitHash:0 }}
+                                    </div>
+                                </div>
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+                        }
+                        @else if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
+                        "CodeableConceptFieldFromBackEnd")
+                        {
+
+                        <ng-container>
+
+                            <div class="below g-just-flex"
+                                (click)="searchCodeableConceptFromBackEnd(`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}`, `${ccfb.value}`)">
+                                <mat-icon matSuffix class="me-10">search</mat-icon>
+                                <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                    Click to search
+                                </span>
+
+                            </div>
+
+
+
+                            <input type="text" [matAutocomplete]="auto" #ccfb matInput
+                                [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName">
+
+                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                                @for(option of
+                                fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
+                                | async;
+                                track
+                                $index){
+                                <mat-option [value]="option.display || option" class="mb-8">
+                                    <div class="ticket-like">
+                                        <div class="text">
+                                            {{(option.display || (option | splitHash:1))| titlecase}}
+                                        </div>
+                                        <div class="code">
+                                            {{(option.code || (option | splitHash: 0))}}
+                                        </div>
+                                    </div>
+
+                                </mat-option>
+
+                                }
+                            </mat-autocomplete>
+                        </ng-container>
+                        }
+
+                        @else{
+                        @if(getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                        getGroupField(field).groupFields[fieldKey].generalProperties.inputType == 'textarea') {
+
+                        <textarea stretch matInput
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            rows="4"
+                            [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??field.generalProperties.fieldName}`">
+                    </textarea>
+
+                        }
+
+                        @else if (getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                        getGroupField(field).groupFields[fieldKey].generalProperties.inputType ==
+                        'datetime-local') {
+
+                        <mat-datepicker-toggle matSuffix [for]=" picker"></mat-datepicker-toggle>
+                        <input matInput [matDatepicker]="picker"
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            matTooltip="Please enter date in Month/Day/Year format (MM/DD/YYYY)"
+                            matTooltipPosition="above" [matTooltipShowDelay]="0" matTooltipClass="date-format-tooltip">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+
+
+
+                        <mat-datepicker #picker></mat-datepicker>
+
+
+                        }
+
+
+                        @else if (getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                        getGroupField(field).groupFields[fieldKey].generalProperties.inputType ==
+                        'photo_upload'){
+                        <app-upload-ui></app-upload-ui>
+                        }
+
+
+
+
+
+
+
+
+
+                        @else{
+                        <input type="text" matInput
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`">
+                        }
+                        }
+
+
+                    </mat-form-field>
+                    }
+                    }
+                </div>
+                }
+                }
+
+                }
+                @if(formMetaData && !formMetaData.hasOwnProperty('showSubmitButton') || (formMetaData &&
+                formMetaData.showSubmitButton
+                &&
+                formMetaData.showSubmitButton
+                === true)) {
+
+                <div class="submit-area" style="width: 100%; display: flex; justify-content: flex-end;">
+                    <button type="submit" mat-flat-button class="mt-20" (click)="closeAndReturn()">
+                        {{formMetaData.submitText}}
+                    </button>
+                </div>
+                }
+                <!-- {{formMetaData| json}} -->
+
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>
+}
+
+<!-- {{aForm.value|json}} -->

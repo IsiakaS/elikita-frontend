@@ -1,4 +1,4 @@
-<div class="sidemenu-wrapper">
+<div class="{{'sidemenu-wrapper '+(collapseMenu?'collapse-menu':'')}}">
     <div class="menus">
         <div class="primary-menus">
             <div class="menu-group">
@@ -8,12 +8,14 @@
 
                 <div class="menu-group-list">
                     <ul>
-                        @for (linkObject of menuObjects[userRole]; track $index) {
-                        <li>
-                            <a [routerLink]="[linkObject.link]" routerLinkActive="router-link-active">
+                        @for (linkObject of menuObjects[userRole]['primary_menu']; track $index) {
+                        <a [routerLink]="[linkObject.link]" routerLinkActive="router-link-active"
+                            class="g-just-flex gap-8" matTooltip="{{linkObject.title}}" title="{{linkObject.title}}">
+                            <mat-icon>{{linkObject['icon']}}</mat-icon>
+                            <span>
                                 {{ linkObject.title}}
-                            </a>
-                        </li>
+                            </span>
+                        </a>
                         }
 
 
@@ -23,8 +25,38 @@
 
 
 
+
             </div>
+            @for (linkObject of menuObjects[userRole]['grouped_menu']; track $index) {
+            <div class="menu-group">
+                <div class="menu-group-header">
+                    {{linkObject[0]}}
+                </div>
+
+                <div class="menu-group-list">
+                    <ul>
+                        @for (specLinks of linkObject[1]; track $index) {
+                        <a [routerLink]="[specLinks.link]" routerLinkActive="router-link-active"
+                            class="g-just-flex gap-8">
+                            <mat-icon>{{specLinks['icon']}}</mat-icon>
+                            <span>
+                                {{ specLinks.title}}
+                            </span>
+                        </a>
+                        }
+
+
+                    </ul>
+                </div>
+
+
+
+
+
+            </div>
+            }
         </div>
+
         <div class="secondary-menus">
             <div class="menu-group">
                 <div class="menu-group-header">
@@ -33,9 +65,9 @@
                 <div class="menu-group-list">
                     <ul>
 
-                        <li>
-                            <a (click)="logout()">Logout</a>
-                        </li>
+                        <a (click)="logout()">
+                            <span>Logout</span>
+                        </a>
                     </ul>
 
                 </div>

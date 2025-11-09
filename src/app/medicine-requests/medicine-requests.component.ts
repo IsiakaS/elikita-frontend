@@ -10,7 +10,7 @@ import { ErrorService } from '../shared/error.service';
 import { commonImports } from '../shared/table-interface';
 import { UtilityService } from '../shared/utility.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
 import { CodeableConcept2Pipe } from '../shared/codeable-concept2.pipe';
 import { Bundle, Medication, MedicationRequest, Resource } from 'fhir/r5';
 import { CodeableRef2Pipe } from '../shared/codeable-ref2.pipe';
@@ -30,13 +30,17 @@ import {
   SingleCodeField
 } from '../shared/dynamic-forms.interface2';
 import { FormFieldsSelectDataService } from '../shared/form-fields-select-data.service';
+import { AuthService, capacityObject } from '../shared/auth/auth.service';
+import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
 
 
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
   selector: 'app-medicine-requests',
-  imports: [...commonImports, JsonPipe, CodeableConcept2Pipe, CodeableRef2Pipe, References2Pipe, fetchFromReferencePipe,
+  imports: [...commonImports,
+    CommonModule,
+    JsonPipe, CodeableConcept2Pipe, CodeableRef2Pipe, References2Pipe, fetchFromReferencePipe,
     MatProgressSpinnerModule, DetailBaseComponent
   ],
   templateUrl: './medicine-requests.component.html',
@@ -57,13 +61,15 @@ export class MedicineRequestsComponent implements tablePropInt {
   patientId!: string | null;
   tableColumns!: string[];
   http: HttpClient = inject(HttpClient);
+  // utilityService = inject(UtilityService)
   patientOpenAndClose: PatientDetailsKeyService = inject(PatientDetailsKeyService);
   getPatientName(): void {
     if (!this.getPatientId()) return;
     this.patientName = this.utilityService.getPatientName(this.getPatientId)
   }
+
   getPatientId(): string | null {
-    return this.patientId = this.route.parent?.snapshot.params['id'];
+    return this.patientId = this.route.parent?.snapshot.params['id'] || this.utilityService.getPatientIdFromRoute();
   }
   connectTableDataSource(): void {
     this.tableDataSource.connect = () => {
@@ -87,26 +93,65 @@ export class MedicineRequestsComponent implements tablePropInt {
         }
         return e.resource as MedicationRequest
       });
+      const sortedAccRequisition: { [key: string]: MedicationRequest[] } = {}
+      this.immutableLevelTableData?.forEach((e: MedicationRequest) => {
 
+        if (e.hasOwnProperty('groupIdentifier') && e.groupIdentifier?.hasOwnProperty('value')) {
+          if (!sortedAccRequisition.hasOwnProperty(e.groupIdentifier!.value!)) {
+            sortedAccRequisition[e.groupIdentifier!.value!] = [];
+          }
+          sortedAccRequisition[e.groupIdentifier!.value!].push(e);
+        } else {
+          sortedAccRequisition['N/A'] = sortedAccRequisition['N/A'] || [];
+          sortedAccRequisition['N/A'].push(e);
+        }
+        this.sortedWithRequisition = sortedAccRequisition;
+      })
+      console.log(sortedAccRequisition);
+      this.sortedWithRequisitionKeys = Object.keys(sortedAccRequisition);
+      console.log(this.sortedWithRequisitionKeys);
+      Object.values(sortedAccRequisition).forEach((e: MedicationRequest[]) => {
+        this.immutableLevelTableData = [...this.immutableLevelTableData || [], ...e];
+      });
       // this.references = new Map(allData['patMed']['references']);
       // console.log(this.references);
       console.log(this.immutableLevelTableData);
       this.tableDataLevel2.next(this.immutableLevelTableData);
     })
   }
-
+  sortedWithRequisition: { [key: string]: MedicationRequest[] } = {};
+  sortedWithRequisitionKeys: string[] = [];
+  //for determining actions available to the user
+  auth = inject(AuthService);
+  user: any = null;
+  encounterService = inject(EncounterServiceService);
+  capacityObject = capacityObject;
   ngOnInit() {
+    this.auth.user.subscribe((user) => {
+      this.user = user;
+
+      if (this.route.parent?.routeConfig?.path?.includes('testing')) {
+        this.encounterService.setEncounterState('100001', 'in-progress');
+        this.user = { role: 'testing' }
+        this.patientId = '100001';
+        capacityObject['medicationRequest']['request'].push('testing');
+
+      }
+
+    })
     this.tableFilter = new Map([[
       'status', ['active', 'on-hold', 'ended', 'stopped', 'completed', 'cancelled', 'draft']
     ]
     ])
 
     this.tableColumns = [
-
+      'groupIdentifier',
       'status',
       'subject',
       'medication',
       'action',
+      'groupReport',
+
     ]
     this.getPatientId();
     this.getPatientName();

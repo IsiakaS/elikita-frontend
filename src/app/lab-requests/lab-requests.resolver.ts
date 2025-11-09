@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
+import { Bundle } from 'fhir/r5';
 import { map } from 'rxjs';
 
-export const labRequestsResolver: ResolveFn<boolean> = (route, state) => {
+export const labRequestsResolver: ResolveFn<Bundle> = (route, state) => {
   const http = inject(HttpClient);
   const dummySubject = [
     {
@@ -17,12 +18,15 @@ export const labRequestsResolver: ResolveFn<boolean> = (route, state) => {
     }
   ]
 
-  return http.get("http://hapi.fhir.org/baseR4/ServiceRequest?_format=json").pipe(map((e: any) => {
+  return http.get<Bundle>("https://server.fire.ly/r5/ServiceRequest?_format=json");
+  // return http.get<Bundle>("serviceRequest_bundle.json");
 
-    return e.entry.map((f: any) => {
-      const randomNmbBtwZeroAndOne = Math.floor(Math.random() * 2);
-      const subject = dummySubject[randomNmbBtwZeroAndOne];
-      return { ...f.resource, subject }
-    });
-  }))
+  // .pipe(map((e: any) => {
+
+  //   return e.entry.map((f: any) => {
+  //     const randomNmbBtwZeroAndOne = Math.floor(Math.random() * 2);
+  //     const subject = dummySubject[randomNmbBtwZeroAndOne];
+  //     return { ...f.resource, subject }
+  //   });
+  // }))
 };

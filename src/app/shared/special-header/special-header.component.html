@@ -1,0 +1,138 @@
+@if(resourceObject && resourceObject[specialHeader.specialHeaderKey]){
+<div class="special-header g-just-flex gap-15" style="align-items: flex-start; ">
+    <mat-icon>
+        {{specialHeader.specialHeaderIcon??'medication'}}
+
+    </mat-icon>
+
+    <div class="words g-just-flex flex-column" style="align-items: flex-start; font-size: 1.1rem;">
+        <strong>
+            <em>
+                @if(specialHeader.specialHeaderDataType == 'CodeableReference'){
+                <app-codeable-reference-display [valueDeepPath]="specialHeader.valueDeepPath"
+                    [data]="resourceObject[specialHeader.specialHeaderKey]"></app-codeable-reference-display>
+                }@else if(specialHeader.specialHeaderDataType == 'CodeableConcept'){
+
+                {{resourceObject[specialHeader.specialHeaderKey] | codeableConcept2 | titlecase}}
+                }@else if(specialHeader.specialHeaderDataType == 'Reference'){
+                <!-- <div class="g-just-flex gap-0 my-12 link-group"
+                                    style="justify-content: flex-start; align-items: center;">
+                                    <div class="g-just-flex gap-5 link-group-words" style="
+                            
+                            justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                                        <div class="top">
+                                            {{resourceObject[specialHeader.specialHeaderKey] | references2}}
+
+
+                                        </div>
+                                        @if(linkInReferences.returnLinkFromReferences(
+                                        resourceObject[specialHeader.specialHeaderKey]
+                                        ) && ((resourceObject[specialHeader.specialHeaderKey].reference &&
+                                        !resourceObject[specialHeader.specialHeaderKey].display))
+                                        && specialHeader.ReferenceDeepPath
+                                        ) {
+                                        <div class="bottom subtitle-text-color-2">
+                                            @if((resourceObject[specialHeader.specialHeaderKey] |
+                                            fetchFromReference : specialHeader.ReferenceDeepPath )| async){
+                                            {{(resourceObject[specialHeader.specialHeaderKey] |
+                                            fetchFromReference : specialHeader.ReferenceDeepPath )| async}}
+                                            }@else{
+                                            <div style="width:10px; height: 10px;">
+                                                <mat-progress-spinner mode="indeterminate"
+                                                    style="width:10px; height: 10px;">
+
+                                                </mat-progress-spinner>
+                                            </div>
+
+                                            }
+
+
+                                        </div>
+                                        }
+                                    </div>
+                                    <div>
+                                        @if(linkInReferences.returnLinkFromReferences(
+                                        resourceObject[specialHeader.specialHeaderKey]
+                                        ) && ((resourceObject[specialHeader.specialHeaderKey].reference &&
+                                        !resourceObject[specialHeader.specialHeaderKey].display))
+                                        && specialHeader.ReferenceDeepPath
+                                    ) { -->
+                <!-- <div (click)="alltds(td)" class="link-group-icon"> -->
+                <!-- <div class="link-group-icon">
+                                            <mat-expansion-panel hideToggle="true" class="detail-base"
+                                                style="box-shadow: none;">
+                                                <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                                    <mat-panel-title style="margin-right: 0px;">
+                                                        <mat-icon class="subtitle-text-color-2"
+                                                            style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                                    </mat-panel-title>
+                                                </mat-expansion-panel-header>
+                                                <ng-template matExpansionPanelContent>
+                                                  
+                                                    <div style="width: 250px;">
+
+                                                        <app-detail-base [url]="linkInReferences.returnLinkFromReferences(
+                                        resourceObject[specialHeader.specialHeaderKey]
+                                        ) || ''"></app-detail-base>
+                                                    </div>
+                                                </ng-template>
+                                            </mat-expansion-panel>
+                                        </div>
+                                        }
+                                    </div>
+                                </div> -->
+                <app-reference-display [data]="resourceObject[specialHeader.specialHeaderKey]"
+                    [referenceDeepPath]="specialHeader.ReferenceDeepPath"></app-reference-display>
+                }@else{
+                <span [innerHTML]="resourceObject[specialHeader.specialHeaderKey]">
+                </span>
+                }
+
+
+            </em>
+
+        </strong>
+
+        <div class="g-just-flex gap-8 flex-wrap" style="flex-wrap: wrap;">
+            @for(baseKey of specialHeader.baseKeys; track $index;){
+            @if(resourceObject[baseKey.key]){
+            <div #sc style="align-items: center;"
+                [attr.class]="'small-chips'+' '+'status-'+statusStyles[resourceObject[baseKey.key]]?.['color']+' g-just-flex gap-8'">
+
+                <span> {{resourceObject[baseKey.key]}}
+
+                </span>
+                <mat-icon>
+                    {{statusStyles[resourceObject[baseKey.key]]?.['icon'] || 'medicine'}}
+                </mat-icon>
+
+            </div>
+            }
+            <!-- <div #sc
+                                [attr.class]="'small-chips'+' '+'status-'+intentStyles[allMedications[0].intent]['color']+' g-just-flex gap-8'">
+
+
+                                <span> {{allMedications[0].intent}}
+
+                                </span>
+                                <mat-icon>
+                                    {{intentStyles[allMedications[0].intent]['icon']}}
+                                </mat-icon>
+
+                            </div> -->
+            }
+        </div>
+
+
+
+        <!-- <a
+                        href="{{allMedications[0].medication.reference && allMedications[0].medication.reference.reference? allMedications[0].medication.reference.reference:''}}">
+
+                        {{allMedications[0].medication.concept?allMedications[0].medication.concept!.coding![0]!.display:
+                        allMedications[0].medication.reference?.display
+                        || allMedications[0].medication.reference?.reference ||
+                        allMedications[0].medication.reference?.identifier
+                        }}
+                    </a> -->
+    </div>
+</div>}

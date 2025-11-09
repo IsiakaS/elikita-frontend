@@ -1,0 +1,46 @@
+@if(group && resources){
+<div class="my-10 mt-20">
+    <div class="my-10"></div>
+    <div class="card-content-details">
+        <div class="fields-wrapper g-just-flex gap-22">
+
+            @for(field of group.groupMembers; track $index;){
+            @let fieldValue = retrieveValueFromDeepPath(resources[field.key], field.valueDeepPath);
+            @if(fieldValue){
+            <div class="field-group" #fg>
+                <div class="field-value">
+                    <div #sc class="value-with-icon">
+                        @if(field.keyDataType === 'CodeableConcept'){
+                        <!-- {{'cc'}}{{ fieldValue | json}} -->
+                        {{fieldValue | codeableConcept2}}
+
+                        }@else if(field.keyDataType === 'CodeableReference'){
+
+                        <app-codeable-reference-display (tdClicked)="alltds(fg)" [valueDeepPath]="field.valueDeepPath"
+                            [data]="fieldValue"></app-codeable-reference-display>
+                        }@else if(field.keyDataType === 'Reference'){
+
+                        <!-- {{field.referenceDeepPath+""}} -->
+                        <app-reference-display [data]="fieldValue" (tdClicked)="alltds(fg)"
+                            [referenceDeepPath]="field.referenceDeepPath"></app-reference-display>
+                        }@else{
+                        @if(field.keyDataType == 'dateTime'){
+                        {{fieldValue | date : 'short'}}
+                        }@else{
+                        {{(fieldValue+"" | titlecase)|| 'N/A'}}
+                        }
+                        }
+
+
+                    </div>
+                </div>
+                <div class="field-title">
+                    {{field.label | titlecase}}
+                </div>
+            </div>
+            }
+            }
+        </div>
+    </div>
+</div>
+}

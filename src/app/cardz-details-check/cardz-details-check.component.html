@@ -1,0 +1,115 @@
+<!-- <mat-card class="profile-card px-15 pb-20">
+
+
+
+    <mat-card-header>
+        <mat-card-title>
+            <div class="g-just-flex gap-15">
+                <div class="round-icon-wrapper contrast">
+                    <mat-icon>
+                        {{detailsBuilderObject.resourceIcon}}
+
+                    </mat-icon>
+                </div>
+                <span> {{detailsBuilderObject.resourceName | titlecase}}</span>
+            </div>
+        </mat-card-title>
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-10">
+            <mat-divider>
+
+            </mat-divider>
+            <div class="my-20"></div>
+
+            <div class="g-just-flex special-header-wrapper  my-20 mb-20 gap-18"
+                style="justify-content: space-between; flex-wrap: wrap;">
+                @if(detailsBuilderObject.specialHeader ){
+                @let specialHeader = detailsBuilderObject.specialHeader;
+
+                <app-special-header [resourceObject]="realHospitalDetails"
+                    [specialHeader]="specialHeader"></app-special-header>
+                }
+                <div class="action-button mb-15 gap-15">
+
+                    <a mat-flat-button class=" header-group" (click)="hosServ.addOrganization()">
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit</span>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="cards-wrapper">
+                @for(group of detailsBuilderObject.groups; track $index;){
+                <mat-card>
+
+                    <mat-card-header>
+                        <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+
+                            <div class="header-words  ">
+                                <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <mat-icon>{{group.groupIcon}}</mat-icon> <mat-card-title>
+                                        {{group.groupName}}</mat-card-title>
+                                </div>
+
+                            </div>
+                        </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <app-details-cardz [group]="group" [resources]="realHospitalDetails"></app-details-cardz>
+                    </mat-card-content>
+
+
+                </mat-card>
+                }
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card> -->
+
+@if(resourceType === 'lab-supply') {
+<mat-card class="p-20" style="width: max-content; max-width: 100%">
+
+    <mat-card-header>
+        <mat-card-title>Low Stock Supplies</mat-card-title>
+        <mat-card-subtitle></mat-card-subtitle>
+    </mat-card-header>
+    <div class="mt-20"></div>
+    <mat-divider></mat-divider>
+    <div class="mb-10"></div>
+    @if(testingTabeledOption.rawTableData !== null){
+
+    <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData" (selectedRow)="processSelectedRow($event)"
+        [isToBeSelected]="true" [columns]="testingTabeledOption.columns"
+        [rawTableData]="testingTabeledOption.rawTableData">
+
+    </app-tabled-option>}
+</mat-card>
+}@else if(resourceType === 'medicine') {
+<mat-card class="p-20" style="width: max-content; max-width: 100%">
+
+    <mat-card-header>
+        <mat-card-title>Low Stock Medicines</mat-card-title>
+        <mat-card-subtitle></mat-card-subtitle>
+    </mat-card-header>
+    <div class="mt-20"></div>
+    <mat-divider></mat-divider>
+    <div class="mb-10"></div>
+    @if(testingTabeledOption.rawTableData !== null){
+
+    <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData2"
+        (selectedRow)="processSelectedRow($event)" [isToBeSelected]="true" [columns]="testingTabeledOption.columns2"
+        [rawTableData]="testingTabeledOption.rawTableData">
+
+    </app-tabled-option>
+    }
+</mat-card>
+}

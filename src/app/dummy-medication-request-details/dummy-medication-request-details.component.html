@@ -116,7 +116,11 @@
                     </a> -->
                     </div>
                 </div>
-                <div class="action-button mb-15 gap-18">
+                <div class="action-button mb-15 gap-18" style="flex-wrap: wrap;">
+                    <a mat-flat-button class=" header-group">
+                        <mat-icon>assignment</mat-icon>
+                        <span>Generate Order</span>
+                    </a>
                     <a mat-flat-button class=" header-group" (click)="dispense(allMedications[0]);">
                         <mat-icon>local_pharmacy</mat-icon>
                         <span>Dispense</span>

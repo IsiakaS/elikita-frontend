@@ -1,0 +1,98 @@
+@if (this.realLabRequestDetails) {
+
+<mat-card class="profile-card px-15 pb-20">
+    <mat-card-header>
+        <mat-card-title>
+            <div class="g-just-flex gap-15">
+                <div class="round-icon-wrapper contrast">
+                    <mat-icon>
+                        {{detailsBuilderObject.resourceIcon}}
+
+                    </mat-icon>
+                </div>
+                <span> {{detailsBuilderObject.resourceName | titlecase}}</span>
+            </div>
+        </mat-card-title>
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-10">
+            <mat-divider>
+
+            </mat-divider>
+            <div class="my-20"></div>
+
+
+            <div class="g-just-flex special-header-wrapper  my-20 mb-20 gap-18"
+                style="justify-content: space-between; flex-wrap: wrap;">
+                @if(detailsBuilderObject.specialHeader ){
+                @let specialHeader = detailsBuilderObject.specialHeader;
+
+                <app-special-header [resourceObject]="realLabRequestDetails"
+                    [specialHeader]="specialHeader"></app-special-header>
+                }
+                <div class="action-button mb-15 gap-15" style="flex-wrap: wrap;">
+
+                    @if(
+                    capacityObject['labRequest']['request'].includes(user.role)
+
+                    )
+                    { <a mat-flat-button class=" header-group" (click)="encounterService.addServiceRequest(patientId)">
+                        <mat-icon>add</mat-icon>
+                        <span>Add More Requests</span>
+                    </a>
+                    }
+                    @if(
+                    capacityObject['labRequest']['request'].includes(user.role)
+
+                    )
+                    { <a mat-flat-button class=" header-group" (click)="encounterService.addServiceRequest(patientId)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit</span>
+                    </a>
+                    }
+                    @if(
+                    capacityObject['labRequest']['order'].includes(user.role)
+                    )
+                    { <a mat-flat-button class=" header-group">
+                        <mat-icon>assignment</mat-icon>
+                        <span>Generate Order</span>
+                    </a>
+                    }
+
+                </div>
+            </div>
+
+            <div class="cards-wrapper">
+                @for(group of detailsBuilderObject.groups; track $index;){
+                <mat-card>
+
+                    <mat-card-header>
+                        <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+
+                            <div class="header-words  ">
+                                <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <mat-icon>{{group.groupIcon}}</mat-icon> <mat-card-title>
+                                        {{group.groupName}}</mat-card-title>
+                                </div>
+
+                            </div>
+                        </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <app-details-cardz [group]="group" [resources]="realLabRequestDetails"></app-details-cardz>
+                    </mat-card-content>
+
+
+                </mat-card>
+                }
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>}

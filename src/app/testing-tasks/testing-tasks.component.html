@@ -1,0 +1,626 @@
+<div class="form-group m-20">
+    @if(overallTasksForm){
+
+    <div class="default-task my-15">
+        <div class="default-task-title mb-8">Default Task</div>
+        <div class="default-task-subtitle subtitle-text-color-2
+        small-subtitle
+        ">These are pre-added tasks automatically created on
+            patient admission.
+            You can add more tasks by clicking the button below</div>
+        <div class="task-details my-30">
+            <div class="super-title resource-name">
+                Vital Signs
+            </div>
+            <div class="task-header">
+                <div class="task-header-left">
+
+                    <div class="task-name">
+                        Vital Signs Monitoring
+                    </div>
+                    <div class="task-description subtitle-text-color-2 small-subtitle mb-15">
+                        Monitor the patient's vital signs such as temperature, blood pressure, heart rate, and
+                        respiratory rate
+                        regularly to ensure their stability and well-being.
+                    </div>
+                </div>
+                <div class="task-header-right">
+                    <!-- <div class="actions-wrapper"> -->
+                    <button class="action-button g-just-flex justify-content-start gap-8">
+                        <mat-icon>assignment_ind</mat-icon>
+                        <span>Assign</span>
+                    </button>
+                    <div class="more-btn g-just-flex" [mat-menu-trigger-for]="mom3" style="position: relative;">
+
+                        <mat-icon>more_vert</mat-icon>
+
+                    </div>
+                    <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
+
+                        <div mat-menu-item value="period">
+                            Edit
+                        </div>
+                        <div mat-menu-item value="period">
+                            Delete
+                        </div>
+                        <div mat-menu-item value="period">
+                            Complete
+                        </div>
+                    </mat-menu>
+
+                    <!-- </div> -->
+                </div>
+            </div>
+            <div class="middle-patient g-just-flex gap-8 mb-15
+            justify-content-start
+            ">
+                <div class="rounded-icon-wrapper g-just-flex gap-8">
+
+                    <mat-icon>person</mat-icon>
+                </div>
+                <div class="g-just-flex gap-30">
+                    <div class="g-just-flex flex-column gap-0 " style="align-items: flex-start;">
+                        <span>Adams Garuba</span>
+                        <span class="small-subtitle subtitle-text-color-2">Patient/ 8181</span>
+                    </div>
+                    <mat-icon>link</mat-icon>
+                </div>
+
+            </div>
+            <div class="recurrence g-just-flex  justify-content-start">
+                <div class="recurrence-pattern g-just-flex 
+                
+                gap-12 flex-column
+                justify-content-start
+               
+                ">
+                    <div class="pipe-separated g-just-flex justify-content-start gap-12 mb-8">
+                        <div class="pattern g-just-flex justify-content-start gap-12">
+                            <mat-icon>
+                                event_repeat
+                            </mat-icon>
+                            <span>Daily</span>
+                        </div>
+                        <div class="pipe">
+                            |
+                        </div>
+                        <div class="pattern g-just-flex justify-content-start gap-8">
+                            <!-- <mat-icon>
+                                show_chart
+                            </mat-icon> -->
+                            <!-- <span class="subtitle-text-color-2 small-subtitle"> Start - </span> -->
+                            <span class="">Jan 12, 2025</span>
+                            <!-- </div> -->
+
+                            <!-- <div class="pipe">
+                            |
+                        </div> -->
+                            <div class="rounded-icon">
+                                <mat-icon>arrow_forward</mat-icon>
+                            </div>
+                            <!-- <div class="pattern g-just-flex justify-content-start gap-8">
+                            <mat-icon>
+                                show_chart
+                            </mat-icon> -->
+                            <!-- <span class="subtitle-text-color-2 small-subtitle">End - </span> -->
+                            <span class="">Jan 18, 2025</span>
+                        </div>
+
+
+                    </div>
+                    <div class="times  g-just-flex justify-content-start gap-12">
+                        <mat-icon>
+                            access_time
+                        </mat-icon>
+                        <div
+                            class="time-list subtitle-text-color-2 g-just-flex justify-content-start gap-12 small-subtitle mb-5">
+
+                            <span class="recurrence-time">8:00 AM</span>
+                            <span class="recurrence-time">12:00 PM</span>
+                            <span class="recurrence-time">4:00 PM</span>
+                            <span class="recurrence-time">8:00 PM</span>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- <div class="start-date">
+                    <span>28 Sep, 2023</span>
+                </div>
+                <div class="end-date">
+                    <span>30 Sep, 2023</span>
+
+                </div> -->
+            </div>
+            <div class="mt-12"></div>
+            <mat-divider></mat-divider>
+            <div class="mb-12"></div>
+            <div class="g-just-flex small-subtitle " style="justify-content: space-between;">
+                <a [routerLink]="['/']" class="g-just-flex gap-8" style="
+                color: var(--mat-sys-primary);
+                    text-decoration: none;
+                   ">
+                    <span> Fullfilment Details</span>
+                    <mat-icon style="
+                   
+                    font-size: 14px;
+                    
+                    height: 14px; width: 14px;">chevron_right</mat-icon>
+                </a>
+                <div class="assignee">
+                    Dr. Muhammad, Dr. Garba
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <form class="overall-tasks-form" [formGroup]="overallTasksForm">
+
+        <div class="form-array" [formArrayName]="'tasksForm'">
+            @for (taski of taskFormArray.controls; track $index;) {
+
+            <div class="task-form">
+                <div class="task-label mb-15">Task {{ $index + 1 }}</div>
+                <div class="task-item" [formGroupName]="$index">
+
+                    @for(eachField of formFields; track $index){
+
+                    @switch(eachField.generalProperties.fieldApiName){
+                    @case ('taskName') {
+                    <mat-form-field appearance="outline" class="me-30 mb-10" floatLabel="always">
+                        <mat-label>Give the Task A Name</mat-label>
+                        <input matInput [formControlName]="'taskName'" placeholder="Give the Task A Name">
+
+                    </mat-form-field>
+                    }
+                    @case('taskDescription') {
+                    <mat-form-field style="display: block; width: 450px; max-width: 100%;" appearance="outline"
+                        class="me-30 mb-10" floatLabel="always">
+                        <mat-label>Describe the Task</mat-label>
+                        <textarea matInput [formControlName]="'taskDescription'" placeholder="Describe the Task"
+                            rows="3"></textarea>
+                    </mat-form-field>
+                    }
+                    @case ('taskFocus') {
+
+                    <mat-form-field appearance="outline" class="me-30 mb-10" floatLabel="always">
+                        <mat-label>Task Focus</mat-label>
+                        <mat-select [formControlName]="'taskFocus'">
+                            @for(option of eachField.data; track $index){
+                            <mat-option [value]="option">
+                                {{ option }}
+                            </mat-option>
+                            }
+
+                        </mat-select>
+                    </mat-form-field>
+                    }
+
+                    @case('taskRecurrenceDateAndTime'){
+                    <!-- @let gg = Object.values(eachField.groupFields); -->
+                    @for(eachSubField of eachField.keys; track $index;){
+                    @switch (eachSubField) {
+                    @case('recurrencePattern'){
+                    <!-- {{eachField['recurrencePattern'] | json}} {{'dddkkkls'}} -->
+                    <div class="form-title mb-1 g-just-flex gap-15 justify-content-start">
+                        <mat-icon>settings</mat-icon>
+                        <span>Recurrence Settings</span>
+                    </div>
+                    <div class="subtitle mb-18 subtitle-text-color-2 small-subtitle mb-8">
+                        Set repetition periods
+                        and
+                        times for tasks
+                    </div>
+                    <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                        <mat-label>Choose a recurrence pattern</mat-label>
+                        <input type="text" formControlName="recurrencePattern" matInput [matAutocomplete]="auc"
+                            placeholder="Recurrence Pattern">
+                        <mat-autocomplete #auc="matAutocomplete">
+                            @for(value of (eachField['groupFields']['recurrencePattern'].data || []); track $index){
+                            <mat-option [value]="value">
+                                {{ value }}
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <!-- {{taski.get(['recurrencePattern'])?.value.trim()}} -->
+                    }
+
+                    <!-- ['recurrencePattern', 'daysOfWeek',
+            'oneTimeDate', 'oneTimeTime',
+            'throughoutAdmissionPeriodTime',
+            'startDate', 'endDate', 'startTime', 'endTime', 'executionDate', 'executionTime '], -->
+                    @case('oneTimeDate'){
+                    <!-- {{taski.get(['recurrencePattern'])?.value}}{{ ' One Time'}} -->
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'One Time') {
+
+                    <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                        <mat-label>Set Date for This Task</mat-label>
+                        <input matInput [formControlName]="'oneTimeDate'" placeholder="Set Date for This Task"
+                            [matDatepicker]="picker">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    }
+                    }
+                    @case('oneTimeTime'){
+
+                    <!-- {{taski.get(['recurrencePattern'])?.value}}{{ ' One Time'}} -->
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'One Time'
+                    ) {
+
+
+                    @if(taski.get(['isOneTimeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="oneTimeTime"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+                    @else if (taski.get(['isAnyTimeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="anyTime"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+                    @else if (taski.get(['isTimeRangeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="timeRange"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+
+                    }
+                    @else {
+
+                    <ng-container [ngTemplateOutlet]="timeperiod"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+
+
+
+
+                    }
+
+                    }
+
+                    @case ('daysOfWeek') {
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
+                    ) {
+
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>Select the day of the week you want the task done on the patient</mat-hint>
+                        <mat-label>Select Day of Week</mat-label>
+                        <mat-select formControlName="daysOfWeek">
+                            @for (day of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+                            'Sunday'];
+                            track $index) {
+                            <mat-option value="{{day}}">
+                                {{day}}
+                            </mat-option>
+                            }
+                        </mat-select>
+
+                    </mat-form-field>
+                    }
+                    }
+
+                    @case('daysOfMonth'){
+
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Monthly'
+                    ) {
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>Select the day of the month you want the task done on the patient</mat-hint>
+                        <mat-label>Select Day of Month</mat-label>
+                        <mat-select formControlName="daysOfMonth">
+                            @for (day of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                            22,
+                            23, 24, 25,
+                            26, 27, 28, 29, 30]; track $index;){
+                            <mat-option value="{{day}}">
+                                {{day}}
+                            </mat-option>
+                            }
+
+                        </mat-select>
+                    </mat-form-field>
+                    }
+
+
+                    }
+                    @case ('startMonth') {
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Monthly'
+                    ) {
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>When do you want this task to start</mat-hint>
+                        <mat-label>Start Month</mat-label>
+                        <mat-select formControlName="startMonth">
+                            @for (month of ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                            'August',
+                            'September', 'October', 'November', 'December']; track $index;) {
+                            <mat-option value="{{month}}">
+                                {{month}}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    }
+
+
+
+                    }
+                    @case ('endMonth') {
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Monthly'
+                    ) {
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>When do you want this task to end</mat-hint>
+                        <mat-label>End Month</mat-label>
+                        <mat-select formControlName="endMonth">
+                            @for (month of ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                            'August',
+                            'September', 'October', 'November', 'December']; track $index;) {
+                            <mat-option value="{{month}}">
+                                {{month}}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    }
+
+                    }
+
+                    @case('startDate'){
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Daily'
+
+
+                    ) {
+
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>When do you want this task to start</mat-hint>
+                        <mat-label>Start Date</mat-label>
+                        <input matInput [formControlName]="'startDate'" placeholder="Start Date"
+                            [matDatepicker]="pickerSD">
+                        <mat-datepicker-toggle matSuffix [for]="pickerSD"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerSD></mat-datepicker>
+                    </mat-form-field>
+                    }
+                    }
+                    @case ('endDate') {
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Daily'
+
+
+
+                    ) {
+                    <mat-form-field floatLabel="always" appearance="outline" class="me-30 mb-20">
+                        <mat-hint>When do you want this task to end</mat-hint>
+                        <mat-label>End Date</mat-label>
+                        <input matInput [formControlName]="'endDate'" placeholder="End Date" [matDatepicker]="pickerED">
+                        <mat-datepicker-toggle matSuffix [for]="pickerED"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerED></mat-datepicker>
+                    </mat-form-field>
+                    }
+
+                    }
+
+                    @case('startTime'){
+                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Daily'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Monthly'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Yearly'
+                    || taski.get(['recurrencePattern'])?.value.trim() === 'Daily Throughout Admission Period'
+
+                    ) {
+
+                    @if(taski.get(['isOneTimeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="oneTimeTime"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+                    @else if (taski.get(['isAnyTimeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="anyTime"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+                    @else if (taski.get(['isTimeRangeInstead'])?.value === true) {
+                    <ng-container [ngTemplateOutlet]="timeRange"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+
+                    }
+                    @else {
+
+                    <ng-container [ngTemplateOutlet]="timeperiod"
+                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
+                    }
+                    }
+                    }
+
+
+                    }
+                    }
+
+                    }
+
+
+                    }
+                    }
+
+                    <button class="delete-task-button" mat-icon-button (click)="taskFormArray.removeAt($index)"
+                        aria-label="Remove Task">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+
+            </div>
+
+            }
+        </div>
+
+        <div class="my-15 g-just-flex" style="justify-content: flex-end;">
+            <button mat-flat-button (click)="addTasks()">
+                <mat-icon>add</mat-icon>
+                <span>Add Another Task</span>
+            </button>
+        </div>
+
+    </form>
+
+
+    }
+    @if(data){
+    <div class="my-12" style="display: flex; justify-content: flex-end; width: 100%;">
+        <button mat-flat-button (click)="saveTasks()">Save Tasks</button>
+    </div>
+
+    }
+    <ng-template #timeRange let-taski="taski">
+        <div class="mat-mdc-form-field group g-just-flex me-30 mb-20" style="height: max-content;
+                    position: relative; 
+                    display: block; width: 520px; max-width: 100%; padding: 10px;
+                    ">
+
+            <div class="title">Set A Range of Time For This Task</div>
+            <div class="subtitle subtitle-text-color-2 mb-20 small-subtitle">
+                This means the task is still valid when executed anytime between the two times you set.
+            </div>
+            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                <mat-label>From</mat-label>
+
+                <input matInput [matTimepicker]="pickeri1" id="from" #from>
+                <mat-timepicker-toggle matIconSuffix [for]="pickeri1" />
+                <mat-timepicker #pickeri1 />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="" floatLabel="always">
+                <mat-label>To</mat-label>
+                <input matInput [matTimepicker]="pickeri2" id="to" #to>
+                <mat-timepicker-toggle matIconSuffix [for]="pickeri2" />
+                <mat-timepicker #pickeri2 />
+
+            </mat-form-field>
+            <div class="select-button pos-abs g-just-flex" [mat-menu-trigger-for]="mom1">
+
+                <mat-icon>arrow_drop_down</mat-icon>
+
+            </div>
+            <mat-menu name="timeAlternative" id="timeAlternative" #mom1="matMenu">
+
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                    Set A Specific Time Instead
+                </div>
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                    Set A Time Period instead
+                </div>
+                <div mat-menu-item value="period" (click)="
+                setToAnyTime(taski, 'isAnyTimeInstead')">
+                    Set to Any Time
+
+                </div>
+            </mat-menu>
+        </div>
+
+        <input type="text" formControlName="oneTimeTime" matInput style="display: none;"
+            value="{{from.value}} - {{to.value}}" placeholder="Set Time or Period For This Task">
+
+
+    </ng-template>
+
+    <ng-template #timeperiod let-taski="taski">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+                    position: relative;
+                    ">
+            <mat-form-field appearance="outline" class="" floatLabel="always">
+                <mat-label>Set A Period For This Task</mat-label>
+
+                <mat-select formControlName="oneTimeTime" placeholder="Set  Period For This Task">
+                    <mat-option value="morning">Morning (6 AM - 12 PM)</mat-option>
+                    <mat-option value="afternoon">Afternoon (12 PM - 6 PM)</mat-option>
+                    <mat-option value="evening">Evening (6 PM - 9 PM)</mat-option>
+                    <mat-option value="night">Night (9 PM - 12 AM)</mat-option>
+                    <mat-option value="midnight">Midnight (12 AM - 6 AM)</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div class="select-button pos-abs g-just-flex" [mat-menu-trigger-for]="mom2">
+
+                <mat-icon>arrow_drop_down</mat-icon>
+
+            </div>
+            <mat-menu name="timeAlternative" id="timeAlternative" #mom2="matMenu">
+
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                    Set A Specific Time Instead
+                </div>
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                    Set a Time Range instead
+                </div>
+                <div mat-menu-item value="period" (click)="
+                setToAnyTime(taski, 'isAnyTimeInstead')">
+                    Set to Any Time
+
+                </div>
+            </mat-menu>
+        </div>
+
+    </ng-template>
+
+    <ng-template #oneTimeTime let-taski="taski">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+                    position: relative;
+                    ">
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Set Time For This Task</mat-label>
+                <input matInput [formControlName]="'oneTimeTime'" placeholder="Set Time or Period For This Task"
+                    [matTimepicker]="picker">
+                <mat-timepicker-toggle matIconPrefix [for]="picker" />
+                <mat-timepicker #picker />
+
+            </mat-form-field>
+
+            <div class="select-button pos-abs g-just-flex" [mat-menu-trigger-for]="mom3">
+
+                <mat-icon>arrow_drop_down</mat-icon>
+
+            </div>
+            <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
+
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                    Set A Time Period instead
+                </div>
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                    Set a Time Range instead
+                </div>
+                <div mat-menu-item value="period" (click)="
+                setToAnyTime(taski, 'isAnyTimeInstead')">
+                    Set to Any Time
+
+                </div>
+            </mat-menu>
+        </div>
+
+    </ng-template>
+
+    <ng-template #anyTime let-taski="taski">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+                    position: relative;
+                    ">
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Set Time For This Task</mat-label>
+                <input matInput [formControlName]="'oneTimeTime'" placeholder="Set Time or Period For This Task"
+                    value="Any Time During The Day" [disabled]="true">
+                <!-- <mat-timepicker-toggle matIconPrefix [for]="picker" />
+                <mat-timepicker #picker /> -->
+
+            </mat-form-field>
+
+            <div class="select-button pos-abs g-just-flex" [mat-menu-trigger-for]="mom3">
+
+                <mat-icon>arrow_drop_down</mat-icon>
+
+            </div>
+            <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
+
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                    Set A Time Period instead
+                </div>
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                    Set a Time Range instead
+                </div>
+                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                    Set A Specific Time Instead
+                </div>
+            </mat-menu>
+        </div>
+
+    </ng-template>

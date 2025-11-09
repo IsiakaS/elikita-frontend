@@ -1,0 +1,44 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Observation Analytics</mat-card-title>
+        <mat-card-subtitle>Gain insights from observation data</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="my-15">
+        <div class="my-20">
+            <mat-chip-listbox (change)="chipsValueChanges($event)" class="chip-list">
+                <mat-chip-option value="vital-signs" selected>
+
+                    Vital Signs
+                </mat-chip-option>
+                <mat-chip-option value="lab-results">
+                    Lab Results
+                </mat-chip-option>
+
+
+            </mat-chip-listbox>
+        </div>
+        <div class="chart-area my-30">
+
+            <div class="pos-abs">
+                <select [formControl]="chartFilter" class="chart-filter">
+                    @for(option of chartFilterOptions; track $index;) {
+                    <option [value]="option">{{ option }}</option>
+                    }
+
+                </select>
+
+
+            </div>
+
+            @if(ngxChartData){
+            <ngx-charts-line-chart [autoScale]="true" [showGridLines]="true" [legendTitle]="legendTitle"
+                [legend]="false" [scheme]="colorScheme" [showXAxisLabel]="showXAxisLabel"
+                [showYAxisLabel]="showYAxisLabel" [xAxis]="xAxis" [yAxis]="yAxis" [xAxisLabel]="xAxisLabel"
+                [yAxisLabel]="yAxisLabel" [timeline]="timeline" [results]="ngxChartData">
+            </ngx-charts-line-chart>
+            }@else {
+            No Data
+            }
+        </div>
+    </mat-card-content>
+</mat-card>

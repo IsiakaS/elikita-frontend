@@ -1,0 +1,39 @@
+@if(designatedFormFields && designatedRegForm){
+<div class="" style="max-width: 900px; margin: 30px auto;">
+    <mat-tab-group>
+
+        <mat-tab label="Appointment Details">
+            <div class="" style="max-width: 900px;">
+                @if(designatedFormFields && designatedRegForm){
+                <app-dynamic-forms-v2 [formFields]="designatedFormFields" [formMetaData]="designatedRegForm">
+
+                </app-dynamic-forms-v2>}
+
+            </div>
+        </mat-tab>
+        <mat-tab label="Select Time & Date">
+            <div class="" style="max-width: 700px; margin:auto" class="date-slot">
+                <mat-card class="demo-inline-calendar-card" style="border: 1px solid var(--mat-sys-outline);">
+                    <mat-calendar [(selected)]="selected"></mat-calendar>
+
+                    <p>Selected date: {{selected}}</p>
+                </mat-card>
+                <mat-card>
+                    <mat-chip-listbox class="p-20">
+                        @for(option of ['07:00AM', '08:00AM', '09:00AM', '10:00AM', '11:00AM', '12:00AM', '01:00PM'];
+                        track $index;){
+                        <mat-chip-option class="me-30">
+                            {{option}}
+                        </mat-chip-option>
+                        }
+                    </mat-chip-listbox>
+                </mat-card>
+
+                <button mat-flat-button>Book Appointment</button>
+
+            </div>
+
+        </mat-tab>
+
+    </mat-tab-group>
+</div>}

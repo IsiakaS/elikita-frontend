@@ -1,0 +1,147 @@
+<div class="default-task my-15">
+
+    <div class="task-details my-30">
+        <div class="super-title resource-name">
+            Vital Signs
+        </div>
+        <div class="task-header">
+            <div class="task-header-left">
+
+                <div class="task-name">
+                    Vital Signs Monitoring
+                </div>
+                <div class="task-description subtitle-text-color-2 small-subtitle mb-15">
+                    Monitor the patient's vital signs such as temperature, blood pressure, heart rate, and
+                    respiratory rate
+                    regularly to ensure their stability and well-being.
+                </div>
+            </div>
+            <div class="task-header-right">
+                <!-- <div class="actions-wrapper"> -->
+                <button class="action-button g-just-flex justify-content-start gap-8">
+                    <mat-icon>assignment_ind</mat-icon>
+                    <span>Assign</span>
+                </button>
+                <div class="more-btn g-just-flex" [mat-menu-trigger-for]="mom3" style="position: relative;">
+
+                    <mat-icon>more_vert</mat-icon>
+
+                </div>
+                <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
+
+                    <div mat-menu-item value="period">
+                        Edit
+                    </div>
+                    <div mat-menu-item value="period">
+                        Delete
+                    </div>
+                    <div mat-menu-item value="period" (click)="fulfillTasks()">
+                        Fulfill
+                    </div>
+                </mat-menu>
+
+                <!-- </div> -->
+            </div>
+        </div>
+        <div class="middle-patient g-just-flex gap-8 mb-15
+            justify-content-start
+            ">
+            <div class="rounded-icon-wrapper g-just-flex gap-8">
+
+                <mat-icon>person</mat-icon>
+            </div>
+            <div class="g-just-flex gap-30">
+                <div class="g-just-flex flex-column gap-0 " style="align-items: flex-start;">
+                    <span>Adams Garuba</span>
+                    <span class="small-subtitle subtitle-text-color-2">Patient/ 8181</span>
+                </div>
+                <mat-icon>link</mat-icon>
+            </div>
+
+        </div>
+        <div class="recurrence g-just-flex  justify-content-start">
+            <div class="recurrence-pattern g-just-flex 
+                
+                gap-12 flex-column
+                justify-content-start
+               
+                ">
+                <div class="pipe-separated g-just-flex justify-content-start gap-12 mb-8">
+                    <div class="pattern g-just-flex justify-content-start gap-12">
+                        <mat-icon>
+                            event_repeat
+                        </mat-icon>
+                        <span>Daily</span>
+                    </div>
+                    <div class="pipe">
+                        |
+                    </div>
+                    <div class="pattern g-just-flex justify-content-start gap-8">
+                        <!-- <mat-icon>
+                                show_chart
+                            </mat-icon> -->
+                        <!-- <span class="subtitle-text-color-2 small-subtitle"> Start - </span> -->
+                        <span class="">Jan 12, 2025</span>
+                        <!-- </div> -->
+
+                        <!-- <div class="pipe">
+                            |
+                        </div> -->
+                        <div class="rounded-icon">
+                            <mat-icon>arrow_forward</mat-icon>
+                        </div>
+                        <!-- <div class="pattern g-just-flex justify-content-start gap-8">
+                            <mat-icon>
+                                show_chart
+                            </mat-icon> -->
+                        <!-- <span class="subtitle-text-color-2 small-subtitle">End - </span> -->
+                        <span class="">Jan 18, 2025</span>
+                    </div>
+
+
+                </div>
+                <div class="times  g-just-flex justify-content-start gap-12">
+                    <mat-icon>
+                        access_time
+                    </mat-icon>
+                    <div
+                        class="time-list subtitle-text-color-2 g-just-flex justify-content-start gap-12 small-subtitle mb-5">
+
+                        <span class="recurrence-time">8:00 AM</span>
+                        <span class="recurrence-time">12:00 PM</span>
+                        <span class="recurrence-time">4:00 PM</span>
+                        <span class="recurrence-time">8:00 PM</span>
+                    </div>
+                </div>
+
+            </div>
+            <!-- <div class="start-date">
+                    <span>28 Sep, 2023</span>
+                </div>
+                <div class="end-date">
+                    <span>30 Sep, 2023</span>
+
+                </div> -->
+        </div>
+        <div class="mt-12"></div>
+        <mat-divider></mat-divider>
+        <div class="mb-12"></div>
+        <div class="g-just-flex small-subtitle " style="justify-content: space-between;">
+            <a [routerLink]="['/']" class="g-just-flex gap-8" style="
+                color: var(--mat-sys-primary);
+                    text-decoration: none;
+                   ">
+                <span> Fullfilment Details</span>
+                <mat-icon style="
+                   
+                    font-size: 14px;
+                    
+                    height: 14px; width: 14px;">chevron_right</mat-icon>
+            </a>
+            <div class="assignee">
+                Dr. Muhammad, Dr. Garba
+            </div>
+        </div>
+    </div>
+
+</div>

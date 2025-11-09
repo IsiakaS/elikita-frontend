@@ -1,5 +1,5 @@
 import { AsyncPipe, TitleCasePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +10,7 @@ import { DynamicFormsComponent } from '../dynamic-forms/dynamic-forms.component'
 import { combineLatest, forkJoin, map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-forms-v2.component';
-import { CodeableConceptField, CodeField, GroupField, IndividualField, IndividualReferenceField, ReferenceFieldArray, formMetaData, codeableConceptDataType, ReferenceDataType, codingDataType, SingleCodeField } from '../shared/dynamic-forms.interface2';
+import { CodeableConceptField, CodeField, GroupField, IndividualField, IndividualReferenceField, ReferenceFieldArray, formMetaData, codeableConceptDataType, ReferenceDataType, codingDataType, SingleCodeField, generalFieldsData, CodeableConceptFieldFromBackEnd } from '../shared/dynamic-forms.interface2';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SuccessMessageComponent } from '../shared/success-message/success-message.component';
 import { EncounterServiceService } from './encounter-service.service';
@@ -24,11 +24,21 @@ import { TopProfileComponent } from '../top-profile/top-profile.component';
 import { PatientSidedetailsComponent } from '../patient-sidedetails/patient-sidedetails.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
+import { TopActionsService } from '../app-wrapper/top-actions.service';
+import { AdmissionService } from '../admission/add-admission/admission.service';
+import { PatientAdmissionWrapperComponent } from '../patient-admission-wrapper/patient-admission-wrapper.component';
+import { AddVitalsComponent } from '../patient-observation/add-vitals/add-vitals.component';
+import { BookingsFormComponent } from '../bookings-form/bookings-form.component';
+import { AuthService } from '../shared/auth/auth.service';
+import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
+import { CheckSheetComponent } from '../check-sheet/check-sheet.component';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
   selector: 'app-patient-wrapper',
-  imports: [MatTabsModule, PatientSidedetailsComponent, MatSidenavModule,
+  imports: [MatTabsModule,
+    MatButtonModule,
+    PatientSidedetailsComponent, MatSidenavModule, PatientAdmissionWrapperComponent,
     SidemenuComponent, DashboardsWrapperComponent, TopbreadcrumbComponent, TopProfileComponent,
     RouterOutlet, TitleCasePipe, RouterLink, RouterLinkActive, MatIconModule, MatButtonModule, MatMenuModule,
 
@@ -38,6 +48,8 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   styleUrl: './patient-wrapper.component.scss'
 })
 export class PatientWrapperComponent {
+  auth = inject(AuthService);
+
   route = inject(ActivatedRoute);
   sn = inject(MatSnackBar);
   dialog = inject(MatDialog);
@@ -45,15 +57,23 @@ export class PatientWrapperComponent {
   encounterState: Observable<any> | undefined;
 
   patientId: string = '';
-  links: string[] = ['summary', 'observations', 'conditions', 'medications'];
+  links: string[] = ['summary', 'observations', 'diagnosis', 'tests-requests', 'medications', 'allergies', 'immunizations'];
+
   // 'medications', 'procedures', 'immunizations', 'allergies', 'encounters'];
   activeLink = this.links[0];
   ecounterService = inject(EncounterServiceService)
 
   resolvedData: any;
   patientDetailsStripService = inject(PatientDetailsKeyService);
+  isPatientAdmitted: boolean = false;
   ngOnInit() {
-    this.patientDetailsStripService.openPatientDetailsStrip();
+    this.route.queryParams.subscribe((e: any) => {
+      if (e['type'] && e['type'] == 'admitted') {
+        alert(e['type']);
+        this.isPatientAdmitted = true;
+      }
+    })
+    // this.patientDetailsStripService.openPatientDetailsStrip();
     combineLatest({
       data: this.route.data, params:
         this.route.params
@@ -70,450 +90,593 @@ export class PatientWrapperComponent {
   }
 
   addEncounter() {
+    this.ecounterService.addEncounter(this.patientId);
     // Logic to add an encounter
-    console.log('Add Encounter clicked');
-    forkJoin({
-      class: this.http.get("/encounter/encounter_class.json"),
-      priority: this.http.get("/encounter/encounter_priority.json"),
-      reference: this.http.get("/encounter/encounter_reference.json"),
-      participant: this.http.get("/encounter/encounter_participant.json") as Observable<ReferenceDataType>,
-      reason: this.http.get("/encounter/encounter_reason.json"),
-      reason_use: this.http.get("/encounter/encounter_reason_use.json"),
+    // console.log('Add Encounter clicked');
+    // forkJoin({
+    //   class: this.http.get("/encounter/encounter_class.json"),
+    //   priority: this.http.get("/encounter/encounter_priority.json"),
+    //   reference: this.http.get("/encounter/encounter_reference.json"),
+    //   participant: this.http.get("/encounter/encounter_participant.json") as Observable<ReferenceDataType>,
+    //   reason: this.http.get("/encounter/encounter_reason.json"),
+    //   reason_use: this.http.get("/encounter/encounter_reason_use.json"),
 
-    }).pipe(map((all: any) => {
-      const keys = Object.keys(all);
-      keys.forEach((key) => {
-        console.log(all[key]);
-        if (all[key].hasOwnProperty('system') && all[key].hasOwnProperty('property')) {
-          all[key] = {
-            ...all[key], concept: all[key].concept.map((e: any) => {
+    // }).pipe(map((all: any) => {
+    //   const keys = Object.keys(all);
+    //   keys.forEach((key) => {
+    //     console.log(all[key]);
+    //     if (all[key].hasOwnProperty('system') && all[key].hasOwnProperty('property')) {
+    //       all[key] = {
+    //         ...all[key], concept: all[key].concept.map((e: any) => {
 
-              const system = all[key].system;
-              console.log(key);
-              return { ...e, system }
-
-
-            })
-          }
-        } else {
-          all[key] = all[key]
-        }
-      })
-      return all;
-    })).subscribe((g: any) => {
-      console.log(g);
-      const dRef = this.dialog.open(DynamicFormsV2Component, {
-        maxHeight: '90vh',
-        maxWidth: '900px',
-        autoFocus: false,
-        data: {
-
-          formMetaData: <formMetaData>{
-            formName: 'Encounter (Visits)',
-            formDescription: "Record your encounter with patient",
-            submitText: 'Initiate Encounter',
-          },
-
-          formFields: <FormFields[]>
-            [
-              {
-                generalProperties: {
-
-                  fieldApiName: 'class',
-                  fieldName: 'Type of Encounter',
-                  fieldLabel: 'Type of Encounter',
-                  fieldType: 'CodeableConceptField',
-                  isArray: false,
-                  isGroup: false
-                },
-                data: <codeableConceptDataType>{
-                  coding: g.class.concept
-                }
-              },
-              {
-                generalProperties: {
-
-                  fieldApiName: 'priority',
-                  fieldName: 'Encounter Urgency',
-                  fieldLabel: 'Encounter Urgency',
-                  fieldType: 'CodeableConceptField',
-                  isArray: false,
-                  isGroup: false
-                },
-                data: <codeableConceptDataType>{
-                  coding: g.priority.concept
-                }
-              },
-              {
-                generalProperties: {
-
-                  fieldApiName: 'participant',
-                  fieldName: 'Participant',
-                  fieldLabel: 'People Providing Service',
-                  fieldType: 'IndividualReferenceField',
-                  isArray: true,
-                  isGroup: false
-                },
-                data: <ReferenceDataType>g.participant
+    //           const system = all[key].system;
+    //           console.log(key);
+    //           return { ...e, system }
 
 
+    //         })
+    //       }
+    //     } else {
+    //       all[key] = all[key]
+    //     }
+    //   })
+    //   return all;
+    // })).subscribe((g: any) => {
+    //   console.log(g);
+    //   const dRef = this.dialog.open(DynamicFormsV2Component, {
+    //     maxHeight: '90vh',
+    //     maxWidth: '900px',
+    //     autoFocus: false,
+    //     data: {
 
-              },
+    //       formMetaData: <formMetaData>{
+    //         formName: 'Encounter (Visits)',
+    //         formDescription: "Record your encounter with patient",
+    //         submitText: 'Initiate Encounter',
+    //       },
 
-              {
-                generalProperties: {
-                  fieldApiName: 'encounter_reason',
-                  fieldName: 'Reason for Encounter',
-                  fieldLabel: 'Reason for Encounter',
-                  isArray: true,
-                  isGroup: true
+    //       formFields: <FormFields[]>
+    //         [
+    //           {
+    //             generalProperties: {
 
-                },
-                groupFields: {
-                  'reason': <CodeableConceptField>{
-                    generalProperties: {
-                      fieldApiName: 'reason',
-                      fieldName: 'Reason for Encounter',
-                      fieldLabel: 'Reason for Encounter',
-                      fieldType: 'CodeableConceptField',
-                      isArray: false,
-                      isGroup: false
-                    },
-                    data: {
-                      coding: g.reason.concept
-                    }
-                  },
-                  'encounter_use': <CodeableConceptField>{
-                    generalProperties: {
-                      fieldApiName: 'encounter_reason_use',
-                      fieldName: 'Reason\'s Type',
-                      fieldLabel: 'Reason\'s Type',
-                      fieldType: 'CodeableConceptField',
-                      isArray: false,
-                      isGroup: false
-                    },
-                    data: {
-                      coding: g.reason_use.concept
-                    }
-                  }
-                }
+    //               fieldApiName: 'class',
+    //               fieldName: 'Type of Encounter',
+    //               fieldLabel: 'Type of Encounter',
+    //               fieldType: 'CodeableConceptField',
+    //               isArray: false,
+    //               isGroup: false
+    //             },
+    //             data: <codeableConceptDataType>{
+    //               coding: g.class.concept
+    //             }
+    //           },
+    //           {
+    //             generalProperties: {
+
+    //               fieldApiName: 'priority',
+    //               fieldName: 'Encounter Urgency',
+    //               fieldLabel: 'Encounter Urgency',
+    //               fieldType: 'CodeableConceptField',
+    //               isArray: false,
+    //               isGroup: false
+    //             },
+    //             data: <codeableConceptDataType>{
+    //               coding: g.priority.concept
+    //             }
+    //           },
+    //           {
+    //             generalProperties: {
+
+    //               fieldApiName: 'participant',
+    //               fieldName: 'Participant',
+    //               fieldLabel: 'People Providing Service',
+    //               fieldType: 'IndividualReferenceField',
+    //               isArray: true,
+    //               isGroup: false
+    //             },
+    //             data: <ReferenceDataType>g.participant
 
 
 
+    //           },
 
-              }
+    //           {
+    //             generalProperties: {
+    //               fieldApiName: 'encounter_reason',
+    //               fieldName: 'Reason for Encounter',
+    //               fieldLabel: 'Reason for Encounter',
+    //               isArray: true,
+    //               isGroup: true
 
-            ]
-
-
-
-        }
-      })
-
-      dRef.afterClosed().subscribe((result) => {
-        console.log(result);
-        // Handle the result of the dialog here
-        if (result) {
-          this.ecounterService.setEncounterState(this.patientId, 'in-progress');
-          this.sn.openFromComponent(SuccessMessageComponent, {
-            data: {
-              message: 'Encounter initiated successfully',
-
-            },
-            panelClass: "error-dialog",
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-          })
-        } else {
-          this.errorService.openandCloseError("You did not initiate an encounter before closing the encounter form!.")
-        }
-
-      });
-
-      // this.dialog.open(DynamicFormsComponent, {
-      //   maxWidth: '560px',
-      //   maxHeight: '90%',
-      //   autoFocus: false,
-      //   data: {
-      //     formMetaData: <formMetaData>{
-      //       formName: 'Encounter (Visits)',
-      //       formDescription: "Record your encounter with patient",
-      //       submitText: 'Initiate Encounter',
-      //     },
-      //     formFields: <formFields[]>[{
-      //       fieldApiName: 'class',
-      //       fieldName: 'Type of Encounter',
-      //       fieldLabel: 'Type of Encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.class.concept,
-      //       codingSystems: g.class.system
-
-      //     },
-
-      //     {
-      //       fieldApiName: 'priority',
-      //       fieldName: 'Encounter Urgency',
-      //       fieldLabel: 'Urgency of the encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.priority.concept,
-      //       codingSystems: g.priority.system
-
-      //     }, {
-      //       fieldApiName: 'participant',
-      //       fieldName: 'Participant',
-      //       fieldLabel: 'People Providing Service',
-      //       dataType: 'Reference',
-      //       BackboneElement_Array: true,
-      //       Reference: g.participant,
-
-      //     }, {
-      //       fieldApiName: 'reason',
-      //       fieldName: 'Reaon for Encounter',
-      //       fieldLabel: 'Reason for Encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.reason.concept,
-      //       codingSystems: g.reason.system,
-      //       BackboneElement_Array: true,
+    //             },
+    //             groupFields: {
+    //               'reason': <CodeableConceptField>{
+    //                 generalProperties: {
+    //                   fieldApiName: 'reason',
+    //                   fieldName: 'Reason for Encounter',
+    //                   fieldLabel: 'Reason for Encounter',
+    //                   fieldType: 'CodeableConceptField',
+    //                   isArray: false,
+    //                   isGroup: false
+    //                 },
+    //                 data: {
+    //                   coding: g.reason.concept
+    //                 }
+    //               },
+    //               'encounter_use': <CodeableConceptField>{
+    //                 generalProperties: {
+    //                   fieldApiName: 'encounter_reason_use',
+    //                   fieldName: 'Reason\'s Type',
+    //                   fieldLabel: 'Reason\'s Type',
+    //                   fieldType: 'CodeableConceptField',
+    //                   isArray: false,
+    //                   isGroup: false
+    //                 },
+    //                 data: {
+    //                   coding: g.reason_use.concept
+    //                 }
+    //               }
+    //             }
 
 
-      //     }]
-      //   }
-      // })
-    })
+
+
+    //           }
+
+    //         ]
+
+
+
+    //     }
+    //   })
+
+    //   dRef.afterClosed().subscribe((result) => {
+    //     console.log(result);
+    //     // Handle the result of the dialog here
+    //     if (result) {
+    //       this.ecounterService.setEncounterState(this.patientId, 'in-progress');
+    //       this.sn.openFromComponent(SuccessMessageComponent, {
+    //         data: {
+    //           message: 'Encounter initiated successfully',
+
+    //         },
+    //         panelClass: "error-dialog",
+    //         duration: 3000,
+    //         horizontalPosition: 'center',
+    //         verticalPosition: 'top'
+    //       })
+    //     } else {
+    //       this.errorService.openandCloseError("You did not initiate an encounter before closing the encounter form!.")
+    //     }
+
+    //   });
+
+    //   // this.dialog.open(DynamicFormsComponent, {
+    //   //   maxWidth: '560px',
+    //   //   maxHeight: '90%',
+    //   //   autoFocus: false,
+    //   //   data: {
+    //   //     formMetaData: <formMetaData>{
+    //   //       formName: 'Encounter (Visits)',
+    //   //       formDescription: "Record your encounter with patient",
+    //   //       submitText: 'Initiate Encounter',
+    //   //     },
+    //   //     formFields: <formFields[]>[{
+    //   //       fieldApiName: 'class',
+    //   //       fieldName: 'Type of Encounter',
+    //   //       fieldLabel: 'Type of Encounter',
+    //   //       dataType: 'CodeableConcept',
+    //   //       codingConcept: g.class.concept,
+    //   //       codingSystems: g.class.system
+
+    //   //     },
+
+    //   //     {
+    //   //       fieldApiName: 'priority',
+    //   //       fieldName: 'Encounter Urgency',
+    //   //       fieldLabel: 'Urgency of the encounter',
+    //   //       dataType: 'CodeableConcept',
+    //   //       codingConcept: g.priority.concept,
+    //   //       codingSystems: g.priority.system
+
+    //   //     }, {
+    //   //       fieldApiName: 'participant',
+    //   //       fieldName: 'Participant',
+    //   //       fieldLabel: 'People Providing Service',
+    //   //       dataType: 'Reference',
+    //   //       BackboneElement_Array: true,
+    //   //       Reference: g.participant,
+
+    //   //     }, {
+    //   //       fieldApiName: 'reason',
+    //   //       fieldName: 'Reaon for Encounter',
+    //   //       fieldLabel: 'Reason for Encounter',
+    //   //       dataType: 'CodeableConcept',
+    //   //       codingConcept: g.reason.concept,
+    //   //       codingSystems: g.reason.system,
+    //   //       BackboneElement_Array: true,
+
+
+    //   //     }]
+    //   //   }
+    //   // })
+    // })
     // You can implement the logic to open a dialog or navigate to a form here
   }
 
   addObservation() {
+    this.ecounterService.addObservation(this.patientId, 'exam');
+    // forkJoin({
 
-    forkJoin({
-
-      practitioner: this.http.get("/encounter/encounter_participant.json") as Observable<ReferenceDataType>,
-      category: this.http.get("/observation/observation_category.json"),
-      code: this.http.get("/observation/observation_code.json"),
-
-
-    }).pipe(map((all: any) => {
-      const keys = Object.keys(all);
-      keys.forEach((key) => {
-        console.log(all[key]);
-        if (all[key].hasOwnProperty('system') && all[key].hasOwnProperty('property')) {
-          all[key] = {
-            ...all[key], concept: all[key].concept.map((e: any) => {
-
-              const system = all[key].system;
-              return { ...e, system }
+    //   practitioner: this.http.get("/encounter/encounter_participant.json") as Observable<ReferenceDataType>,
+    //   category: this.http.get("/observation/observation_category.json"),
+    //   code: this.http.get("/observation/observation_code.json"),
 
 
-            })
-          }
-        } else {
-          all[key] = all[key]
-        }
-      })
-      return all;
-    })).subscribe((g: any) => {
-      console.log(g);
-      const dRef = this.dialog.open(DynamicFormsV2Component, {
-        maxHeight: '90vh',
-        maxWidth: '900px',
-        autoFocus: false,
-        data: {
+    // }).pipe(map((all: any) => {
+    //   const keys = Object.keys(all);
+    //   keys.forEach((key) => {
+    //     console.log(all[key]);
+    //     if (all[key].hasOwnProperty('system') && all[key].hasOwnProperty('property')) {
+    //       all[key] = {
+    //         ...all[key], concept: all[key].concept.map((e: any) => {
 
-          formMetaData: <formMetaData>{
-            formName: 'Observations',
-            formDescription: "Record your Observations",
-            submitText: 'Submit Observation',
-          },
-          formFields: <FormFields[]>[
-            {
-
-              generalProperties: {
-
-                fieldApiName: 'category',
-                fieldName: 'Observation Category',
-                fieldLabel: 'Observation Category',
-
-                fieldType: 'CodeableConceptField',
-                isArray: false,
-                isGroup: false
-              },
-              data: <codeableConceptDataType>{
-                coding: g.category.concept
-              }
-              ,
-            },
-
-            {
-
-              generalProperties: {
-
-                fieldApiName: 'name',
-                fieldName: 'Name of Observation',
-                fieldLabel: 'Name of Observation',
-
-                fieldType: 'CodeableConceptField',
-                isArray: false,
-                isGroup: false
-              },
-              data: <codeableConceptDataType>{
-                coding: g.code.concept
-              }
-              ,
-            },
-            <SingleCodeField>{
-
-              generalProperties: {
-
-                fieldApiName: 'status',
-                fieldName: 'Observation\'s Status',
-                fieldLabel: 'Observation\'s Status',
-
-                fieldType: 'SingleCodeField',
-                isArray: false,
-                isGroup: false
-              },
-              data: this.observation_status
-              ,
-            },
-            <GroupField>{
-              groupFields: {
-                'result_type': <SingleCodeField>{
-
-                  generalProperties: {
-
-                    fieldApiName: 'result_type',
-                    fieldName: 'Type of Result',
-                    fieldLabel: 'Type of Result',
-
-                    fieldType: 'SingleCodeField',
-                    isArray: false,
-                    isGroup: false
-                  },
-                  data: ['Number', 'Text']
-
-                },
-                'result_value': <IndividualField>{
-                  generalProperties: {
-
-                    fieldApiName: 'result_value',
-                    fieldName: 'Result Value',
-                    fieldLabel: 'Result Value',
-
-                    fieldType: 'IndividualField',
-                    isArray: false,
-                    isGroup: false
-                  },
+    //           const system = all[key].system;
+    //           return { ...e, system }
 
 
-                },
+    //         })
+    //       }
+    //     } else {
+    //       all[key] = all[key]
+    //     }
+    //   })
+    //   return all;
+    // })).subscribe((g: any) => {
+    //   console.log(g);
+    //   const dRef = this.dialog.open(DynamicFormsV2Component, {
+    //     maxHeight: '90vh',
+    //     maxWidth: '900px',
+    //     autoFocus: false,
+    //     data: {
 
-                'result_unit': <IndividualField>{
+    //       formMetaData: <formMetaData>{
+    //         formName: 'Observations',
+    //         formDescription: "Record your Observations",
+    //         submitText: 'Submit Observation',
+    //       },
+    //       formFields: <FormFields[]>[
+    //         {
 
-                  generalProperties: {
+    //           generalProperties: {
 
-                    fieldApiName: 'result_unit',
-                    fieldName: 'Unit',
-                    fieldLabel: 'Unit',
+    //             fieldApiName: 'category',
+    //             fieldName: 'Observation Category',
+    //             fieldLabel: 'Observation Category',
 
-                    fieldType: 'SingleCodeField',
-                    isArray: false,
-                    isGroup: false
-                  },
-                  data: this.observation_units
+    //             fieldType: 'CodeableConceptField',
+    //             isArray: false,
+    //             isGroup: false
+    //           },
+    //           data: <codeableConceptDataType>{
+    //             coding: g.category.concept
+    //           }
+    //           ,
+    //         },
 
-                },
+    //         {
 
+    //           generalProperties: {
 
-              },
-              keys: [
-                ''
-              ],
-              generalProperties: {
+    //             fieldApiName: 'name',
+    //             fieldName: 'Name of Observation',
+    //             fieldLabel: 'Name of Observation',
 
-                fieldApiName: 'value',
-                fieldName: 'Test Results',
-                fieldLabel: 'Test Results',
-                fieldType: 'SingleCodeField',
-                isArray: false,
-                isGroup: true
-              },
+    //             fieldType: 'CodeableConceptField',
+    //             isArray: false,
+    //             isGroup: false
+    //           },
+    //           data: <codeableConceptDataType>{
+    //             coding: g.code.concept
+    //           }
+    //           ,
+    //         },
+    //         <SingleCodeField>{
 
+    //           generalProperties: {
 
-            },
+    //             fieldApiName: 'status',
+    //             fieldName: 'Observation\'s Status',
+    //             fieldLabel: 'Observation\'s Status',
 
-            <GroupField>{
-              groupFields: {
-                'result_type': <SingleCodeField>{
+    //             fieldType: 'SingleCodeField',
+    //             isArray: false,
+    //             isGroup: false
+    //           },
+    //           data: this.observation_status
+    //           ,
+    //         },
+    //         <GroupField>{
+    //           groupFields: {
+    //             'result_type': <SingleCodeField>{
 
-                  generalProperties: {
+    //               generalProperties: {
 
-                    fieldApiName: 'result_type',
-                    fieldName: 'Type',
-                    fieldLabel: 'Type',
+    //                 fieldApiName: 'result_type',
+    //                 fieldName: 'Type of Result',
+    //                 fieldLabel: 'Type of Result',
 
-                    fieldType: 'SingleCodeField',
-                    isArray: false,
-                    isGroup: false
-                  },
-                  data: ['Numbers', 'words']
+    //                 fieldType: 'SingleCodeField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
+    //               data: ['Number', 'Text']
 
-                },
-                'result_value': <IndividualField>{
-                  generalProperties: {
+    //             },
+    //             'result_value': <IndividualField>{
+    //               generalProperties: {
 
-                    fieldApiName: 'result_value',
-                    fieldName: 'Value',
-                    fieldLabel: ' Value',
+    //                 fieldApiName: 'result_value',
+    //                 fieldName: 'Result Value',
+    //                 fieldLabel: 'Result Value',
 
-                    fieldType: 'IndividualField',
-                    isArray: false,
-                    isGroup: false
-                  },
-
-
-                },
-
-                'result_unit': <IndividualField>{
-
-                  generalProperties: {
-
-                    fieldApiName: 'result_unit',
-                    fieldName: 'Unit',
-                    fieldLabel: 'Unit',
-
-                    fieldType: 'SingleCodeField',
-                    isArray: false,
-                    isGroup: false
-                  },
-                  data: this.observation_units
-
-                },
-
-
-              },
-              keys: [
-                ''
-              ],
-              generalProperties: {
-
-                fieldApiName: 'Normal Range',
-                fieldName: 'Normal Test  Range',
-                fieldLabel: 'Normal Test Range',
-                fieldType: 'SingleCodeField',
-                isArray: false,
-                isGroup: true
-              },
+    //                 fieldType: 'IndividualField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
 
 
-            },
-          ]
-        }
-      })
-    })
+    //             },
+
+    //             'result_unit': <IndividualField>{
+
+    //               generalProperties: {
+
+    //                 fieldApiName: 'result_unit',
+    //                 fieldName: 'Unit',
+    //                 fieldLabel: 'Unit',
+
+    //                 fieldType: 'SingleCodeField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
+    //               data: this.observation_units
+
+    //             },
+
+
+    //           },
+    //           keys: [
+    //             ''
+    //           ],
+    //           generalProperties: {
+
+    //             fieldApiName: 'value',
+    //             fieldName: 'Test Results',
+    //             fieldLabel: 'Test Results',
+    //             fieldType: 'SingleCodeField',
+    //             isArray: false,
+    //             isGroup: true
+    //           },
+
+
+    //         },
+
+    //         <GroupField>{
+    //           groupFields: {
+    //             'result_type': <SingleCodeField>{
+
+    //               generalProperties: {
+
+    //                 fieldApiName: 'result_type',
+    //                 fieldName: 'Type',
+    //                 fieldLabel: 'Type',
+
+    //                 fieldType: 'SingleCodeField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
+    //               data: ['Numbers', 'words']
+
+    //             },
+    //             'result_value': <IndividualField>{
+    //               generalProperties: {
+
+    //                 fieldApiName: 'result_value',
+    //                 fieldName: 'Value',
+    //                 fieldLabel: ' Value',
+
+    //                 fieldType: 'IndividualField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
+
+
+    //             },
+
+    //             'result_unit': <IndividualField>{
+
+    //               generalProperties: {
+
+    //                 fieldApiName: 'result_unit',
+    //                 fieldName: 'Unit',
+    //                 fieldLabel: 'Unit',
+
+    //                 fieldType: 'SingleCodeField',
+    //                 isArray: false,
+    //                 isGroup: false
+    //               },
+    //               data: this.observation_units
+
+    //             },
+
+
+    //           },
+    //           keys: [
+    //             ''
+    //           ],
+    //           generalProperties: {
+
+    //             fieldApiName: 'Normal Range',
+    //             fieldName: 'Normal Test  Range',
+    //             fieldLabel: 'Normal Test Range',
+    //             fieldType: 'SingleCodeField',
+    //             isArray: false,
+    //             isGroup: true
+    //           },
+
+
+    //         },
+    //       ]
+    //     }
+    //   })
+    // })
 
   }
+  addExamObservation() {
+    this.dialog.open(AddObservationComponent, {
+      maxHeight: '90vh',
+      maxWidth: '1200px',
+      autoFocus: false,
+      data: {
+        isAnyCategory: false,
+        observationCategoryValue: "exam"
+      }
+    })
+  }
+
+
+
+  showEncounterSheet() {
+
+    this.dialog.open(CheckSheetComponent, {
+      maxHeight: '90vh',
+      maxWidth: '900px',
+      autoFocus: false,
+      data: {
+        patientId: this.patientId
+      }
+    })
+  }
   addDiagnosis() {
+    forkJoin({
+      code: this.formFieldsDataService.getFormFieldSelectData('condition', 'code'),
+      //ce.getFormFieldSelectData('medication', 'reason'),
+    }).subscribe({
+      next: (g: any) => {
+        const dRef = this.dialog.open(DynamicFormsV2Component, {
+          maxHeight: '90vh',
+          maxWidth: '650px',
+          autoFocus: false,
+          data: {
+
+            formMetaData: <formMetaData>{
+              formName: 'Diagnosis Form',
+              formDescription: "Use this form to enter a diagnosis for the patient. You can request A.I. assistance using the side chat",
+              submitText: 'Confirm Diagnosis',
+            },
+            formFields: <FormFields[]>[
+              // verificationStatus - unconfirmed | provisional | differential | confirmed | refuted | entered-in-error
+              //clinicalStatus - 	active | recurrence | relapse | inactive | remission | resolved | unknown
+              //severity - mild | moderate | severe
+              //code - 
+              //onsetDateTime - 
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'clinicalStatus',
+                  fieldName: "Clinical Status",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+
+                },
+                data: "active | recurrence | relapse | inactive | remission | resolved | unknown".split('|').map((e: string) => e.trim())
+              },
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'verificationStatus',
+                  fieldName: "Verification Status",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: "unconfirmed | provisional | differential | confirmed | refuted | entered-in-error".split('|').map((e: string) => e.trim())
+              },
+              //severity
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'severity',
+                  fieldName: "Severity",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: "mild | moderate | severe".split('|').map((e: string) => e.trim())
+              },
+              //code
+              <CodeableConceptFieldFromBackEnd>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'code',
+                  fieldName: "Diagnosis Code & Name",
+                  fieldType: 'CodeableConceptFieldFromBackEnd',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+
+                },
+                data: g.code,
+              },
+
+
+
+              <IndividualField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'onsetDateTime',
+                  fieldName: "Onset Date/Time",
+                  fieldType: 'IndividualField',
+                  inputType: 'datetime-local',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: ""
+              }
+            ]
+          }
+        });
+      },
+      error: (err: any) => {
+        console.error('Error fetching diagnosis data:', err);
+        this.errorService.openandCloseError('Error fetching diagnosis data. Please try again later.');
+
+
+
+
+      }
+    })
   }
   formFieldsDataService = inject(FormFieldsSelectDataService);
   errorService = inject(ErrorService)
@@ -737,8 +900,143 @@ export class PatientWrapperComponent {
     "d"       // days
   ]
 
+  @ViewChild('topactions') topactions?: TemplateRef<any>
+  topactionService = inject(TopActionsService)
+  ngAfterViewInit() {
+    this.auth.user.subscribe((e: any) => {
 
+      if (this.topactions && e.role === 'doctor') {
+        this.topactionService.insertTopAction(this.topactions);
+      } else {
+        this.topactionService.removeTopAction();
+      }
+    })
+  }
+
+
+  ngOnDestroy() {
+    if (this.topactions) {
+      this.topactionService.removeTopAction();
+    }
+  }
+
+  admissionService = inject(AdmissionService);
+  openAdmissionDialog() {
+    const dRef = this.dialog.open(DynamicFormsV2Component, {
+      maxHeight: '90vh',
+      maxWidth: '600px',
+      autoFocus: false,
+      data: {
+
+        formMetaData: <formMetaData>{
+          formName: 'Admission',
+          formDescription: "Use this form to admit a patient",
+          submitText: 'Admit Patient',
+        },
+        formFields: <FormFields[]>[
+          {
+            generalProperties: {
+              fieldApiName: 'admission_reason',
+              fieldName: 'Reason for Admission',
+              fieldLabel: 'Reason for Admission',
+              fieldType: 'IndividualField',
+              isArray: false,
+              isGroup: false
+            },
+            data: []
+          }
+        ]
+      }
+    })
+  }
+  addVitals() {
+    this.dialog.open(AddVitalsComponent, {
+      maxHeight: "90vh",
+      maxWidth: "680px"
+    })
+  }
+
+  showBooking() {
+    this.dialog.open(BookingsFormComponent, {
+      maxHeight: '93vh',
+      maxWidth: '1200px',
+    })
+  }
+
+  referPatient() {
+    forkJoin({
+      organization: this.formFieldsDataService.getFormFieldSelectData('referral', 'organization'),
+    }).subscribe((g: any) => {
+      console.log(g);
+      const dRef = this.dialog.open(DynamicFormsV2Component, {
+        maxHeight: '90vh',
+        maxWidth: '900px',
+        autoFocus: false,
+        data: {
+          formMetaData: <formMetaData>{
+            formName: 'Refer Patient',
+            formDescription: "Use this form to refer a patient.The patient details in the ongoing encounter will be used to refer the patient. You can restrict the details to be sent to the organization.",
+            submitText: 'Refer Patient',
+          },
+          formFields: <FormFields[]>[
+            {
+              generalProperties: {
+                fieldApiName: 'organization',
+                fieldName: 'Organization',
+                fieldLabel: 'Organization',
+                fieldType: 'IndividualReferenceField',
+                isArray: false,
+                isGroup: false
+              },
+              data: g.organization
+            },
+            <SingleCodeField>{
+              generalProperties: <generalFieldsData>{
+                auth: {
+                  read: 'all',
+                  write: 'doctor, nurse'
+                },
+                fieldApiName: 'referral_details',
+                fieldName: "Details to be sent",
+                fieldHint: "Select the details from this encounter to be sent to the organization",
+                fieldType: 'SingleCodeField',
+                inputType: 'checkbox',
+                isArray: false,
+                isGroup: false,
+
+
+              },
+              dataType: "SingleCodeDataType",
+              data: ['patient', 'encounter', 'observations', 'Diagnostic report', 'diagnosis', 'medications', 'allergies', 'immunizations', 'procedures', 'vitals'],
+            },
+            //referrral reason
+            {
+              generalProperties: {
+                fieldApiName: 'referral_reason',
+                fieldName: 'Reason for Referral',
+                fieldLabel: 'Reason for Referral',
+                fieldType: 'IndividualField',
+                isArray: false,
+
+                isGroup: false
+              },
+            },
+
+            {
+              generalProperties: {
+                fieldApiName: 'referral_notes',
+                fieldName: 'Notes for Referral',
+                fieldLabel: 'Notes for Referral',
+                fieldType: 'IndividualField',
+                isArray: false,
+                inputType: 'textarea',
+                isGroup: false
+              },
+            },
+          ]
+        }
+      })
+    })
+  }
 }
-
-
 

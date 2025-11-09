@@ -26,19 +26,317 @@ import { MedicineRequestsComponent } from './medicine-requests/medicine-requests
 import { medReqResResolver } from './medicine-requests/med-req-res.resolver';
 import { PatientRegistrationComponent } from './patient-registration/patient-registration.component';
 import { patRegResolver } from './patient-reg/pat-reg.resolver';
+import { PatientRegComponent } from './patient-reg/patient-reg.component';
+import { MakeAppointmentsComponent } from './make-appointments/make-appointments.component';
+import { SpecimenDetailsComponent } from './specimen/specimen-details/specimen-details.component';
+import { HospitalDetailsComponent } from './hospital-details/hospital-details.component';
+import { HospitalRegistrationComponent } from './hospital-registration/hospital-registration.component';
+import { ServicesComponent } from './services/services.component';
+import { ProfileComponent } from './profile/profile.component';
+import { OrdersComponent } from './orders/orders.component';
+import { AdmissionComponent } from './admission/admission.component';
+import { TestingTasksComponent } from './testing-tasks/testing-tasks.component';
+import { AddVitalsComponent } from './patient-observation/add-vitals/add-vitals.component';
+import { TasksTableComponent } from './tasks/tasks-table/tasks-table.component';
+import { AdmissionAnalyticsComponent } from './admission-analytics/admission-analytics.component';
+import { PatientAdmissionWrapperComponent } from './patient-admission-wrapper/patient-admission-wrapper.component';
+import { MedicationComponent2 } from './medication2/medication2.component';
+import { AddMedicationComponent } from './medication2/add-medication/add-medication.component';
+import { AllergyComponent } from './allergy/allergy.component';
+import { PatientSidedetailsComponent } from './patient-sidedetails/patient-sidedetails.component';
+import { TestingComponent } from './testing/testing.component';
+import { ImmunizationComponent } from './immunization/immunization.component';
+import { LabreportComponent } from './labreport/labreport.component';
+import { AddReportComponent } from './labreport/add-report/add-report.component';
+import { EncounterV2Component } from './encounter-v2/encounter-v2.component';
+import { SpecimenComponent } from './specimen/specimen.component';
+import { LabSupplyComponent } from './lab-supply/lab-supply.component';
+import { SpecimensComponent } from './specimens/specimens.component';
+import { CreateScheduleComponent } from './create-schedule/create-schedule.component';
+import { DetailsCardzComponent } from './details-cardz/details-cardz.component';
+import { CardzDetailsCheckComponent } from './cardz-details-check/cardz-details-check.component';
+import { AichatComponent } from './aichat/aichat.component';
+import { BookingsFormComponent } from './bookings-form/bookings-form.component';
+import { InvoiceComponent } from './invoice/invoice.component';
+import { CalendarComponent } from './calendar/calendar.component';
+import { DocumentComponent } from './document/document.component';
+import { AddObservationComponent } from './patient-observation/add-observation/add-observation.component';
+import { CheckSheetComponent } from './check-sheet/check-sheet.component';
+import { EncounterCheckComponent } from './encounter-check/encounter-check.component';
+import { LaunchComponent } from './launch/launch.component';
+import { AuthcallackComponent } from './authcallack/authcallack.component'
+import { AzureUploadDemoComponent } from './upload-ui/azure-upload-demo.component';
+import { PatientRegistrationCenterComponent } from './patient-registration-center/patient-registration-center.component';
+import { patientRegistrationCenterResolver } from './patient-registration-center/patient-registration-center.resolver';
+import { PatientRegistrationApprovedComponent } from './patient-registration-center/patient-registration-approved.component';
+import { PatientRegistrationDeceasedComponent } from './patient-registration-center/patient-registration-deceased.component';
 
 export const routes: Routes = [
+    {
+        path: "testing",
+        component: TestingComponent,
+        children: [
+            {
+                path: "encounter",
+                component: EncounterCheckComponent
+            },
+            {
+                path: "add-obs",
+                component: AddObservationComponent
+            },
+            {
+                path: "check-sheet",
+                component: CheckSheetComponent
+            },
+            //admission'
+            {
+                path: "document",
+                component: DocumentComponent
+            },
+            {
+                path: "calendar",
+                component: CalendarComponent,
+            },
+            {
+
+                path: "ai-chat",
+                component: AichatComponent
+            },
+            {
+                path: "details",
+                component: CardzDetailsCheckComponent
+
+            },
+            {
+                path: "book-try",
+                component: BookingsFormComponent
+            },
+
+
+            {
+                path: "schedule",
+                component: CreateScheduleComponent
+            },
+            {
+                path: "add-medicine",
+                component: AddMedicationComponent
+            },
+            {
+                path: "ec-bills",
+                component: EncounterV2Component
+
+            }, {
+                path: "lab-report",
+                component: LabreportComponent
+
+            },
+            {
+                path: "add-report",
+                component: AddReportComponent
+
+            },
+            {
+                path: "medicine",
+                component: MedicationComponent2,
+
+            },
+            {
+                path: "admission",
+                component: AdmissionComponent,
+                // resolve: { admission: admissionResolver }
+            },
+            {
+                path: "admission-analytics",
+                component: AdmissionAnalyticsComponent,
+
+            },
+            {
+                path: "vitals",
+                component: AddVitalsComponent,
+            },
+            {
+                path: "tasks",
+                component: TestingTasksComponent,
+
+
+            },
+            {
+
+                path: "patientSide",
+                component: PatientSidedetailsComponent
+            },
+            {
+                path: "allergy",
+                component: AllergyComponent,
+            },
+            {
+                path: "task-list",
+                component: TasksTableComponent,
+
+            },
+            {
+                path: "tests-requests",
+                component: LabRequestsComponent,
+                resolve: { labRequests: labRequestsResolver }
+
+
+            },
+            {
+                path: "claims",
+                component: OrdersComponent,
+
+
+            },
+            {
+                path: "invoice",
+                component: InvoiceComponent
+            },
+            {
+                path: "medicine-requests",
+                component: MedicineRequestsComponent,
+                resolve: { medReqRes: medReqResResolver }
+
+
+            },
+            {
+                path: "specimen-details",
+                component: SpecimenDetailsComponent,
+                data: {
+                    title: "Specimen Details", breadCrumbTitle: "Specimen Details",
+                    breadCrumbIcon: "biotech"
+                },
+            },
+            {
+                path: "org",
+                component: HospitalDetailsComponent,
+                data: {
+                    title: "Hospital Details", breadCrumbTitle: "Hospital Details",
+                    breadCrumbIcon: "local_hospital"
+                },
+            },
+
+            //services,
+            {
+                path: "org-services",
+                component: ServicesComponent,
+                data: {
+                    title: "Available Services", breadCrumbTitle: "Available Services",
+                    breadCrumbIcon: "work"
+                }
+            }
+        ]
+    },
     {
         path: "app",
         component: AppWrapperComponent,
         canActivate: [appAuthGuard],
         canActivateChild: [appAuthGuard],
         children: [
+            //medicine-stock
+            {
+                path: "org-reg",
+                component: HospitalRegistrationComponent,
+                data: {
+                    title: "Hospital Registration", breadCrumbTitle: "Hospital Registration",
+                    breadCrumbIcon: "add_business"
+                },
+            },
+            {
+                path: "document",
+                component: DocumentComponent
+            },
+            {
+                path: "calendar",
+                component: CalendarComponent,
+            },
+            {
+                path: "schedule",
+                component: CreateScheduleComponent
+
+            },
+            {
+                path: "tasks",
+                component: TasksTableComponent,
+            },
+            {
+                path: "specimens",
+                component: SpecimensComponent,
+            },
+            {
+                path: "lab-supplies",
+                component: LabSupplyComponent
+
+            },
+            {
+                path: "medicine-stock",
+                component: MedicationComponent2
+            },
+            {
+                path: "admission",
+                component: AdmissionComponent,
+                // resolve: { admission: admissionResolver }
+            },
+            {
+                path: "claims",
+                component: OrdersComponent,
+
+
+            },
+            {
+                path: "patient-bills",
+                component: EncounterV2Component,
+
+
+            },
+
+            {
+                path: "invoice",
+                component: InvoiceComponent
+            },
+            {
+                path: "profile",
+                component: ProfileComponent
+
+            },
+            {
+                path: "org-services",
+                component: ServicesComponent,
+                data: {
+                    title: "Available Services", breadCrumbTitle: "Available Services",
+                    breadCrumbIcon: "work"
+                }
+            },
+
+            {
+                path: "org",
+                component: HospitalDetailsComponent,
+                data: {
+                    title: "Hospital Details", breadCrumbTitle: "Hospital Details",
+                    breadCrumbIcon: "local_hospital"
+                }
+
+            },
             {
                 path: "dashboard",
                 component: DashboardsWrapperComponent,
 
             },
+            {
+                path: "patient-registration",
+                component: PatientRegistrationCenterComponent,
+                resolve: { patientCenter: patientRegistrationCenterResolver },
+                data: {
+                    title: "Patient Registration", breadCrumbTitle: "Patient Registration",
+                    breadCrumbIcon: "person_add"
+                },
+                children: [
+                    { path: '', redirectTo: 'pending', pathMatch: 'full' },
+                    { path: 'pending', component: PatientRegComponent },
+                    { path: 'approved', component: PatientRegComponent },
+                    { path: 'deceased', component: PatientRegComponent },
+                ]
+            },
+            { path: "patient-registration-data", redirectTo: "patient-registration", pathMatch: 'full' },
             {
                 path: "medicine-requests",
                 component: MedicineRequestsComponent,
@@ -53,6 +351,10 @@ export const routes: Routes = [
                 component: AppointmentComponent,
                 resolve: { appointment: appointmentResolver }
 
+            },
+            {
+                path: "appointments/add",
+                component: MakeAppointmentsComponent
             },
 
             {
@@ -70,11 +372,60 @@ export const routes: Routes = [
 
             },
             {
+                component: PatientsComponent,
+                path: "admitted-patients",
+                resolve: { patientsRegistrationData: patientsResolver }
+
+            },
+            {
+                path: "admitted-patients/:id",
+                component: PatientAdmissionWrapperComponent,
+                children: [
+                    {
+                        path: "tasks",
+                        component: TasksTableComponent,
+                    },
+                    {
+                        path: "analytics",
+                        component: AdmissionAnalyticsComponent
+                    },
+                    {
+                        path: "",
+                        redirectTo: "tasks",
+                        pathMatch: 'full'
+                    }
+                ],
+                // resolve: { admission: admissionResolver }
+
+            },
+            {
 
                 path: "patients/:id",
                 component: PatientWrapperComponent,
                 resolve: { patientData: patientsRecordResolver },
                 children: [
+                    //allergies
+                    {
+                        path: "tests-requests",
+                        component: LabRequestsComponent,
+                        resolve: { labRequests: labRequestsResolver }
+
+
+                    },
+
+                    {
+                        path: "allergies",
+                        component: AllergyComponent
+
+                    },
+                    //immunizations
+                    {
+                        path: "immunizations",
+                        component: ImmunizationComponent
+
+                    },
+
+
                     {
                         path: "patients-reg",
                         component: PatientRegistrationComponent,
@@ -97,18 +448,35 @@ export const routes: Routes = [
                         data: { title: "Patient Observations" }
                     },
                     {
-                        path: "conditions",
+                        path: "diagnosis",
 
                         component: PatientConditionComponent,
                         resolve: { patCond: patCondResolver },
-                        data: { title: "Patient Conditions" }
+                        data: { title: "Patient Diagnosis" }
 
                     },
                     {
+                        path: "tests-requests",
+                        component: LabRequestsComponent,
+                        resolve: { labRequests: labRequestsResolver }
+
+
+                    },
+                    // {
+                    //     path: "medications",
+
+                    //     component: MedicationComponent,
+                    //     resolve: { patMed: medicationResolver },
+                    //     data: { title: "Patient Medications" }
+
+                    // },
+                    {
                         path: "medications",
 
-                        component: MedicationComponent,
-                        resolve: { patMed: medicationResolver },
+                        component: MedicineRequestsComponent,
+                        resolve: {
+                            medReqRes: medReqResResolver
+                        },
                         data: { title: "Patient Medications" }
 
                     },
@@ -122,6 +490,7 @@ export const routes: Routes = [
                         data: { title: "Patient Summary" }
 
                     },
+
 
                     {
                         path: "",
@@ -145,11 +514,13 @@ export const routes: Routes = [
         ]
 
     },
+
     {
         path: "DummyMedicationRequest",
         component: DummyMedicationRequestDetailsComponent,
 
     },
+
     {
         path: "login",
         component: LoginComponent,
@@ -159,10 +530,38 @@ export const routes: Routes = [
             breadCrumbIcon: "key"
         }
     },
+
+    {
+        path: "auth/callback",
+        component: AuthcallackComponent,
+        data: {
+            title: "Elikita | Login Redirect", breadCrumbTitle: "login-redirect",
+
+            breadCrumbIcon: "key"
+        }
+    },
+
+    {
+        path: "launch",
+        component: LaunchComponent,
+        data: {
+            title: "Elikita | Login", breadCrumbTitle: "Login",
+
+            breadCrumbIcon: "key"
+        }
+    },
+
     {
         path: "register",
         component: PatientRegistrationComponent
     },
-    { path: "", redirectTo: "login", pathMatch: 'full' },
-    { path: "**", component: NotFoundComponentComponent }
+    {
+        path: "upload-demo",
+        component: AzureUploadDemoComponent
+    },
+
+    { path: "", redirectTo: "launch", pathMatch: 'full' },
+    { path: "**", redirectTo: 'launch' },
+    //upload-demo
+
 ];

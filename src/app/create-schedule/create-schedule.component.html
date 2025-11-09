@@ -1,0 +1,439 @@
+<!-- Schedule Ui -->
+<!-- 
+{{scheduleForm?.value | json}}
+{{scheduleForm?.get(['date', 'end', 'value'])?.value | json}} -->
+<div class="cards-wrapper flex-wrap gap-30 mt-18 " style="
+ flex-wrap: wrap;
+justify-content: flex-start; display: flex;
+">
+    <mat-card class="gon" style="box-sizing: border-box; width: 300px;
+  position: sticky;
+  top: 0px;
+max-height: max-content;
+height: 100%;
+
+padding-bottom: 0px;
+overflow-y: auto;
+max-width: 100%;
+">
+
+        <mat-card-header class="p-12">
+            <mat-card-title>Availability Form</mat-card-title>
+            <mat-card-subtitle>Set your Availability</mat-card-subtitle>
+        </mat-card-header>
+        <div class="gap m-5"></div>
+        <mat-card-content>
+            @if(scheduleForm) {
+            <form [formGroup]="scheduleForm" class="schedule-form-2" style="">
+
+
+                <div class="p-12 date-section">
+                    <div class="section-title g-just-flex gap-12" style="
+                justify-content: space-between;
+                    font-weight: 500; font-size: 1rem;
+                    color: var(--mat-sys-primary)
+                    ">
+
+                        <span>Date</span>
+                        @if(subGroupsVisibility.date) {
+                        <mat-icon (click)="subGroupsVisibility.date = false" class="small-icon">expand_less</mat-icon>
+                        } @else {
+                        <mat-icon (click)="subGroupsVisibility.date = true" class="small-icon">expand_more</mat-icon>
+                        }
+                    </div>
+                    <div class="sub-section-wrapper" formGroupName="date" style="overflow: hidden;"
+                        [style.height]="subGroupsVisibility.date ? 'auto' : '0px'"
+                        [style.padding]="subGroupsVisibility.date ? '12px' : '0px'"
+                        [style.transition]="'0.3s ease-in-out'" [style.transitionProperty]="'height'">
+                        <div class="start-date-form mb-20">
+                            <label for="startDate" class="mb-5" style="display: block;">Start Date</label>
+                            <mat-form-field appearance="outline" style=" display: block;">
+                                <input matInput [matDatepicker]="pickerSD" placeholder="01/30/2025"
+                                    formControlName="start">
+                                <mat-hint>MM/DD/YYYY</mat-hint>
+                                <mat-datepicker-toggle matIconSuffix [for]="pickerSD"></mat-datepicker-toggle>
+                                <mat-datepicker #pickerSD></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="end-date-form" formGroupName="end">
+                            <div class="form-group-label">End Date</div>
+                            <mat-radio-group formControlName="type" class="radio-group ">
+                                <div class="radio-with-options g-just-flex gap-12
+                            justify-content-start
+                            ">
+                                    <mat-radio-button [value]="'specific_date'"
+                                        style="margin-bottom: 20px;"></mat-radio-button>
+                                    <mat-form-field appearance="outline" style="width: 100%;">
+                                        <input matInput placeholder="01/30/2025" [matDatepicker]="pickerSDV"
+                                            formControlName="value">
+                                        <mat-hint>MM/DD/YYYY</mat-hint>
+                                        <mat-datepicker-toggle matIconSuffix [for]="pickerSDV"></mat-datepicker-toggle>
+                                        <mat-datepicker #pickerSDV></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                                <div class="gap m-3"></div>
+                                <div class="radio-with-options g-just-flex gap-12 justify-content-start">
+
+                                    <mat-radio-button [value]="'indefinite'" style="margin-bottom: 0px;">Indefinite Into
+                                        the Future</mat-radio-button>
+                                </div>
+
+
+
+
+
+                            </mat-radio-group>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+                <mat-divider></mat-divider>
+
+                <div class="p-12 date-section">
+                    <div class="section-title g-just-flex gap-12" style="
+                justify-content: space-between; max-width: 100%;
+                box-sizing: border-box;
+                    font-weight: 500; font-size: 1rem;
+                    color: var(--mat-sys-primary)
+                    ">
+
+                        <div>
+                            <div>Date Recurrence Pattern</div>
+                            <span class="small-subtitle" style="color: var(--mat-sys-on-surface)">
+                                Set available days between the chosen date range
+                            </span>
+
+
+                        </div>
+                        @if(subGroupsVisibility.dateRecurrence) {
+                        <mat-icon (click)="subGroupsVisibility.dateRecurrence = false" class="small-icon"
+                            style="overflow: visible;">expand_less</mat-icon>
+                        } @else {
+                        <mat-icon (click)="subGroupsVisibility.dateRecurrence = true" class="small-icon"
+                            style="overflow: visible;">expand_more</mat-icon>
+                        }
+                    </div>
+                    <div class="sub-section-wrapper" formGroupName="dateRecurrence" style=" overflow: hidden;"
+                        [style.height]="subGroupsVisibility.dateRecurrence ? 'auto' : '0px'"
+                        [style.padding]="subGroupsVisibility.dateRecurrence ? '12px 0px' : '0px'"
+                        [style.transition]="'0.3s ease-in-out'" [style.transitionProperty]="'height'">
+                        <!-- <div class="start-date-form mb-20"> -->
+                        <mat-radio-group formControlName="type" class="radio-group ">
+                            <div class="radio-with-options g-just-flex
+                            justify-content-start
+                            ">
+                                <mat-radio-button [value]="'mon_fri'" style="margin-bottom: 12px;">Monday -
+                                    Friday</mat-radio-button>
+
+
+                            </div>
+                            <div class="gap"></div>
+                            <div class="radio-with-options g-just-flex justify-content-start">
+
+                                <mat-radio-button [value]="'all_days'" style="margin-bottom: 12px;">All
+                                    Days</mat-radio-button>
+
+                            </div>
+                            <div class="radio-with-options g-just-flex justify-content-start">
+
+                                <mat-radio-button [value]="'weekdays'">
+                                    Some days of every week
+                                </mat-radio-button>
+                            </div>
+                            @if(scheduleForm.get(['dateRecurrence', 'type'])?.value === "weekdays"){
+                            <div class="weekdays-selection-wrapper">
+                                <div class="section-subtitle my-12" style="font-size: 1rem;">
+                                    Select Days
+                                </div>
+                                <mat-chip-listbox [multiple]="true"
+                                    (change)="setValue($event, scheduleForm!.get(['dateRecurrence', 'value'])!)"
+                                    class="chip-list">
+                                    @for(option of ['Monday', "Tuesday", "Wednesday", "Thursday", "Firday", "Saturday",
+                                    "Sunday"]; track $index;){
+                                    <mat-chip-option value="{{option}}">
+
+                                        {{option}}
+                                    </mat-chip-option>
+                                    }
+
+
+
+                                </mat-chip-listbox>
+                            </div>
+                            }
+
+
+
+
+
+
+                        </mat-radio-group>
+                        <!-- </div> -->
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+                <mat-divider></mat-divider>
+
+
+
+                <div class="p-12 date-section">
+                    <div class="section-title g-just-flex gap-12" style="
+                justify-content: space-between;
+                    font-weight: 500; font-size: 1rem;
+                    color: var(--mat-sys-primary)
+                    ">
+
+                        <span>Time</span>
+                        @if(subGroupsVisibility.time) {
+                        <mat-icon (click)="subGroupsVisibility.time = false" class="small-icon">expand_less</mat-icon>
+                        } @else {
+                        <mat-icon (click)="subGroupsVisibility.time = true" class="small-icon">expand_more</mat-icon>
+                        }
+                    </div>
+                    <div class="sub-section-wrapper" formGroupName="time" style="overflow: hidden;"
+                        [style.height]="subGroupsVisibility.time ? 'auto' : '0px'"
+                        [style.padding]="subGroupsVisibility.time ? '12px' : '0px'"
+                        [style.transition]="'0.3s ease-in-out'" [style.transitionProperty]="'height'">
+                        <div class="start-date-form mb-0">
+                            <label for="startDate" class="mb-5" style="display: block;">Start Time</label>
+                            <mat-form-field appearance="outline" style=" display: block;">
+                                <input matInput [formControlName]="'start'" placeholder="Set Time"
+                                    [matTimepicker]="picker">
+                                <mat-timepicker-toggle matIconPrefix [for]="picker" />
+                                <mat-timepicker #picker />
+                            </mat-form-field>
+                        </div>
+                        <div class="start-date-form mb-0" formGroupName="end">
+                            <label for="startDate" class="mb-5" style="display: block;">End Time</label>
+                            <mat-form-field appearance="outline" style=" display: block;">
+
+                                <input matInput [formControlName]="'value'" placeholder="Set Time"
+                                    [matTimepicker]="pickerET">
+                                <mat-timepicker-toggle matIconPrefix [for]="pickerET" />
+                                <mat-timepicker #pickerET />
+                            </mat-form-field>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+                <mat-divider></mat-divider>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <div class="p-12 date-section">
+                    <div class="section-title g-just-flex gap-12" style="
+                justify-content: space-between; max-width: 100%;
+                box-sizing: border-box;
+                    font-weight: 500; font-size: 1rem;
+                    color: var(--mat-sys-primary)
+                    ">
+
+                        <div>
+                            <div>Time Intervals</div>
+                            <span class="small-subtitle" style="color: var(--mat-sys-on-surface)">
+                                Set time duration for each meeting schedule
+                            </span>
+
+
+                        </div>
+                        @if(subGroupsVisibility.timeRecurrence) {
+                        <mat-icon (click)="subGroupsVisibility.timeRecurrence = false" class="small-icon"
+                            style="overflow: visible;">expand_less</mat-icon>
+                        } @else {
+                        <mat-icon (click)="subGroupsVisibility.timeRecurrence = true" class="small-icon"
+                            style="overflow: visible;">expand_more</mat-icon>
+                        }
+                    </div>
+                    <div class="sub-section-wrapper" formGroupName="timeRecurrence" style=" overflow: hidden;"
+                        [style.height]="subGroupsVisibility.timeRecurrence ? 'auto' : '0px'"
+                        [style.padding]="subGroupsVisibility.timeRecurrence ? '12px 0px' : '0px'"
+                        [style.transition]="'0.3s ease-in-out'" [style.transitionProperty]="'height'">
+                        <!-- <div class="start-date-form mb-20"> -->
+                        <mat-form-field appearance="outline"><mat-hint>minimum : 30 mins </mat-hint>
+
+                            <input matInput [formControlName]="'value'" placeholder="Set Time or Period For This Task">
+                            <span matTextSuffix> Minutes</span>
+                        </mat-form-field>
+                        <!-- <mat-radio-group formControlName="va" class="radio-group ">
+                        <div class="radio-with-options g-just-flex
+                            justify-content-start
+                            ">
+                            <mat-radio-button [value]="'mon_fri'" style="margin-bottom: 12px;">Monday -
+                                Friday</mat-radio-button>
+
+
+                        </div>
+                        <div class="gap"></div>
+                        <div class="radio-with-options g-just-flex justify-content-start">
+
+                            <mat-radio-button [value]="'all_days'" style="margin-bottom: 12px;">All
+                                Days</mat-radio-button>
+
+                        </div>
+                        <div class="radio-with-options g-just-flex justify-content-start">
+
+                            <mat-radio-button [value]="'weekdays'">
+                                Some days of every week
+                            </mat-radio-button>
+                        </div>
+                        @if(scheduleForm.get(['dateRecurrence', 'type'])?.value === "weekdays"){
+                        <div class="weekdays-selection-wrapper">
+                            <div class="section-subtitle my-12" style="font-size: 1rem;">
+                                Select Days
+                            </div>
+                            <mat-chip-listbox [multiple]="true"
+                                (change)="setValue($event, scheduleForm!.get(['dateRecurrence', 'value'])!)"
+                                class="chip-list">
+                                @for(option of ['Monday', "Tuesday", "Wednesday", "Thursday", "Firday", "Saturday",
+                                "Sunday"]; track $index;){
+                                <mat-chip-option value="{{option}}">
+
+                                    {{option}}
+                                </mat-chip-option>
+                                }
+
+
+
+                            </mat-chip-listbox>
+                        </div>
+                        }
+
+
+
+
+
+
+                    </mat-radio-group> -->
+                        <!-- </div> -->
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- Form fields for schedule creation go here -->
+            </form>
+
+
+
+            }
+        </mat-card-content>
+        <div class="abs-pos py-6 px-12 g-just-flex gap-15" style="justify-content: flex-end;">
+            <button mat-button> Cancel</button>
+            <button mat-flat-button> Save</button>
+        </div>
+    </mat-card>
+
+    <mat-card class="preview-schedule" style="    height: max-content;
+    flex: 1 1 min-content;
+    width: max-content;
+    max-width: max-content;">
+        <mat-card-header>
+            <mat-card-title>
+                Preview Your Schedule
+            </mat-card-title>
+            <mat-card-subtitle>
+                Preview your schedule display on the bookings page
+            </mat-card-subtitle>
+        </mat-card-header>
+        <div class="gap my-10"></div>
+        <mat-card-content>
+            <div class="preview-cards-wrapper 
+            g-just-flex  flex-wrap  px-20" style="
+
+
+                gap: 50px;
+                
+                align-items: flex-start">
+                <div class="calendar-preview">
+                    <!-- <mat-form-field appearance="outline" style=" display: block;"> -->
+
+                    <!-- <input matInput [matDatepicker]="previewSD" placeholder="01/30/2025"
+                        [value]="scheduleForm?.get(['date', 'start'])?.value" style="height: 0px;">
+                    <mat-hint>MM/DD/YYYY</mat-hint> -->
+                    <!-- <mat-datepicker-toggle matIconSuffix [for]="pickerSD"></mat-datepicker-toggle> -->
+
+                    <mat-calendar #previewSD style="width: 280px; max-width: 100%;"
+                        [selected]="selectedDateArray"></mat-calendar>
+                    <!-- </mat-form-field> -->
+                </div>
+                <div class="time-preview" style="flex: 1 0 275px; max-width: 100%;">
+                    <div class="time-preview-title mb-20" style="text-align: center;">
+                        Selected Time Slot
+                    </div>
+                    @if(this.scheduleForm?.get(['time', 'end', 'value'])?.value
+                    && this.scheduleForm?.get(['time', 'start'])?.value
+                    && this.scheduleForm?.get(['timeRecurrence', 'value'])?.value
+
+                    ){
+                    <div class="time-wrapper g-just-flex gap-30 flex-wrap">
+
+
+                        @for(time of selectedTimeArray; track $index;){
+                        <div class="time-sl">
+                            {{time}}
+                        </div>
+
+                        }@empty {
+
+                        }
+                    </div>
+
+                    }@else {
+                    <div> No Time Selected Yet</div>
+                    }
+                </div>
+
+            </div>
+
+        </mat-card-content>
+
+    </mat-card>
+
+</div>

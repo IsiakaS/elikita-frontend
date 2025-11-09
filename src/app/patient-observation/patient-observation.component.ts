@@ -12,17 +12,19 @@ import { MatInputModule } from '@angular/material/input'
 import { MatFormField } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider'
 import { MatChipsModule } from '@angular/material/chips'
-import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { AsyncPipe, CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
+import { BehaviorSubject, map, Observable, startWith } from 'rxjs';
 import { AgePipe } from '../age.pipe';
 import { TableHeaderComponent } from '../table-header/table-header.component';
 import { HttpClient } from '@angular/common/http';
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
+import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
+import { baseStatusStyles } from '../shared/statusUIIcons';
 
 @Component({
   selector: 'app-patient-observation',
   imports: [MatCardModule, MatButtonModule,
-    MatFormField, MatDividerModule, DatePipe, RouterLink,
+    MatFormField, MatDividerModule, DatePipe, RouterLink, CommonModule,
     RouterLinkActive,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
@@ -39,8 +41,8 @@ export class PatientObservationComponent {
   tableDataSource = new MatTableDataSource();
   tableDataLevel2: BehaviorSubject<any> = new BehaviorSubject([])
   references: Map<string, any> = new Map();
-
-
+  categoryFiltering = new FormControl('vital-signs');
+  statuStyles = baseStatusStyles
   patientObservationTableFilter: Map<string, any[]> = new Map([[
     'category', ['vital-signs', 'imaging', 'laboratory', 'survey', 'procedure', 'social-history', 'nutrition', 'family-history', 'device']
   ], [
@@ -52,12 +54,12 @@ export class PatientObservationComponent {
 
   patientObservationTableFilterArray = this.patientObservationTableFilter;
   patientObservationFiltersFormControlObject: any = {};
-
+  encounterService = inject(EncounterServiceService);
 
   patientName!: Observable<string>;
   patientId!: string;
   patientOpenAndClose = inject(PatientDetailsKeyService);
-  patientObservationDisplayedColumns = ['dateTaken', 'category', 'name', 'status',
+  patientObservationDisplayedColumns = ['dateTaken', 'name', 'status',
     'result', 'normal_range', 'practitioner',
   ]
   // ['basedOn', 'category', 'code', 'subject', 'performer', 'referenceRange', 'value[x]', 'status', 'effective[x]', 'component', 'issued'];
@@ -93,7 +95,23 @@ export class PatientObservationComponent {
       console.log(this.patientObservationData);
       this.tableDataLevel2.next(this.patientObservationData);
     });
+    this.categoryFiltering.valueChanges.pipe(startWith('vital-signs')).subscribe((value) => {
+      console.log(value);
+      this.tableDataLevel2.next(this.patientObservationData.filter((obs: any) => {
+        console.log(value, obs.category[0].coding[0].display)
+        return obs.category[0].coding[0].display.trim().toLowerCase() === value?.trim().toLowerCase();
+      }));
+    });
 
+
+
+
+
+
+  }
+
+  setCategoryFilter(value: string) {
+    this.categoryFiltering.setValue(value);
   }
 
   showRow(row: any) {

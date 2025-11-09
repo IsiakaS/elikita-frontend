@@ -1,0 +1,172 @@
+.pos-abs {
+    position: absolute;
+    height: calc(100% - 22px);
+
+    top: 0px;
+    // border-left: 7px solid var(--mat-sys-surface);
+    left: calc(100% + 5px);
+    width: 35px;
+    max-height: 50px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    // border-radius: 4px;
+    border: 1px solid var(--mat-sys-outline);
+    // border-left: none;
+    background-color: light-dark(#0001, #fff6); //var(--mat-sys-on-surface-variant);
+    // color: var(--mat-sys-surface);
+}
+
+.mat-mdc-form-field.group {
+    // box-shadow: 2px 2px 7px -2px var(--mat-sys-outline);
+    border: 1px solid var(--mat-sys-outline);
+    box-sizing: border-box;
+    width: max-content;
+    max-width: 100%;
+}
+
+
+
+.task-details {
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 9px;
+    width: 600px;
+    max-width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+    padding-top: 30px;
+
+    .super-title {
+        position: absolute;
+        top: -15px;
+        left: 10px;
+        padding: 0.35rem;
+        height: max-content;
+        border-radius: 20px;
+        font-size: 14px;
+        border: 5px solid var(--mat-sys-background);
+        font-weight: 500;
+        // a success - likebackground and color; faint green and an on-green color
+        background-color: #D6E9C6;
+        ;
+        font-weight: 500;
+        color: #3E4E2C;
+    }
+
+    .recurrence-pattern {
+        align-items: flex-start;
+    }
+
+    .time-list {
+        flex-wrap: wrap;
+    }
+
+    .times {
+        align-items: start;
+
+        .recurrence-time {
+            padding: 0.25rem;
+            border: 1px solid var(--mat-sys-outline);
+            border-radius: 2px;
+            // color: #fffs !important;
+        }
+    }
+
+    .pipe-separated {
+        flex-wrap: wrap;
+    }
+}
+
+.action-button {
+    border: 1px solid var(--mat-sys-outline);
+    background-color: transparent;
+    padding: 0.5rem;
+    border-radius: 4px;
+
+    mat-icon {
+        font-size: 15px;
+        height: 15px;
+        width: 15px;
+    }
+
+    &:hover {
+        background-color: light-dark(#0002, #fff8);
+    }
+}
+
+.task-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    justify-content: flex-start;
+
+
+    .task-header-left {
+        flex: 1 1 auto;
+    }
+
+    .task-header-right {
+        display: flex;
+        gap: 4px;
+        flex: 1 0 auto;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+
+        .action-button {
+            @media (max-width: 700px) {
+                display: none;
+            }
+        }
+    }
+
+
+    .more-btn {
+        border: 1px solid var(--mat-sys-outline);
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
+
+.rounded-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--mat-sys-outline);
+
+    mat-icon {
+        font-size: 14px;
+        height: 14px;
+        width: 14px;
+
+
+    }
+}
+
+.task-form {
+    border-radius: 10px;
+    // border-top: 2px solid var(--mat-sys-outline);
+    border-left: 2px solid var(--mat-sys-primary);
+    padding: 20px;
+    position: relative;
+    margin-bottom: 20px;
+    ;
+}
+
+.delete-task-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    // border-radius: 0px 10px 0px 0px;
+    background-color: var(--mat-sys-on-error-container);
+    color: var(--mat-sys-error-container);
+    width: 30px;
+    height: 30px;
+
+    &:hover {
+        background-color: var(--mat-sys-error-container);
+        color: var(--mat-sys-on-error-container);
+    }
+}

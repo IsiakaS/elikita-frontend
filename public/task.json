@@ -1,0 +1,1427 @@
+{
+  "resourceType": "Bundle",
+  "id": "d54711df-55a1-4900-837f-194279775b1e",
+  "meta": { "lastUpdated": "2025-07-21T11:42:27.924+00:00" },
+  "type": "searchset",
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://hapi.fhir.org/baseR5/Task?_format=json"
+    },
+    {
+      "relation": "next",
+      "url": "https://hapi.fhir.org/baseR5?_getpages=d54711df-55a1-4900-837f-194279775b1e&_getpagesoffset=20&_count=20&_format=json&_pretty=true&_bundletype=searchset"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/5952",
+      "resource": {
+        "resourceType": "Task",
+        "id": "5952",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-10-12T21:08:17.956+00:00",
+          "source": "#mJNUMmy2nyAFt4Sx"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "system": "urn:oid:1.2.840.114350.1.13.1.1.7.2.798268"
+          }
+        ],
+        "status": "received",
+        "intent": "order",
+        "priority": "routine",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/dme-orders/ValueSet/PAOX-Task-Code",
+              "code": "approve",
+              "display": "Activate/approve the focal resource"
+            }
+          ]
+        },
+        "description": "human readable description of the Task",
+        "focus": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/DeviceRequest/e55Vnx-uVAksCVBTppz92nnslzZnqFulIZSq.dQfBZPM3",
+          "display": "Home Oxygen Therapy"
+        },
+        "for": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Patient/e7ZbuM-uVWBgSnK0oBY67PQ3",
+          "display": "Pao, Devreqone"
+        },
+        "authoredOn": "2021-01-15T17:59:49Z",
+        "lastModified": "2021-01-15T17:59:49Z",
+        "requester": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Practitioner/e1a2oJ9leLDhh8sBkQVf41Q3",
+          "display": "Neil Howard"
+        }
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/5953",
+      "resource": {
+        "resourceType": "Task",
+        "id": "5953",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-10-12T21:08:47.016+00:00",
+          "source": "#qaUoAf70rImmOYSk"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "system": "urn:oid:1.2.840.114350.1.13.1.1.7.2.798268"
+          }
+        ],
+        "status": "received",
+        "intent": "order",
+        "priority": "routine",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/dme-orders/ValueSet/PAOX-Task-Code",
+              "code": "approve",
+              "display": "Activate/approve the focal resource"
+            }
+          ]
+        },
+        "description": "human readable description of the Task",
+        "focus": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/DeviceRequest/e55Vnx-uVAksCVBTppz92nnslzZnqFulIZSq.dQfBZPM3",
+          "display": "Home Oxygen Therapy"
+        },
+        "for": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Patient/e7ZbuM-uVWBgSnK0oBY67PQ3",
+          "display": "Pao, Devreqone"
+        },
+        "authoredOn": "2021-01-15T17:59:49Z",
+        "lastModified": "2021-01-15T17:59:49Z",
+        "requester": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Practitioner/e1a2oJ9leLDhh8sBkQVf41Q3",
+          "display": "Neil Howard"
+        }
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/5954",
+      "resource": {
+        "resourceType": "Task",
+        "id": "5954",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-10-12T21:09:05.116+00:00",
+          "source": "#GD1ujEwIW0jMcbjP"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "system": "urn:oid:1.2.840.114350.1.13.1.1.7.2.798268"
+          }
+        ],
+        "status": "received",
+        "intent": "order",
+        "priority": "routine",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/dme-orders/ValueSet/PAOX-Task-Code",
+              "code": "approve",
+              "display": "Activate/approve the focal resource"
+            }
+          ]
+        },
+        "description": "human readable description of the Task",
+        "focus": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/DeviceRequest/e55Vnx-uVAksCVBTppz92nnslzZnqFulIZSq.dQfBZPM3",
+          "display": "Home Oxygen Therapy"
+        },
+        "for": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Patient/e7ZbuM-uVWBgSnK0oBY67PQ3",
+          "display": "Pao, Devreqone"
+        },
+        "authoredOn": "2021-01-15T17:59:49Z",
+        "lastModified": "2021-01-15T17:59:49Z",
+        "requester": {
+          "reference": "https://connectathon.epic.com/Interconnect-Fhir-Unsecure/api/FHIR/R4/Practitioner/e1a2oJ9leLDhh8sBkQVf41Q3",
+          "display": "Neil Howard"
+        }
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/43857",
+      "resource": {
+        "resourceType": "Task",
+        "id": "43857",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-02-06T14:06:45.934+00:00",
+          "source": "#wAnXRQq5FXPQ57L9"
+        },
+        "text": {
+          "status": "generated",
+          "div": "\u003Cdiv xmlns=\"http://www.w3.org/1999/xhtml\"\u003E\u003Cp\u003E\u003Cb\u003EGenerated Narrative: Task\u003C/b\u003E\u003Ca name=\"example1\"\u003E \u003C/a\u003E\u003C/p\u003E\u003Cdiv style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"\u003E\u003Cp style=\"margin-bottom: 0px\"\u003EResource Task &quot;example1&quot; \u003C/p\u003E\u003C/div\u003E\u003Cp\u003E\u003Cb\u003Eidentifier\u003C/b\u003E: id: 20170201-001 (use: OFFICIAL)\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EbasedOn\u003C/b\u003E: \u003Cspan\u003E: General Wellness Careplan\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EgroupIdentifier\u003C/b\u003E: id: G20170201-001 (use: OFFICIAL)\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Estatus\u003C/b\u003E: in-progress\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EbusinessStatus\u003C/b\u003E: \u003Cspan title=\" fictive business status populated for this example  \"\u003Ewaiting for specimen \u003Cspan style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"\u003E ()\u003C/span\u003E\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Eintent\u003C/b\u003E: order\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Epriority\u003C/b\u003E: routine\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Ecode\u003C/b\u003E: \u003Cspan title=\" fictive code and description elements populated for this example  \"\u003ELipid Panel \u003Cspan style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"\u003E (\u003Ca href=\"codesystem-task-code.html\"\u003ETask Codes\u003C/a\u003E#fulfill)\u003C/span\u003E\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Edescription\u003C/b\u003E: Create order for getting specimen, Set up inhouse testing,  generate order for any sendouts and submit with specimen\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Efocus\u003C/b\u003E: \u003Cspan title=\" \tUse the lipid servicerequest example  \"\u003E\u003Ca href=\"servicerequest-example-lipid.html\"\u003EServiceRequest/lipid: Lipid Panel Request\u003C/a\u003E\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Efor\u003C/b\u003E: \u003Cspan title=\" \twho the task is for\n \"\u003E\u003Ca href=\"patient-example.html\"\u003EPatient/example: Peter James Chalmers\u003C/a\u003E &quot;Peter CHALMERS&quot;\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Eencounter\u003C/b\u003E: \u003Ca href=\"encounter-example.html\"\u003EEncounter/example: Example In-Patient Encounter\u003C/a\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EexecutionPeriod\u003C/b\u003E: \u003Cspan title=\" \tLots of dates  \"\u003E2016-10-31T08:25:05+10:00 --&gt; (ongoing)\u003C/span\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EauthoredOn\u003C/b\u003E: 2016-10-31T08:25:05+10:00\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ElastModified\u003C/b\u003E: 2016-10-31T09:45:05+10:00\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Erequester\u003C/b\u003E: \u003Ca href=\"practitioner-example.html\"\u003EPractitioner/example: Dr Adam Careful\u003C/a\u003E &quot;Adam CAREFUL&quot;\u003C/p\u003E\u003Ch3\u003ERequestedPerformers\u003C/h3\u003E\u003Ctable class=\"grid\"\u003E\u003Ctr\u003E\u003Ctd\u003E-\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EConcept\u003C/b\u003E\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E*\u003C/td\u003E\u003Ctd\u003EPerformer \u003Cspan style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"\u003E (\u003Ca href=\"https://browser.ihtsdotools.org/\"\u003ESNOMED CT\u003C/a\u003E#18850004 &quot;Laboratory hematologist&quot;)\u003C/span\u003E\u003C/td\u003E\u003C/tr\u003E\u003C/table\u003E\u003Cp\u003E\u003Cb\u003Eowner\u003C/b\u003E: \u003Ca href=\"organization-example-lab.html\"\u003EOrganization/1832473e-2fe0-452d-abe9-3cdb9879522f: Clinical Laboratory @ Acme Hospital\u003C/a\u003E &quot;Clinical Lab&quot;\u003C/p\u003E\u003Ch3\u003EReasons\u003C/h3\u003E\u003Ctable class=\"grid\"\u003E\u003Ctr\u003E\u003Ctd\u003E-\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EConcept\u003C/b\u003E\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E*\u003C/td\u003E\u003Ctd\u003EThe Task.reason should only be included if there is no Task.focus or if it differs from the reason indicated on the focus \u003Cspan style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"\u003E ()\u003C/span\u003E\u003C/td\u003E\u003C/tr\u003E\u003C/table\u003E\u003Cp\u003E\u003Cb\u003Enote\u003C/b\u003E: This is an example to demonstrate using task for actioning a servicerequest and to illustrate how to populate many of the task elements - this is the parent task that will be broken into subtask to grab the specimen and a sendout lab test \u003C/p\u003E\u003Cp\u003E\u003Cb\u003ErelevantHistory\u003C/b\u003E: \u003Cspan title=\" \tadd the link to the signature on the task to show how this element is usedemonstrating in this example the relevant history element using a contained resource for the purpose of this example only typically would reference an external resource\n\n \"\u003E\u003Ca name=\"signature\"\u003E \u003C/a\u003E\u003C/span\u003E\u003C/p\u003E\u003Cblockquote\u003E\u003Cp/\u003E\u003Cp\u003E\u003Ca name=\"signature\"\u003E \u003C/a\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Etarget\u003C/b\u003E: \u003Ca href=\"servicerequest-example2.html\"\u003EServiceRequest/physiotherapy/_history/1\u003C/a\u003E\u003C/p\u003E\u003Cp\u003E\u003Cb\u003Erecorded\u003C/b\u003E: Oct 30, 2016, 10:25:05 PM\u003C/p\u003E\u003Ch3\u003EAgents\u003C/h3\u003E\u003Ctable class=\"grid\"\u003E\u003Ctr\u003E\u003Ctd\u003E-\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003ERole\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EWho\u003C/b\u003E\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E*\u003C/td\u003E\u003Ctd\u003Eauthor (originator) \u003Cspan style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"\u003E (\u003Ca href=\"http://terminology.hl7.org/4.0.0/CodeSystem-v3-ParticipationType.html\"\u003EParticipationType\u003C/a\u003E#AUT)\u003C/span\u003E\u003C/td\u003E\u003Ctd\u003E\u003Ca href=\"practitioner-example-f202-lm.html\"\u003EPractitioner/f202: Luigi Maas\u003C/a\u003E &quot;Luigi Maas&quot;\u003C/td\u003E\u003C/tr\u003E\u003C/table\u003E\u003Ch3\u003ESignatures\u003C/h3\u003E\u003Ctable class=\"grid\"\u003E\u003Ctr\u003E\u003Ctd\u003E-\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EType\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EWhen\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EWho\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003ETargetFormat\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003ESigFormat\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EData\u003C/b\u003E\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E*\u003C/td\u003E\u003Ctd\u003EAuthor's Signature (Details: urn:iso-astm:E1762-95:2013 code 1.2.840.10065.1.12.1.1 = 'Author's Signature', stated as 'Author's Signature')\u003C/td\u003E\u003Ctd\u003EOct 30, 2016, 10:25:05 PM\u003C/td\u003E\u003Ctd\u003E\u003Ca href=\"practitioner-example.html\"\u003EPractitioner/example: Dr Adam Careful\u003C/a\u003E &quot;Adam CAREFUL&quot;\u003C/td\u003E\u003Ctd\u003Eapplication/fhir+xml\u003C/td\u003E\u003Ctd\u003Eapplication/signature+xml\u003C/td\u003E\u003Ctd\u003EdGhpcyBibG9iIGlzIHNuaXBwZWQ=\u003C/td\u003E\u003C/tr\u003E\u003C/table\u003E\u003C/blockquote\u003E\u003Ch3\u003ERestrictions\u003C/h3\u003E\u003Ctable class=\"grid\"\u003E\u003Ctr\u003E\u003Ctd\u003E-\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003ERepetitions\u003C/b\u003E\u003C/td\u003E\u003Ctd\u003E\u003Cb\u003EPeriod\u003C/b\u003E\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E*\u003C/td\u003E\u003Ctd\u003E1\u003C/td\u003E\u003Ctd\u003E?? --&gt; 2016-11-02T09:45:05+10:00\u003C/td\u003E\u003C/tr\u003E\u003C/table\u003E\u003C/div\u003E"
+        },
+        "contained": [
+          {
+            "resourceType": "Provenance",
+            "id": "signature",
+            "target": [{ "reference": "ServiceRequest/physiotherapy" }],
+            "recorded": "2016-10-31T08:25:05+10:00",
+            "agent": [
+              {
+                "role": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "AUT"
+                      }
+                    ]
+                  }
+                ],
+                "who": {
+                  "reference": "Practitioner/2282",
+                  "display": "Luigi Maas"
+                }
+              }
+            ],
+            "signature": [
+              {
+                "type": [
+                  {
+                    "system": "urn:iso-astm:E1762-95:2013",
+                    "code": "1.2.840.10065.1.12.1.1",
+                    "display": "Author's Signature"
+                  }
+                ],
+                "when": "2016-10-31T08:25:05+10:00",
+                "who": {
+                  "reference": "Practitioner/2282",
+                  "display": "Dr Adam Careful"
+                },
+                "targetFormat": "application/fhir+xml",
+                "sigFormat": "application/signature+xml",
+                "data": "dGhpcyBibG9iIGlzIHNuaXBwZWQ="
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "use": "official",
+            "system": "http:/goodhealth.org/identifiers",
+            "value": "20170201-001"
+          }
+        ],
+        "basedOn": [{ "display": "General Wellness Careplan" }],
+        "groupIdentifier": {
+          "use": "official",
+          "system": "http:/goodhealth.org/accession/identifiers",
+          "value": "G20170201-001"
+        },
+        "status": "in-progress",
+        "businessStatus": { "text": "waiting for specimen" },
+        "intent": "order",
+        "priority": "routine",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/CodeSystem/task-code",
+              "code": "fulfill"
+            }
+          ],
+          "text": "Lipid Panel"
+        },
+        "description": "Create order for getting specimen, Set up inhouse testing,  generate order for any sendouts and submit with specimen",
+        "focus": {
+          "reference": "ServiceRequest/43856",
+          "display": "Lipid Panel Request"
+        },
+        "for": {
+          "reference": "Patient/1505",
+          "display": "Peter James Chalmers"
+        },
+        "encounter": {
+          "reference": "Encounter/1509",
+          "display": "Example In-Patient Encounter"
+        },
+        "executionPeriod": { "start": "2016-10-31T08:25:05+10:00" },
+        "authoredOn": "2016-10-31T08:25:05+10:00",
+        "lastModified": "2016-10-31T09:45:05+10:00",
+        "requester": {
+          "reference": "Practitioner/2282",
+          "display": "Dr Adam Careful"
+        },
+        "requestedPerformer": [
+          {
+            "concept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "18850004",
+                  "display": "Laboratory hematologist"
+                }
+              ],
+              "text": "Performer"
+            }
+          }
+        ],
+        "owner": {
+          "reference": "Organization/422",
+          "display": "Clinical Laboratory @ Acme Hospital"
+        },
+        "reason": [
+          {
+            "concept": {
+              "text": "The Task.reason should only be included if there is no Task.focus or if it differs from the reason indicated on the focus"
+            }
+          }
+        ],
+        "note": [
+          {
+            "text": "This is an example to demonstrate using task for actioning a servicerequest and to illustrate how to populate many of the task elements - this is the parent task that will be broken into subtask to grab the specimen and a sendout lab test "
+          }
+        ],
+        "relevantHistory": [
+          { "reference": "#signature", "display": "Author's Signature" }
+        ],
+        "restriction": {
+          "repetitions": 1,
+          "period": { "end": "2016-11-02T09:45:05+10:00" }
+        }
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/23e21cf7-5ed3-4c0e-a544-757bd639e609",
+      "resource": {
+        "resourceType": "Task",
+        "id": "23e21cf7-5ed3-4c0e-a544-757bd639e609",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:32:02.483+00:00",
+          "source": "#klPLhcqcwJ7ZlZbg",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/4efcbaf2-a24f-4cee-b1d5-4c890b143997",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/99d839d3-c0c8-4792-ac7a-85d321b5783c"
+          },
+          { "reference": "Transport/864de8cf-b4b4-4e11-a48c-62ddcb358bda" },
+          { "reference": "Transport/7be208e9-a64f-430c-a072-ddd921aa5de1" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/cb21f571-20cc-457a-9b80-018f2ff65c8c"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/74237bbc-b6c3-4afa-86da-c2a1b470e3cd",
+      "resource": {
+        "resourceType": "Task",
+        "id": "74237bbc-b6c3-4afa-86da-c2a1b470e3cd",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:35:04.257+00:00",
+          "source": "#5C4weUjop81wuCQM",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/076d7564-a17e-48ba-b910-ebf97f2e0eb1",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/3c3b5c40-7b34-4462-a8bb-c78d676fa46b"
+          },
+          { "reference": "Transport/7982f20e-ffb3-45fe-8cf1-2c05bbbcb473" },
+          { "reference": "Transport/ea7a262a-ce76-4d79-bcea-f17374a41572" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/1c3fd47f-e615-4885-97a0-9d6c388ad200"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/5622d079-e181-4574-8baf-020080a7ea18",
+      "resource": {
+        "resourceType": "Task",
+        "id": "5622d079-e181-4574-8baf-020080a7ea18",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:38:47.196+00:00",
+          "source": "#oWtP4w1cJPnSf6Ox",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/b981e7f0-2ac0-4ece-ad60-f04714c358ee",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/28452161-b3e4-4b62-959d-b66eb6ce06c9"
+          },
+          { "reference": "Transport/5352c87a-246c-48c5-a36f-f02eddbcee52" },
+          { "reference": "Transport/419816e2-d816-4461-a205-41b87ef7dcbc" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/16b04cd5-2c87-4b35-a629-f98a1442c8dd"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/a113b461-d638-44d1-b439-c615202520b1",
+      "resource": {
+        "resourceType": "Task",
+        "id": "a113b461-d638-44d1-b439-c615202520b1",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:38:53.647+00:00",
+          "source": "#fIOPPdLPd9eWUYlN",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/a8c7f7a6-68c2-4407-a50c-7829f42f9e57",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/1ca984fa-2a75-4c93-a150-3cc8105b6361"
+          },
+          { "reference": "Transport/c7439b2f-9ec3-4a46-aae7-dc7e89c483bc" },
+          { "reference": "Transport/2aa96127-84bf-413f-8431-d7232aead80a" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/ecd6e617-78ff-4c0e-bfcc-c279841a2275"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/48c7a8ff-3948-4c0b-9c99-451ac67ab6d5",
+      "resource": {
+        "resourceType": "Task",
+        "id": "48c7a8ff-3948-4c0b-9c99-451ac67ab6d5",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:45:26.633+00:00",
+          "source": "#Znec808vUm6UhtgC",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/fdf5333d-e946-4066-aed5-97386983a474",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/025d9abb-57ed-4606-b49e-2767e9fe22e2"
+          },
+          { "reference": "Transport/cfc92c29-871a-478f-934d-642e37375b5e" },
+          { "reference": "Transport/782b147b-902b-4e38-b5f9-bef82844c12c" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/fba895c7-4828-4488-b6f3-bce0adce4fd5"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/c77a28f9-58b6-40f1-96ca-1909e074378e",
+      "resource": {
+        "resourceType": "Task",
+        "id": "c77a28f9-58b6-40f1-96ca-1909e074378e",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:53:49.997+00:00",
+          "source": "#n6vklILqKkEZS2QR",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/45a321d6-e71b-469c-9ffd-de267b0a5975",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/2c241e89-44ed-4584-b3d1-704730602ad0"
+          },
+          { "reference": "Transport/607e5604-2894-4262-9e6d-b68effcd5038" },
+          { "reference": "Transport/eefcd739-1090-4645-89f1-b9bdb0677bae" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/9e07ca44-3a91-4e7c-9acd-c6b016adce41"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/05548560-1e36-4880-ab34-736b6b1a9f54",
+      "resource": {
+        "resourceType": "Task",
+        "id": "05548560-1e36-4880-ab34-736b6b1a9f54",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:53:54.768+00:00",
+          "source": "#Gl5TPDEFrKJXo193",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/ed96e7d9-105a-4e05-bf8f-46dea9f0a769",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/f5e8c48f-eabf-46e5-973e-78c97eb9f13c"
+          },
+          { "reference": "Transport/b5448d6f-674c-4450-bbcd-e3fc8057333d" },
+          { "reference": "Transport/0bbe65d0-e18a-44a5-828d-dc8e16945f7e" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/47c9beb9-cf3d-4b1f-a3ea-914744f66f3d"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/c0cbc892-13af-441f-8389-c280c127a70c",
+      "resource": {
+        "resourceType": "Task",
+        "id": "c0cbc892-13af-441f-8389-c280c127a70c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-15T18:54:07.424+00:00",
+          "source": "#cpPHxguIubjCD0pe",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/0374a191-3da4-4543-9ec4-e899807ae584",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/59dd8ce3-08cf-4b5a-b56e-442121d6a44c"
+          },
+          { "reference": "Transport/70cf1580-ec63-476c-abea-ad5df3f1ed52" },
+          { "reference": "Transport/c81475bd-7d4f-45d8-8918-5b70b6a76c4a" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/da0c11fe-143a-47a5-90a3-2e4fe0878d0a"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/03ff6020-904c-4b4e-b99e-96b3e46885c9",
+      "resource": {
+        "resourceType": "Task",
+        "id": "03ff6020-904c-4b4e-b99e-96b3e46885c9",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T06:58:42.038+00:00",
+          "source": "#8xmrtdF6emQmwAoW",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/0ecc8105-7e13-41bb-b176-338996fc8343",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/1cf132d1-078b-4bfb-b016-2f189575a827"
+          },
+          { "reference": "Transport/480903f0-179f-4175-a171-793cc51808a9" },
+          { "reference": "Transport/1d3cc841-fed8-401e-8518-3c83764a6556" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2022-07-30" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/4d687aa8-eefb-4cdd-9c4d-54d648c8fc6b"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/e82f9105-9d21-47f4-aab2-d3e5229930fb",
+      "resource": {
+        "resourceType": "Task",
+        "id": "e82f9105-9d21-47f4-aab2-d3e5229930fb",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:32:45.668+00:00",
+          "source": "#ErVn2fOsv9rgefsY",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/8a6981ec-12c5-4175-919b-cde2782702bd",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/0f4df883-5022-4adc-b7e4-5415f422320b"
+          },
+          { "reference": "Transport/6572aee9-51a1-4032-a17f-40b2e0dba7bd" },
+          { "reference": "Transport/f67f2465-db2d-4d54-9898-94d5f98f58f5" }
+        ],
+        "status": "rejected",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/010dd676-211c-41a4-bd02-08fc320f824e",
+      "resource": {
+        "resourceType": "Task",
+        "id": "010dd676-211c-41a4-bd02-08fc320f824e",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:40:44.461+00:00",
+          "source": "#cH1D4x1pa2kQ9HNl",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/a1c964e2-cec6-4077-ad85-6e3b0c9d59f6",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/51eba531-8532-4109-b692-6a5adba105bf"
+          },
+          { "reference": "Transport/8280ce29-a4cb-4235-bceb-72c2dd6e976e" },
+          { "reference": "Transport/66921ae4-f79b-45b4-b875-318eb806d281" }
+        ],
+        "status": "rejected",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/1c032d2b-e301-4e66-8b87-7e910f1b8271",
+      "resource": {
+        "resourceType": "Task",
+        "id": "1c032d2b-e301-4e66-8b87-7e910f1b8271",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:40:52.595+00:00",
+          "source": "#JObpnCI2Om4UZgOB",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/ad083def-46e0-409e-b432-a62778a364f6",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/998e45ce-8b47-4ce9-b464-c08dfae874fc"
+          },
+          { "reference": "Transport/934d8248-4956-440e-952c-02719a8e0fad" },
+          { "reference": "Transport/410c9449-231c-4ebc-9e09-6168c85c3692" }
+        ],
+        "status": "rejected",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/ec070b5f-db93-4a7d-b8b7-5738e153bf05",
+      "resource": {
+        "resourceType": "Task",
+        "id": "ec070b5f-db93-4a7d-b8b7-5738e153bf05",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:41:06.230+00:00",
+          "source": "#HvX4nOt0j8OKPmxV",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/4a703160-41a9-4be5-a5de-e12f2fb9a6c8",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/4405a7d2-8761-4c6a-9d0b-ced6fe3b6010"
+          },
+          { "reference": "Transport/8c83bdfc-beec-4613-bf99-ee6e88a9bddf" },
+          { "reference": "Transport/854660b8-c0f9-4d62-8c2f-10e4e6839d33" }
+        ],
+        "status": "rejected",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/21c4ffaa-89ad-450b-8d80-814be33755e6",
+      "resource": {
+        "resourceType": "Task",
+        "id": "21c4ffaa-89ad-450b-8d80-814be33755e6",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:41:16.632+00:00",
+          "source": "#ZFFeFnclPmEvEOjW",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/92eb1337-e259-457c-871b-63f8c8a09725",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/e34591ee-714c-4030-9ef3-8eff157beca6"
+          },
+          { "reference": "Transport/78b2a6e6-e58f-45b0-ab3c-5c98e4f9c363" },
+          { "reference": "Transport/fd6fc5eb-aaf1-4bbe-9332-8e7705ace590" }
+        ],
+        "status": "rejected",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/1fc200dd-0c7f-46a8-bdae-b179d13d4f75",
+      "resource": {
+        "resourceType": "Task",
+        "id": "1fc200dd-0c7f-46a8-bdae-b179d13d4f75",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T07:53:23.440+00:00",
+          "source": "#avlTtDZGN7613Lda",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/26f396cc-63cc-478d-8b88-84e76ee4fcd7",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/5540a4b9-49c0-4772-9f65-e468f814d240"
+          },
+          { "reference": "Transport/17b0f06e-85dc-4bec-aa97-6dade6af8e60" },
+          { "reference": "Transport/cd523a3b-e58f-437d-84ff-b4f6a77e388b" }
+        ],
+        "status": "rejected",
+        "statusReason": {
+          "concept": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "123840003",
+                "display": "Sample contaminated"
+              }
+            ],
+            "text": "Reason For Canceling/Rejecting the Lab Order"
+          }
+        },
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR5/Task/44ad3cab-fc13-45e1-8d3d-a14a0edad3b9",
+      "resource": {
+        "resourceType": "Task",
+        "id": "44ad3cab-fc13-45e1-8d3d-a14a0edad3b9",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-08-16T08:01:23.041+00:00",
+          "source": "#pG5xXwjoWgFoyIMB",
+          "profile": [
+            "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/hiv-lab-task"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://openhie.org/fhir/rwanda-hiv/StructureDefinition/result-status-index",
+            "valueInteger": 4
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Identifier"
+                }
+              ],
+              "text": "Lab order number"
+            },
+            "system": "http://openhie.org/fhir/rwanda-hiv/lab-integration/order-number",
+            "value": "ORDER12345"
+          }
+        ],
+        "instantiatesCanonical": "http://openhie.org/fhir/rwanda-hiv/ActivityDefinition/028f4dbf-16f3-4a49-8a53-d5eacb4e1536",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/53e279c5-a998-476a-aee0-71379ac1ddbb"
+          },
+          { "reference": "Transport/b2023e4d-a449-4aa5-b7dc-7c3629adb455" },
+          { "reference": "Transport/b0cd12ee-c742-4a6c-9bb3-b1a536c2ad7c" }
+        ],
+        "status": "completed",
+        "intent": "order",
+        "executionPeriod": { "start": "2020-07-09", "end": "2020-07-09" },
+        "lastModified": "2022-07-30",
+        "note": [
+          {
+            "authorReference": {
+              "reference": "Organization/HIVOrganizationExample"
+            },
+            "time": "2015-02-07T13:28:17-05:00",
+            "text": "additional notes here"
+          }
+        ],
+        "output": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "398579006",
+                  "display": "Human immunodeficiency virus-1 nucleic acid assay"
+                }
+              ],
+              "text": "Viral Load Result"
+            },
+            "valueReference": {
+              "reference": "DiagnosticReport/e19f7487-721c-4bee-866f-6e2db12027eb"
+            }
+          }
+        ]
+      },
+      "search": { "mode": "match" }
+    }
+  ]
+}

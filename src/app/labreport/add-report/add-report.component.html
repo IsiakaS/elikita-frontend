@@ -1,0 +1,107 @@
+@if(toPassLabForm){<mat-stepper class="visible-overflow m-20">
+    <mat-step label="Add Report">
+
+        <div class="mat-card-header mb-20">
+            <div class="mat-mdc-card-title">Add Report</div>
+            <div class="mat-mdc-card-subtitle ">Add a report for the lab tests done
+            </div>
+        </div>
+
+        <app-dynamic-forms-v2 [formFields]="toPassLabForm" [formMetaData]="undefined"></app-dynamic-forms-v2>
+
+        <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+            <button mat-flat-button matStepperPrevious>Back</button>
+            <button mat-flat-button matStepperNext>Next</button>
+
+        </div>
+
+
+    </mat-step>
+    <mat-step label="References">
+        <div class="mat-card-header mb-20">
+            <div class="mat-mdc-card-title">Observation and Specimen References</div>
+            <div class="mat-mdc-card-subtitle subtitle-text-color-2 small-subtitle" style="line-height: 20px;">
+                Add Observation and Specimen References for this report. You'll find some references already
+                added. You can delete them and also add new ones.
+            </div>
+        </div>
+
+        <div class="observation-section" style="width: max-content; max-width: 100%;">
+            <div class="g-just-flex justify-content-between flex-wrap mb-20"
+                style="width: 100%; justify-content: flex-start; gap: 13px;">
+                <div class="mat-mdc-card-title">Observation</div>
+                <button mat-button (click)="addObservationReference()">
+                    <mat-icon>add</mat-icon>
+                    Add Observation</button>
+            </div>
+            <div class="g-just-flex gap-25 flex-wrap justify-content-start">
+                <div class="each-reference g-just-flex gap-30" #td0>
+                    <app-reference-display [data]="{
+                        reference: 'https://hapi.fhir.org/baseR5/Observation/'+rawObservation.entry[0].resource.id
+}" [referenceDeepPath]="[['code','coding', '0', 'code'].join('$#$')]" [tdReference]="td0"
+                        (tdClicked)="raiseTd($event)">
+                    </app-reference-display>
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>delete</mat-icon>
+                    </div>
+                </div>
+
+                <div class="each-reference g-just-flex gap-30" #td1>
+                    <app-reference-display [data]="{
+                        reference: 'https://hapi.fhir.org/baseR5/Observation/'+rawObservation.entry[1].resource.id
+}" [referenceDeepPath]="[['code','coding', '0', 'code'].join('$#$')]" [tdReference]="td1"
+                        (tdClicked)="raiseTd($event)">
+                    </app-reference-display>
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>delete</mat-icon>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="observation-section mt-30 pt-20" style="width: max-content; max-width: 100%;">
+            <div class="g-just-flex justify-content-between flex-wrap mb-20"
+                style="width: 100%; justify-content: flex-start; gap: 13px;">
+                <div class="mat-mdc-card-title">
+
+                    Specimen
+                </div>
+                <button mat-button>
+                    <mat-icon>add</mat-icon>
+                    Add Specimen</button>
+            </div>
+            <div class="g-just-flex gap-25 flex-wrap justify-content-start">
+                <div class="each-reference g-just-flex gap-30">
+                    <app-reference-display [data]="{
+                        reference: 'https://hapi.fhir.org/baseR5/Specimen/'+rawSpecimen.entry[0].resource.id
+}" [referenceDeepPath]="[['type','coding', '0', 'code'].join('$#$')]">
+                    </app-reference-display>
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>delete</mat-icon>
+                    </div>
+                </div>
+
+                <div class="each-reference g-just-flex gap-30">
+                    <app-reference-display [data]="{
+                        reference: 'https://hapi.fhir.org/baseR5/Specimen/'+rawSpecimen.entry[1].resource.id
+}" [referenceDeepPath]="[['type','coding', '0', 'code'].join('$#$')]">
+                    </app-reference-display>
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>delete</mat-icon>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+            <button mat-flat-button>Save</button>
+
+
+        </div>
+    </mat-step>
+</mat-stepper>
+}

@@ -3,51 +3,45 @@ import { tablePropInt } from '../shared/table-interface';
 import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, forkJoin, Observable, combineLatest } from 'rxjs';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
 import { ErrorService } from '../shared/error.service';
 import { commonImports } from '../shared/table-interface';
 import { UtilityService } from '../shared/utility.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { AsyncPipe, JsonPipe } from '@angular/common';
-import { CodeableConcept2Pipe } from '../shared/codeable-concept2.pipe';
-import { Bundle, Medication, MedicationRequest, Resource } from 'fhir/r5';
-import { CodeableRef2Pipe } from '../shared/codeable-ref2.pipe';
-import { References2Pipe } from '../shared/references2.pipe';
+import { CommonModule } from '@angular/common';
+import { Bundle, Patient } from 'fhir/r4';
 import { LinkInReferencesService } from '../shared/link-in-references.service';
-import { fetchFromReferencePipe } from '../shared/Fetch.pipe';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { baseStatusStyles } from '../shared/statusUIIcons';
-import { DetailBaseComponent } from '../shared/detail-base/detail-base.component';
-import { DummyMedicationRequestDetailsComponent } from '../dummy-medication-request-details/dummy-medication-request-details.component';
-import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-forms-v2.component';
-import { formMetaData, formFields } from '../shared/dynamic-forms.interface';
-import {
-  CodeableConceptField, CodeField, GroupField, IndividualField,
-  codeableConceptDataType, ReferenceDataType, codingDataType,
-  IndividualReferenceField, ReferenceFieldArray,
-  SingleCodeField
-} from '../shared/dynamic-forms.interface2';
-import { FormFieldsSelectDataService } from '../shared/form-fields-select-data.service';
+// Removed unused detail/dynamic form related imports for lint cleanliness
+import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
+import { PatientRegistrationDetailsComponent } from '../patient-registration-details/patient-registration-details.component';
+import { SuccessMessageComponent } from '../shared/success-message/success-message.component';
+import { AuthService } from '../shared/auth/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { PatientRegistrationCenterStore } from '../patient-registration-center/patient-registration-center.store';
+import { PatientRegistrationEditComponent } from '../patient-registration-edit/patient-registration-edit.component';
 
 
-type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
-
+// Removed unused FormFields typing (not used in template or logic)
+type PatientRegData = Patient & { status: string };
 @Component({
   selector: 'app-patient-reg',
-  imports: [...commonImports, JsonPipe, CodeableConcept2Pipe, CodeableRef2Pipe, References2Pipe, fetchFromReferencePipe,
-    MatProgressSpinnerModule, DetailBaseComponent
+  imports: [...commonImports,
+    MatProgressSpinnerModule, CommonModule, EmptyStateComponent
   ],
   templateUrl: './patient-reg.component.html',
-  styleUrl: './patient-reg.component.scss'
+  styleUrls: ['../medicine-requests/medicine-requests.component.scss', './patient-reg.component.scss']
 })
 export class PatientRegComponent implements tablePropInt {
   statusStyles = baseStatusStyles;
   islink = inject(LinkInReferencesService);
   utilityService: UtilityService = inject(UtilityService);
   route: ActivatedRoute = inject(ActivatedRoute);
-  immutableLevelTableData!: MedicationRequest[];
+  immutableLevelTableData!: Patient[];
   tableDataSource = new MatTableDataSource();
   tableDataLevel2: BehaviorSubject<any> = new BehaviorSubject([]);
   references!: Map<string, any>;
@@ -58,6 +52,10 @@ export class PatientRegComponent implements tablePropInt {
   tableColumns!: string[];
   http: HttpClient = inject(HttpClient);
   patientOpenAndClose: PatientDetailsKeyService = inject(PatientDetailsKeyService);
+  router: Router = inject(Router);
+  store = inject(PatientRegistrationCenterStore, { optional: true });
+  pageTitle = '';
+  pageSubtitle = '';
   getPatientName(): void {
     if (!this.getPatientId()) return;
     this.patientName = this.utilityService.getPatientName(this.getPatientId)
@@ -72,52 +70,68 @@ export class PatientRegComponent implements tablePropInt {
   }
   isLinkObj: { [key: string]: Map<any, any> } = {}
   subscribeToResolver(): void {
-    this.route.data.subscribe((allData) => {
-      this.immutableLevelTableData = (allData['medReqRes'] as Bundle).entry!.map((e, index) => {
-        for (const [key, value] of Object.entries(e.resource as MedicationRequest)) {
-          console.log(value.reference);
-          if (this.isLinkObj.hasOwnProperty(key)) {
-            this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
-          } else {
-            this.isLinkObj[key] = new Map();
-            this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
-          }
-          console.log(this.isLinkObj[key]);
-
-        }
-        return e.resource as MedicationRequest
-      });
-
-      // this.references = new Map(allData['patMed']['references']);
-      // console.log(this.references);
-      console.log(this.immutableLevelTableData);
-      this.tableDataLevel2.next(this.immutableLevelTableData);
-    })
+    // Replaced: now subscribe to shared store (parent resolver already populated it)
+    if (!this.store) return; // fallback if used standalone somewhere else
+    const segment$ = this.route.url.pipe(
+      map(segs => segs?.[0]?.path || this.route.snapshot.routeConfig?.path || 'pending'),
+      distinctUntilChanged()
+    );
+    combineLatest([this.store.patients$, segment$]).subscribe(([patients, segment]) => {
+      // derive status and filter based on current path segment
+      const enriched: PatientRegData[] = patients.map(p => ({ ...p, status: p.active === true ? 'approved' : 'pending' }));
+      let filtered: PatientRegData[] = [];
+      if (segment === 'pending') {
+        this.pageTitle = 'Pending Patient Registrations';
+        this.pageSubtitle = 'Review, approve or reject patients that are not yet active.';
+        filtered = enriched.filter(p => p.active !== true && !(p as any).deceasedBoolean && !(p as any).deceasedDateTime);
+      } else if (segment === 'approved') {
+        this.pageTitle = 'Approved Patients';
+        this.pageSubtitle = 'All active patients approved from registration.';
+        filtered = enriched.filter(p => p.active === true && !(p as any).deceasedBoolean && !(p as any).deceasedDateTime);
+      } else if (segment === 'deceased') {
+        this.pageTitle = 'Deceased Patients';
+        this.pageSubtitle = 'Patients marked as deceased.';
+        filtered = enriched.filter(p => (p as any).deceasedBoolean === true || !!(p as any).deceasedDateTime);
+      } else {
+        this.pageTitle = 'Patient Registrations';
+        this.pageSubtitle = '';
+        filtered = enriched;
+      }
+      this.immutableLevelTableData = filtered;
+      this.tableDataLevel2.next(filtered);
+    });
   }
 
   ngOnInit() {
-    // this.tableFilter = new Map([[
-    //   'status', ['active', 'on-hold', 'ended', 'stopped', 'completed', 'cancelled', 'draft']
-    // ]
-    // ])
+    this.tableFilter = new Map([[
+      'gender', ['male', 'female',],
+
+    ],
+    ['status', ['approved', 'pending']]
+    ])
 
     this.tableColumns = [
 
-      'lastame',
-      'firstname',
-      'phoneContact',
-      'birthDate',
-      'action'
+      'name',
+      'gender',
+      'contact',
+      'date of birth',
+      'address',
+      'status',
+      'action',
+
     ]
     this.getPatientId();
     this.getPatientName();
     this.connectTableDataSource();
     this.subscribeToResolver();
 
-    for (const [key, value] of this.tableFilter) {
-      this.tableFilterFormControlObject[key] = new FormGroup({});
-      for (const filterValue of value) {
-        this.tableFilterFormControlObject[key].addControl(filterValue, new FormControl(false));
+    if (this.tableFilter) {
+      for (const [key, value] of this.tableFilter) {
+        this.tableFilterFormControlObject[key] = new FormGroup({});
+        for (const filterValue of value) {
+          this.tableFilterFormControlObject[key].addControl(filterValue, new FormControl(false));
+        }
       }
     }
   }
@@ -139,13 +153,69 @@ export class PatientRegComponent implements tablePropInt {
 
 
   viewDetails(element: any) {
-    this.dialog.open(DummyMedicationRequestDetailsComponent,
+    console.log(element);
+    const ref = this.dialog.open(PatientRegistrationDetailsComponent,
 
       {
         maxHeight: '93vh',
+        data: element
 
+      });
+    ref.afterClosed().subscribe((result) => {
+      if (result?.approved && result?.id && this.store) {
+        this.store.updatePatient({ id: result.id, resourceType: 'Patient', active: true } as Patient);
+      } else if (result?.rejected && result?.id && this.store) {
+        this.store.removePatient(result.id);
+        this._sn.openFromComponent(SuccessMessageComponent, {
+          data: { message: 'Patient registration rejected and record deleted.', action: 'Close' },
+          duration: 3500,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
+      }
+    });
+  }
 
-      })
+  editPatient(element: Patient) {
+    const ref = this.dialog.open(PatientRegistrationEditComponent, { data: element });
+    ref.afterClosed().subscribe(result => {
+      if (result?.updated) {
+        const patch = result.patch as { family?: string; given?: string };
+        const updated: Patient = {
+          ...element,
+          name: [{
+            ...(element.name?.[0] || {}),
+            family: patch.family ?? element.name?.[0]?.family,
+            given: [patch.given ?? element.name?.[0]?.given?.[0] ?? '']
+          }]
+        } as Patient;
+        // Persist to server then update store
+        const baseUrl = 'https://elikita-server.daalitech.com';
+        this.http.put<Patient>(`${baseUrl}/Patient/${element.id}`, updated, {
+          headers: { 'Content-Type': 'application/fhir+json' }
+        }).subscribe({
+          next: (saved) => {
+            this.store?.updatePatient(saved);
+            this._sn.openFromComponent(SuccessMessageComponent, {
+              data: { message: 'Patient updated successfully.', action: 'Close' },
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            });
+          },
+          error: () => this.errorService.openandCloseError('Failed to update patient')
+        });
+      }
+    });
+  }
+  approve() {
+    // Legacy method not used anymore; approval happens inside the details dialog
+  }
+  _sn = inject(MatSnackBar);
+  auth = inject(AuthService);
+
+  canAddPatientRegistration(): boolean {
+    return this.auth.can('patient', 'add');
   }
 
 }

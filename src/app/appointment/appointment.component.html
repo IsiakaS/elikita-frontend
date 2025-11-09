@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card style="width: max-content;">
     <mat-card-header>
         <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
             <div class="left">
@@ -30,9 +30,9 @@
                     Date
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.requestedPeriod && element.requestedPeriod.length?`${element.requestedPeriod[0].start |
-                    date: 'mediumDate'}`:
-                    '_'}}</td>
+                    {{element.requestedPeriod &&
+                    element.requestedPeriod.length?(element.requestedPeriod[0].start | date: 'mediumDate'):
+                    (element?.start | date:'mediumDate' ) }}</td>
             </ng-container>
 
             <ng-container matColumnDef="duration">
@@ -41,9 +41,9 @@
                     Duration
                 </th>
                 <td mat-cell *matCellDef="let element">{{element.requestedPeriod &&
-                    element.requestedPeriod.length?`${element.requestedPeriod[0].start | date: 'shortTime'}`: '_' }} -
-                    {{element.requestedPeriod && element.requestedPeriod.length?`${element.requestedPeriod[0].end |
-                    date: 'shortTime'}`: ""}} </td>
+                    element.requestedPeriod.length?(element.requestedPeriod[0].start | date: 'shortTime') + "-" +
+                    (element.requestedPeriod[0].end |
+                    date: 'shortTime'): (element?.start | date:'h:mm a' ) +'-'+ (element?.end | date : 'h:mm a') }}</td>
             </ng-container>
 
             <!--dateRecorded - recordedDateTime -->
@@ -98,7 +98,7 @@
                     Services
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    @for(each of element.serviceType[0].coding; track $index;){
+                    @for(each of element.serviceType?.[0]?.coding; track $index;){
                     <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
                         <span>{{each.display}}</span>
 
@@ -115,7 +115,7 @@
                     Department
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    @for(each of element.specialty[0].coding; track $index;){
+                    @for(each of element.specialty?.[0]?.coding; track $index;){
                     <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
                         <span>{{each.display}}</span>
 
@@ -131,7 +131,7 @@
                     Reason
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    @for(each of element.reason[0].coding; track $index;){
+                    @for(each of element.reason?.[0]?.coding; track $index;){
                     <div class="g-just-flex flex-column gap-8" style="gap:8px; justify-content: flex-start;">
                         <span>{{each.reason}}</span>
 

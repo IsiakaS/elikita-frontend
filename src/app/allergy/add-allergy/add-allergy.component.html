@@ -1,0 +1,19 @@
+@if(allformFields){
+<div class="my-20 mx-20">
+
+    Add Allergies
+</div>
+<app-dynamic-forms-v2 [formFields]="allformFields" [formMetaData]="undefined">
+
+</app-dynamic-forms-v2>
+}
+@if(reactionEventFormFields && reactionEventFormFields.length > 0){
+<app-dynamic-forms-v2 [formFields]="reactionEventFormFields" [formMetaData]="reactionEventsFormMetaData">
+
+</app-dynamic-forms-v2>
+<div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+    <button mat-flat-button>Submit</button>
+
+
+</div>
+}

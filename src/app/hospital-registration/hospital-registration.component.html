@@ -1,0 +1,14 @@
+<div class="hospital-registration-container">
+    <div class="registration-header">
+        <h1 style="color: var(--mat-sys-primary);">Hospital Registration</h1>
+        <p>Register your healthcare organization to start providing services</p>
+    </div>
+
+    @if(hospitalFormFields && hospitalFormMetaData){
+    <div class="form-wrapper">
+        <app-dynamic-forms-v2 [formFields]="hospitalFormFields" [formMetaData]="hospitalFormMetaData"
+            [resetOnSubmit]="false" (formSubmitted)="onFormSubmit($event)">
+        </app-dynamic-forms-v2>
+    </div>
+    }
+</div>

@@ -1,92 +1,146 @@
-<mat-drawer-container>
-    <!-- <mat-drawer mode="side" opened class="max-width patient-side-details">
+<!-- <mat-drawer mode="side" opened class="max-width patient-side-details">
 
         <app-patient-sidedetails [resolvedData]="resolvedData">
 
         </app-patient-sidedetails>
     </mat-drawer> -->
-    <mat-drawer-content>
-        <div class="" style="display: flex; width: 100%;
+@if(!isPatientAdmitted){
+<div style="width: 100%; padding: 0px 20px; box-sizing: border-box;">
+    <div class="" style="display: flex; width: 100%;
         box-sizing: border-box;
             justify-content: flex-start;">
-            <div class="side max-width">
-                <app-patient-sidedetails [resolvedData]="resolvedData">
+        @if( patientDetailsStripService.patientDetailsStripStatus | async){
+        <div class="side max-width">
+            <app-patient-sidedetails [resolvedData]="resolvedData">
 
-                </app-patient-sidedetails>
-            </div>
-            <div class="main">
-                <nav mat-tab-nav-bar [tabPanel]="tabPanel">
-                    @for (link of links; track link) {
-                    <a [routerLink]="[link]" routerLinkActive="router-link-active" mat-tab-link
-                        (click)="activeLink = link" [active]="activeLink == link"> {{link | titlecase}} </a>
-                    }
+            </app-patient-sidedetails>
+        </div>
+        }
+        <div class="main" style="flex: 1 1 auto; min-width: 0px;">
+            <nav mat-tab-nav-bar [tabPanel]="tabPanel" mat-tab-align="center">
+                @for (link of links; track link) {
+                <a [routerLink]="[link]" routerLinkActive="router-link-active" mat-tab-link (click)="activeLink = link"
+                    [active]="activeLink == link"> {{link | titlecase}} </a>
+                }
 
-                </nav>
-                <mat-tab-nav-panel #tabPanel>
-                    <div class="pt-20">
-                        <router-outlet>
+            </nav>
+            <mat-tab-nav-panel #tabPanel mat-tab-align="center">
+                <div class="pt-20">
+                    <router-outlet>
 
-                        </router-outlet>
-                    </div>
-                    <!-- {{encounterState | async}} -->
-                    @if((encounterState | async) === 'unknown' ){
+                    </router-outlet>
+                </div>
+                <!-- {{encounterState | async}} -->
+                @if((auth.user | async)?.role === 'doctor' ){
+                @if((encounterState | async) === 'unknown' ){
 
-                    <a mat-flat-button extended matTooltip="Add a new encounter for this patient"
-                        aria-label="Add Encounter" style="z-index: 9999999999999999999;" tabindex="0"
-                        class="add-encounter" (click)="addEncounter()">
+                <a mat-flat-button extended matTooltip="Add a new encounter for this patient" aria-label="Add Encounter"
+                    style="z-index: 9999999999999999999;" tabindex="0" class="add-encounter" (click)="addEncounter()">
+                    <mat-icon>add</mat-icon>
+                    <span>Add Encounter</span>
+
+                </a>}@else{
+                <mat-menu #activities="matMenu" style="z-index: 9999999999999999999;">
+                    <a (click)="addExamObservation()" mat-menu-item>
                         <mat-icon>add</mat-icon>
-                        <span>Add Encounter</span>
+                        <span>Add Exam. Observation</span>
+                    </a>
+                    <a (click)="addVitals()" mat-menu-item>
+                        <mat-icon>add</mat-icon>
+                        <span>Add Vitals</span>
+                    </a>
+                    <a (click)="showEncounterSheet()" mat-menu-item>
+                        <mat-icon>visibility</mat-icon>
+                        <span>Show Encounter Progress</span>
+                    </a>
 
-                    </a>}@else{
-                    <mat-menu #activities="matMenu" style="z-index: 9999999999999999999;">
-                        <a (click)="addObservation()" mat-menu-item>
+
+                    <a (click)="addDiagnosis()" mat-menu-item>
+                        <mat-icon>add</mat-icon>
+                        <span>Add Diagnosis</span>
+                    </a>
+                    <a (click)="ecounterService.addMedicationRequest(patientId)" mat-menu-item>
+                        <mat-icon>add</mat-icon>
+                        <span>Add Medication Request</span>
+                    </a>
+                    <a (click)="ecounterService.addServiceRequest(patientId);" mat-menu-item>
+                        <mat-icon>add</mat-icon>
+                        <span>Order Lab Tests / Other Services</span>
+                    </a>
+                    <a (click)="ecounterService.addAllergy(patientId)" mat-menu-item>
+                        <mat-icon>add</mat-icon>
+                        <span>Add Allergy</span>
+                    </a>
+
+                    <a (click)="completeEncounter()" mat-menu-item [matMenuTriggerFor]="encounterM">
+                        <div class="menu-trigger">
                             <mat-icon>add</mat-icon>
-                            <span>Add Observation</span>
-                        </a>
-
-                        <a (click)="addDiagnosis()" mat-menu-item>
-                            <mat-icon>add</mat-icon>
-                            <span>Add Diagnosis</span>
-                        </a>
-                        <a (click)="addMedicationRequest()" mat-menu-item>
-                            <mat-icon>add</mat-icon>
-                            <span>Add Medication Request</span>
-                        </a>
-                        <a (click)="ecounterService.addServiceRequest(patientId);" mat-menu-item>
-                            <mat-icon>add</mat-icon>
-                            <span>Order Lab Tests / Other Services</span>
-                        </a>
-
-                        <a (click)="completeEncounter()" mat-menu-item [matMenuTriggerFor]="encounterM">
-                            <div class="menu-trigger">
-                                <mat-icon>add</mat-icon>
-                                <span>Change Encounter Status</span>
-                            </div>
-                            <mat-menu #encounterM="matMenu">
-                                <a class="mat-menu-item">
-                                    Change Encounter to "On-Hold"
-                                </a>
-                                <a class="mat-menu-item">Change Encounter to "Completed"</a>
-                                <a class="mat-menu-item">Cancel Encounter</a>
+                            <span>Change Encounter Status</span>
+                        </div>
+                        <mat-menu #encounterM="matMenu">
+                            <a mat-menu-item>
+                                Change Encounter to "On-Hold"
+                            </a>
+                            <a mat-menu-item>Change Encounter to "Completed"</a>
+                            <a mat-menu-item>Cancel Encounter</a>
 
 
-                            </mat-menu>
+                        </mat-menu>
 
-                        </a>
-                    </mat-menu>
+                    </a>
+                </mat-menu>
 
-                    <a mat-flat-button class="round-circle 
+                <a mat-flat-button class="round-circle 
     g-just-flex
     " style="z-index: 9999999999999999999;" [matMenuTriggerFor]="activities">
 
 
-                        Tasks
-                        <mat-icon>chevron_right</mat-icon>
-                    </a>
-                    }
-
-                </mat-tab-nav-panel>
-            </div>
+                    Tasks
+                    <mat-icon>chevron_right</mat-icon>
+                </a>
+                }
+                }
+            </mat-tab-nav-panel>
         </div>
-    </mat-drawer-content>
-</mat-drawer-container>
+    </div>
+</div>
+
+<ng-template #topactions>
+    <div class="top-actions-links-wrapper">
+        <!-- <a mat-flat-button 
+        [routerLink]="['/app/patients', patientId, 'admission', {action: 'add'}]"
+            class="top-actions-link" routerLinkActive="router-link-active"> -->
+        <a mat-flat-button role="button" (click)="admissionService.addAddmissionForm()" class="top-actions-link">
+            <mat-icon>bed</mat-icon>
+            <span> Admit Patient</span>
+
+        </a>
+        <a mat-flat-button role="button" class="top-actions-link" (click)="showBooking();">
+            <mat-icon>chat</mat-icon>
+            <span> Consult</span>
+        </a>
+
+        <a aria-label="More actions" [mat-menu-trigger-for]="topActionOtherLinks" role="button"
+            class="top-actions-link more">
+
+            <mat-icon>
+                more_horiz
+            </mat-icon>
+        </a>
+        <!--mat menu for other links-->
+        <mat-menu #topActionOtherLinks>
+            <a mat-menu-item (click)="referPatient()">
+
+
+
+                <span>Refer</span>
+            </a>
+
+        </mat-menu>
+    </div>
+</ng-template>
+}@else {
+<app-patient-admission-wrapper>
+
+</app-patient-admission-wrapper>
+}

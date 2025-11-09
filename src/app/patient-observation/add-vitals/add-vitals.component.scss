@@ -1,0 +1,99 @@
+.bmi,
+.blood-pressure {
+    width: max-content;
+    max-width: 100%;
+    border: 1px solid var(--mat-sys-outline);
+    padding: 20px;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+    border-radius: 10px;
+
+    .fields {
+        display: flex;
+        flex-wrap: wrap;
+
+
+        .mat-mdc-form-field {
+            flex: 1 1 200px
+        }
+    }
+
+    .field {
+        flex: 1 1 auto;
+        min-width: 200px;
+    }
+
+
+    .indicator-text {
+        margin-bottom: 0px;
+    }
+}
+
+.bmi-interprete {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.meter-background {
+    width: 100%;
+
+    border-radius: 20px;
+
+
+    .meter-foreground {
+
+        height: 8px;
+        // overflow: hidden;
+        width: 100%;
+        border-radius: 20px;
+        position: relative;
+        display: flex;
+        margin-top: 0px;
+        margin-bottom: 30px;
+
+        .position-indicator {
+            position: absolute;
+            top: -8px;
+
+            width: 12px;
+            height: calc(100% + 16px);
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+
+        }
+
+        .band {
+            height: 100%;
+
+        }
+    }
+}
+
+.indicator-text {
+    background: var(--mat-sys-surface-container);
+    // color: var(--mat-sys-primary-on-primary);
+    padding: 8px;
+    padding-right: 12px;
+    border-radius: 20px;
+    width: max-content;
+    border: 2px solid var(--mat-sys-surface);
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    width: 600px;
+    max-width: 100%;
+
+
+    &>div {
+        display: block;
+        flex: 1 1 auto;
+    }
+}

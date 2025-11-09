@@ -24,6 +24,13 @@ import { DummyMedicationRequestDetailsComponent } from '../dummy-medication-requ
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorService } from './error.service';
 import { UtilityService } from './utility.service';
+import { References2Pipe } from './references2.pipe';
+import { CodeableConcept2Pipe } from './codeable-concept2.pipe';
+import { CodeableRef2Pipe } from './codeable-ref2.pipe';
+import { LinkInReferencesService } from './link-in-references.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DetailBaseComponent } from './detail-base/detail-base.component';
+import { ReferenceDisplayComponent } from './reference-display/reference-display.component';
 
 
 export const commonImports = [MatCardModule, MatButtonModule,
@@ -31,8 +38,8 @@ export const commonImports = [MatCardModule, MatButtonModule,
     RouterLinkActive,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
-    MatChipsModule,
-    MatInputModule,
+    MatChipsModule, MatProgressSpinnerModule, DetailBaseComponent,
+    MatInputModule, MatExpansionModule, References2Pipe, CodeableConcept2Pipe, CodeableRef2Pipe,
     MatMenuModule, AgePipe, TableHeaderComponent,
     MatTableModule, MatIconModule, ReactiveFormsModule];
 

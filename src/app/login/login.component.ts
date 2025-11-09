@@ -4,7 +4,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from "@angular/router"
+import { Router, RouterLink, RouterLinkActive } from "@angular/router"
 import { ErrorService } from '../shared/error.service';
 import { AuthService } from '../shared/auth/auth.service';
 //import { getAuth, signInWithPopup, FacebookAuthProvider } from "firebase/auth";
@@ -13,7 +13,7 @@ import { AuthService } from '../shared/auth/auth.service';
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, MatInputModule, MatIconModule, MatFormField, MatExpansionModule,
-    MatButtonModule
+    MatButtonModule, RouterLink, RouterLinkActive
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']

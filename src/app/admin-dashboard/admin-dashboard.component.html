@@ -1,1 +1,706 @@
-<p>admin-dashboard works!</p>
+<div class=" px-15">
+    <section id="overall-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title g-just-flex">
+                    <div class="me-15"> Summaries </div>
+                    <div>
+                        <select class="header-middle" name="" id="" mat-select>
+                            @for(option of ['Today', 'This Week', 'This month']; track $index){
+                            <option value="{{option}}">
+                                {{option}}
+                            </option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15" [scrolld]="'card'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>people</mat-icon>
+                                <div class="grey round newbg">
+                                    <mat-icon>
+
+                                        auto_awesome
+
+                                    </mat-icon>
+                                </div>
+                            </div>
+
+                            <div class="top-text subtitle-text-color-2  ">
+                                Appointments
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words g-just-flex
+                        justify-content-start gap-8
+                        ">
+                                <div class="large-words">
+                                    10</div>
+
+                            </div>
+
+                            <div class="left">
+                                <select name="" id="" value="Remaining" mat-select [formControl]="todayAppointSelect">
+                                    @for(option of ['Fulfilled', 'No-Show', 'Remaining', 'Booked']; track $index;){
+                                    <option value="{{option}}">
+                                        {{option}}
+                                    </option>
+                                    }
+                                </select>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            10 out of 100 booked
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>group</mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                Encounter
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                10
+                            </div>
+                            <div class="left">
+                                <select name="" id="" mat-select [formControl]="encounterDropDown">
+                                    @for(option of ['All','In-Patient', 'Out-Patient', 'Emergency', 'Virtual', 'Home'];
+                                    track
+                                    $index;){
+                                    <option value="{{option}}">
+                                        {{option}}
+                                    </option>
+                                    }
+                                </select>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            10 out of a total 100
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>person</mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                New Patients
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                10
+                            </div>
+                            <div class="left">
+                                <select name="" id="" mat-select [formControl]="encounterDropDown">
+                                    @for(option of ['All','In-Patient', 'Out-Patient', 'Emergency', 'Virtual', 'Home'];
+                                    track
+                                    $index;){
+                                    <option value="{{option}}">
+                                        {{option}}
+                                    </option>
+                                    }
+                                </select>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            10 out of a total 100
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="appointments-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title g-just-flex">
+                    <div class="me-15"> Quick Actions </div>
+
+
+
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15" [scrolld]="'action-button'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="action-button" (click)="hospital.addOrganization()">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>book</mat-icon>
+                    </div>
+
+                    <span>Add Hospital Details</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+                <div class="action-button" (click)="hospital.addServices()">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>work</mat-icon>
+                    </div>
+
+                    <span>Add Hospital Services</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+                <div class="action-button" (click)="hospital.addSlots()">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>access_time</mat-icon>
+                    </div>
+
+                    <span>Add Slots for Services</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+    <section id="appointments-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title">
+                    Appointments
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+            <div class="controls g-just-flex gap-15" [scrolld]="'card'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-20">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="card appointment-card">
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="grey round newbg">
+                                <mat-icon>
+
+                                    auto_awesome
+
+                                </mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                New Requests
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="large-words">
+                            80
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card appointment-card">
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="grey round yellowbg">
+                                <mat-icon>
+
+                                    pause
+
+                                </mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                Pending
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                           It has been assigned to a doctor but there has been no response
+                           fromt the doctor
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                20
+                            </div>
+                            <div class="left">
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card appointment-card">
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="grey round yellowbg">
+                                <mat-icon>
+
+                                    swap_horiz
+
+                                </mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                Wait-Listed
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                           It has been assigned to a doctor but there has been no response
+                           fromt the doctor
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                20
+                            </div>
+                            <div class="left">
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <section id="resources-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title">
+                    Resources
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15">
+                <div class=" rounded-icon-wrapper prev-btn" [scrolld]="'card'">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="card appointment-card">
+
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>
+
+                                    hotel
+
+                                </mat-icon>
+                            </div>
+                            <div class=" top-text subtitle-text-color-2 ">
+                                Beds Available
+                            </div>
+
+
+                        </div>
+                        <div class=" right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                10
+                            </div>
+                            <div class="left">
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            10 out of 100 total
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card appointment-card">
+
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>
+
+                                    medications
+
+                                </mat-icon>
+                            </div>
+                            <div class=" top-text subtitle-text-color-2 ">
+                                Out-of-Stock Medicines
+                            </div>
+
+
+                        </div>
+                        <div class=" right">
+                            <mat-icon matTooltip="
+                            The number of fulfilled versus 'no-show' 
+                            appointments so far for today
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                10
+                            </div>
+                            <div class="left">
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            10 out of 100 total
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <app-appointment-ui></app-appointment-ui>
+</div>

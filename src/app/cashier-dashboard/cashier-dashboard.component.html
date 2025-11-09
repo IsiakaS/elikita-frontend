@@ -1,0 +1,267 @@
+<div class=" px-15">
+    <section id="overall-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title g-just-flex">
+                    <div class="me-15"> Summaries </div>
+                    <div>
+                        <select class="header-middle" name="" id="" mat-select>
+                            @for(option of ['Today', 'This Week', 'This month']; track $index){
+                            <option value="{{option}}">
+                                {{option}}
+                            </option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15" [scrolld]="'card'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>people</mat-icon>
+                                <div class="grey round newbg">
+                                    <mat-icon>
+
+                                        auto_awesome
+
+                                    </mat-icon>
+                                </div>
+                            </div>
+
+                            <div class="top-text subtitle-text-color-2  ">
+                                Paid Invoice
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="Total amount of money settled from invoices
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words g-just-flex
+                        justify-content-start gap-8
+                        ">
+                                <div class="large-words">
+                                    {{1200 | priceFormat: 'NGN'}}
+
+                                </div>
+
+                            </div>
+
+                            <div class="left">
+                                <!-- <select name="" id="" value="Remaining" mat-select [formControl]="todayAppointSelect">
+                                    @for(option of ['Fulfilled', 'No-Show', 'Remaining', 'Booked']; track $index;){
+                                    <option value="{{option}}">
+                                        {{option}}
+                                    </option>
+                                    }
+                                </select> -->
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            {{(1200 | priceFormat: 'NGN')+ ' / '+ (10000 | priceFormat : 'NGN') }}
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>group</mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                Paid Claims
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                       Total amount of money settled from insurance claims
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                {{(5000 | priceFormat: 'NGN')}}
+                            </div>
+                            <div class="left">
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            {{(5000 | priceFormat: 'NGN')+ ' / '+ (34890.98 | priceFormat : 'NGN') }}
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card appointment-card">
+                    <select class="absolute-top" name="" id="" mat-select>
+
+                        @for(option of ['Today', 'This Week', 'This month']; track $index){
+                        <option value="{{option}}">
+                            {{option}}
+                        </option>
+                        }
+                    </select>
+
+                    <div class="card-top g-just-flex space-between gap-30
+                     ">
+                        <div class="left g-just-flex gap-8 
+                        justify-content-start
+                   ">
+                            <div class="rounded-icon-wrapper">
+                                <mat-icon>person</mat-icon>
+                            </div>
+                            <div class="top-text subtitle-text-color-2  ">
+                                Total Amount Settled
+                            </div>
+
+
+                        </div>
+                        <div class="right">
+                            <mat-icon matTooltip="
+                           The total paid from invoices and claims
+                            ">
+                                light_bulb
+                            </mat-icon>
+
+
+                        </div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="g-just-flex space-between">
+                            <div class="right large-words">
+                                {{(6200 | priceFormat: 'NGN')}}
+                            </div>
+                            <div class="left">
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-bottom g-just-flex space-between gap-12">
+                        <div class="left g-just-flex gap-10 subtitle-text-color-2
+                        justify-content-start
+                        ">
+                            {{(6200 | priceFormat: 'NGN')+ ' / '+ (44890.98 | priceFormat : 'NGN') }}
+
+
+                        </div>
+                        <div class="right">
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div class="todays-appointments my-30 ms-30 me-30">
+        <div class="title mb-30">
+
+            <span>Today's Appointments</span>
+        </div>
+
+        <app-appointment-ui>
+
+        </app-appointment-ui>
+
+    </div>
+</div>

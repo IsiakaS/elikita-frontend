@@ -1,0 +1,238 @@
+<div class="wrapper px-20 add-obs-wrapper" style="background-color: var(--mat-sys-surface);">
+
+
+
+    @if(isAnyCategory && (observationCategory && observationCategory.value !== 'vital-signs' &&
+    observationCategory.value !== 'laboratory'
+    && observationCategory.value !== 'exam'
+    )){
+
+    <mat-chip-listbox (change)="setObsCat($event)" class="chip-list">
+        @for(option of generalObsCategory; track $index;){
+        <mat-chip-option value="{{option.code}}" #err style="
+        font: inherit !important; font-family: 'Nunito Sans' !important;
+        padding: 0.25rem 0.25rem !important;
+margin-right: 12px !important;
+    border-radius: 20px;" selected="{{observationCategory && observationCategory.value == option.code }}">
+
+            {{option.display}}
+        </mat-chip-option>
+        }
+
+    </mat-chip-listbox>
+    }
+    @if(observationCategory.value == 'vital-signs'){
+    <app-add-vitals></app-add-vitals>
+    }@else if(observationCategory.value == 'exam'){
+    <div class="exam-wrapper mat-mdc-card p-20">
+        <div class="exam-title-subtitle py-15">
+            <div class="exam-title">
+                Add Physical Exam Observations
+            </div>
+            <div class="subtitle subtitle-text-color-2 pt-5">
+                Choose type of physical exam observation to add from the suggested list or add a new one.
+            </div>
+
+        </div>
+        <div class="a-form ">
+
+            <div class="physical-exam-cat">
+                <mat-chip-listbox class="chip-list gap-15" multiple="true">
+                    @for(option of samplePhysicalExaminationObservations; track $index;){
+                    <mat-chip-option value=" {{option.display}}" #err class="me-15 mb-18"
+                        (selectionChange)="sv($event)">
+                        <div class="code-display ">
+                            <div class="display" style="font-weight: 500;">{{option.display | titlecase}}</div>
+                            <div class="code subtitle-text-color-2">
+                                <span>{{option.code}}</span>
+                                <!-- <span class=" abs-pos-right"></span>
+                                <span class="abs-pos-left"></span> -->
+                            </div>
+                        </div>
+                    </mat-chip-option>
+                    }
+                </mat-chip-listbox>
+                <div class="mat-field pt-20" style="max-width: 615px;">
+                    <label>
+                        <span>
+                            {{'Or add a new physical exam observation' | titlecase}}
+                        </span>
+                        <br>
+                        <span class="subtitle-text-color-2">Enter a name and click to search to get the correct loinc
+                            codes</span>
+                    </label>
+                    <mat-form-field appearance="outline" floatLabel="always" style="display: block;
+                    width: 100%;
+                    margin-top: 12px;
+                    ">
+
+
+                        <div class="below g-just-flex"
+                            (click)="searchCodeableConceptFromBackEnd(`blll`, `${ccfb.value}`)">
+                            <mat-icon matSuffix class="me-10">search</mat-icon>
+                            <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                Click to search
+                            </span>
+
+                        </div>
+                        <input matInput type="text" [matAutocomplete]="chuks" #ccfb
+                            [formControl]="observationNameChosen" placeholder="Enter new physical exam observation">
+
+                        <mat-autocomplete #chuks="matAutocomplete" [requireSelection]="true"
+                            [displayWith]="displayConceptFieldDisplay">
+                            @for(option of (observationCodeSelectData | async); track $index;){
+                            <mat-option [value]="option">
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{option | splitHash:1 | titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{option | splitHash:0 }}
+                                    </div>
+                                </div>
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+
+                    </mat-form-field>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    }
+
+
+
+    @if(observationCategory.value == 'laboratory'){
+    <div class="exam-wrapper mat-mdc-card">
+        <div class="exam-title-subtitle py-15">
+            <div class="exam-title">
+                Add Laboratory Results
+            </div>
+            <div class="subtitle subtitle-text-color-2 pt-5">
+
+                Choose the name of laboratory tests from the suggested list or enter a new one.
+            </div>
+        </div>
+        <div class="a-form ">
+            <div class="laboratory-observation">
+                <mat-chip-listbox class="chip-list gap-15" (change)="setLabsName($event)">
+                    @for(option of sampleLaboratoryObservations; track $index;){
+                    <mat-chip-option value="{{option.display}}" #err class="me-15 mb-18">
+                        <div class="code-display ">
+                            <div class="display" style="font-weight: 500;">{{option.display | titlecase}}</div>
+                            <div class="code subtitle-text-color-2">
+                                <span>{{option.code}}</span>
+                            </div>
+                        </div>
+                    </mat-chip-option>
+                    }
+                </mat-chip-listbox>
+                <div class="mat-field pt-20" style="max-width: 615px;">
+                    <label>
+                        <span>
+                            {{'Enter the Name of the Laboratory Test' | titlecase}}
+                        </span>
+                        <br>
+                        <span class="subtitle-text-color-2">Enter a name and click to search to get the correct loinc
+                            codes</span>
+                    </label>
+                    <mat-form-field appearance="outline" floatLabel="always" style="display: block;
+                    width: 100%;
+                    margin-top: 12px;
+                    ">
+
+
+                        <div class="below g-just-flex"
+                            (click)="searchCodeableConceptFromBackEnd(`blll`, `${ccfb.value}`)">
+                            <mat-icon matSuffix class="me-10">search</mat-icon>
+                            <span style="cursor: pointer; font-size: 12px;
+                        z-index: 999999999;
+                        ">
+                                Click to search
+                            </span>
+
+                        </div>
+                        <input matInput type="text" [matAutocomplete]="chuks" #ccfb [formControl]="labsName"
+                            placeholder="Name of the Laboratory Test">
+
+                        <mat-autocomplete #chuks="matAutocomplete" [requireSelection]="true"
+                            [displayWith]="displayConceptFieldDisplay">
+                            @for(option of (observationCodeSelectData | async); track $index;){
+                            <mat-option [value]="option">
+                                <div class="ticket-like">
+                                    <div class="text">
+                                        {{option | splitHash:1 | titlecase}}
+                                    </div>
+                                    <div class="code">
+                                        {{option | splitHash:0 }}
+                                    </div>
+                                </div>
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+
+                    </mat-form-field>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    @if(labFormFields){
+    <div class="mt-15">
+        <app-dynamic-forms-v2 [formFields]="labFormFields" [formMetaData]="labFormMetaData">
+
+        </app-dynamic-forms-v2>
+    </div>
+    }
+
+    }
+
+    @if(toPassIntoDynamicForms){
+    <app-dynamic-forms-v2 [formFields]="toPassIntoDynamicForms" [formMetaData]="formMetaData">
+
+    </app-dynamic-forms-v2>
+    }
+</div>
+
+
+
+@if(examArray.controls.length > 0 && examArray.controls[0].value?.value){
+
+
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-18">
+            <div class="g-just-flex flex-wrap justify-content-start gap-30">
+                @for(exam of examArray.controls; track $index;){
+                @let name = exam.get('name')?.value;
+                @let value = exam.get('value')?.value;
+
+
+                <div class="aafield" style="width: 280px; max-width: 100%;">
+                    <label for="" style="display: block; margin-bottom: 4px;"> {{name.split('$#$').length > 1 ?
+                        name.split('$#$')[1] : name | titlecase}}</label>
+                    <mat-form-field appearance="fill" style="width: 100%;">
+                        <textarea [attr.rows]="3" value="{{value}}" matInput>
+
+                            </textarea>
+
+                    </mat-form-field>
+                </div>
+                }
+
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+}

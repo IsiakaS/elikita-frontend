@@ -1,1 +1,151 @@
-<p class="m-100">lab-dashboard works!</p>
+<div class=" px-15">
+
+
+
+
+
+
+
+
+
+    <section id="appointments-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title g-just-flex">
+                    <div class="me-15"> Quick Actions </div>
+
+
+
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15" [scrolld]="'action-button'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30">
+                <div class="action-button" (click)="takeStock()">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>book</mat-icon>
+                    </div>
+
+                    <span>Take Stock of Lab Supplies</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+                <div class="action-button">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>work</mat-icon>
+                    </div>
+
+                    <span>Send Lab Report Readiness Alert</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+                <div class="action-button">
+                    <div class="rounded-icon-wrapper">
+                        <mat-icon>access_time</mat-icon>
+                    </div>
+
+                    <span>Send Low Stock Alert</span>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <section id="overall-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title g-just-flex">
+                    <div class="me-15"> Assigned Tasks Today </div>
+                    <div>
+
+                    </div>
+
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+
+
+            <div class="controls g-just-flex gap-15" [scrolld]="'tsk'">
+                <div class=" rounded-icon-wrapper prev-btn">
+                    <mat-icon>
+                        chevron_left
+                    </mat-icon>
+
+                </div>
+                <div class="rounded-icon-wrapper next-btn">
+                    <mat-icon>
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-wrapper scrollable-container pt-30">
+            <div class="overflow-container g-just-flex justify-content-start gap-30" style="align-items: stretch;">
+                <div class="tsk">
+                    <app-dashboard-tasks [neededHeader]="false"></app-dashboard-tasks>
+                </div>
+                <div class="tsk" style="align-self: stretch;">
+                    <app-cardz-details-check></app-cardz-details-check>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+    <section id="appointments-summaries" class="scrolld-parent">
+        <!-- fulfilled vs booked in real time, Pending, Waitlist, New / Proposed Appointments  -->
+        <div class="secction-header g-just-flex flex-between">
+            <div class="words g-just-flex.flex-column.gap-12">
+                <div class="title">
+                    Appointments
+                </div>
+                <div class="subtitle">
+
+
+                </div>
+            </div>
+        </div>
+        <app-appointment-ui></app-appointment-ui>
+
+    </section>
+</div>

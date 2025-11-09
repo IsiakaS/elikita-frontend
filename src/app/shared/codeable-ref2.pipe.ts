@@ -20,7 +20,10 @@ export class CodeableRef2Pipe implements PipeTransform {
     if (value.concept && value.concept?.coding?.length) {
       const code = concept?.coding?.[0].code || '';
       const display = concept?.coding?.[0].display || '';
-      const label = `${code}${code && display ? ' - ' : ''}${display}`;
+      // const label = `${code}${code && display ? ' - ' : ''}${display}`;
+      //august 20
+      const label = `${code && !display ? code : `${display ? display : ''}`}`;
+      //august 20
       return label
       // this.sanitizer.bypassSecurityTrustHtml(`<span>${label}</span>`);
     }

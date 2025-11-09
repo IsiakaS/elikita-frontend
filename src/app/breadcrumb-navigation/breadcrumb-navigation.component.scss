@@ -1,0 +1,30 @@
+nav.breadcrumb-navigation {
+    display: flex;
+    align-items: center;
+
+    span.path-icon,
+    span.breadcrumb-separator {
+        display: flex;
+    }
+
+    a {
+        color: var(--mat-sys-on-background);
+        text-decoration: none;
+        text-transform: capitalize;
+
+        &.active {
+            color: var(--mat-sys-primary);
+            font-weight: 500;
+        }
+
+        // large breakpoint
+
+        @media (max-width: 552px) {
+            .path-icon+span {
+                display: none;
+            }
+
+        }
+    }
+
+}

@@ -1,7 +1,17 @@
-<mat-sidenav-container>
-    <mat-sidenav #sidenav mode="side" opened="true" class="max-width" fixedInViewport="true">
-        <div class="side-wrapper g-just-flex flex-column">
+<mat-sidenav-container autosize style="height: 100%;">
+    <mat-sidenav #sidenav [mode]="(isBigTablet$ | async )? 'over' : 'side'" opened="true" class="{{'
+        max-width '+(collapseSideNav?'collapsed-size':'')}}" fixedInViewport="true">
+        <div class="{{'side-wrapper g-just-flex flex-column '+( collapseSideNav === true?'collapse-menu':'')}}">
             <div class="top-sidenav px-13 py-13">
+                @if(collapseSideNav){
+                <div class="expand" (click)="sideNavService.expandSideNav()" style="padding: 10px;">
+                    <mat-icon class="small-icon">
+                        chevron_right
+
+                    </mat-icon>
+                </div>
+
+                }
                 <div>
 
 
@@ -9,17 +19,31 @@
                         <div class="logo">
                             ELIKITA
                         </div>
-                        <div class="shrink">
+                        <div class="shrink" (click)="sideNavService.collapseSideNav()" style="padding: 10px;">
                             <mat-icon class="small-icon">
                                 chevron_left
                             </mat-icon>
                         </div>
+
                     </div>
                 </div>
 
             </div>
             <mat-divider></mat-divider>
             <div class="middle-sidenav px-13 py-13">
+                <div class="my-20">
+                    <mat-form-field style="width: 180px; box-sizing: border-box;">
+                        <mat-select [formControl]=" userChangeForm">
+                            @for(option of ['Admin', 'Lab Technician', 'Nurse', 'Doctor', 'Consultant', 'Cashier',
+
+
+                            'Pharmacist', 'Patient'];
+                            track $index) {
+                            <mat-option [value]="option">{{option}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
                 <app-sidemenu></app-sidemenu>
             </div>
             <mat-divider></mat-divider>
@@ -39,10 +63,50 @@
 
     </mat-sidenav>
     <mat-sidenav-content>
-        <div>
-            <router-outlet>
+        <div class="top-menu-strip">
+            @if(isBigTablet$ | async){
+            <div class="hamburger-menu">
+                <mat-icon (click)="sidenav.toggle()">menu</mat-icon>
+            </div>
+            }
 
-            </router-outlet>
+            <div class="links">
+                <a (click)="openandC()" tite="use AI">
+                    <mat-icon>chat</mat-icon>
+
+                </a>
+                <a>
+                    <mat-icon>notifications</mat-icon>
+
+                </a>
+                <a>
+                    <mat-icon>mail</mat-icon>
+                </a>
+                <a>
+                    <mat-icon>person</mat-icon>
+                </a>
+            </div>
+        </div>
+        <div class="gap"></div>
+        <div
+            [style]="{'margin-right': (isBigTablet$ | async) ? '0px' : '20px', 'margin-left': (isBigTablet$ | async) ? '0px' : '20px', }">
+            <div class="breadcrumb-actions mb-20
+           g-just-flex flex-between gap-20 flex-wrap
+           ">
+                <div class="breadcrumbs ">
+                    <app-breadcrumb-navigation></app-breadcrumb-navigation>
+                </div>
+                <div class="actions" [style]="{'margin-right': (isBigTablet$ | async) ? '30px' : '10px'}">
+                    <ng-container *ngTemplateOutlet=" topactionsService.topactiontemplate | async"></ng-container>
+                </div>
+            </div>
+            <div class="mt-20" style="max-width: 1450px; margin: auto;">
+                <router-outlet>
+
+                </router-outlet>
+            </div>
         </div>
     </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-aichat></app-aichat>

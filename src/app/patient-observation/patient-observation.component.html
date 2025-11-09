@@ -4,8 +4,9 @@
             <div class="left">
                 <mat-card-title class="">
                     Clinical Observations for
-                    <a (click)="patientOpenAndClose.openPatientDetailsStrip()" style="text-decoration: none;"
-                        [routerLink]="['/patients', patientId]" routerLinkActive="router-link-active">
+                    <a (click)="patientOpenAndClose.openPatientDetailsStrip()"
+                        style="text-decoration: none; cursor: pointer; color: var(--mat-sys-primary);"
+                        routerLinkActive="router-link-active">
                         {{patientName | async}}
                     </a>
                 </mat-card-title>
@@ -17,7 +18,7 @@
                 <a mat-flat-button extended class="secondary-button small-button">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
-                <a mat-flat-button class="">
+                <a mat-flat-button class="" (click)="encounterService.addAnyObservation()">
                     <mat-icon>add</mat-icon>
                     Add Observations
                 </a>
@@ -33,7 +34,22 @@
             [patientsFiltersFormControlObject]=" patientObservationFiltersFormControlObject">
 
         </app-table-header>
-
+        <div class="my-15">
+            <div class="rounded-buttons-group">
+                <button (click)="categoryFiltering.setValue('vital-signs')" title="Vital Signs"
+                    [ngClass]="{'selected': categoryFiltering.value === 'vital-signs'}">
+                    Vital Signs
+                </button>
+                <button (click)="categoryFiltering.setValue('exam')" title="Physical Examination"
+                    [ngClass]="{'selected': categoryFiltering.value === 'exam'}">
+                    Physical Examination
+                </button>
+                <button (click)="categoryFiltering.setValue('laboratory')" title="Laboratory"
+                    [ngClass]="{'selected': categoryFiltering.value === 'laboratory'}">
+                    Laboratory
+                </button>
+            </div>
+        </div>
 
 
         <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
@@ -43,7 +59,11 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
                     Name
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.code.coding[0].display | titlecase}}</td>
+                <td mat-cell *matCellDef="let element">
+                    <span class="restrict-length">
+                        {{element.code.coding[0].display | titlecase}}
+                    </span>
+                </td>
             </ng-container>
             <!---->
             <!--dateTaken - effectiveDateTime -->
@@ -52,7 +72,13 @@
                     sortActionDescription="Sort by Date Taken">
                     Date Taken
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.effectiveDateTime | date: 'medium'}}</td>
+                <td mat-cell *matCellDef="let element" style="padding-top: 4px; padding-bottom: 4px;">
+                    <span class="restrict-length">{{element.effectiveDateTime | date: 'mediumDate'}}</span>
+                    <br>
+                    <span class="restrict-length subtitle-text-color-2 small-subtitle"> {{element.effectiveDateTime |
+                        date:
+                        'shortTime'}}</span>
+                </td>
             </ng-container>
             <!--category - category.coding.display -->
             <ng-container matColumnDef="category">
@@ -60,7 +86,11 @@
                     sortActionDescription="Sort by Category">
                     Category
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.category[0].coding[0].display | titlecase}}</td>
+                <td mat-cell *matCellDef="let element">
+                    <span class="restrict-length">
+                        {{element.category[0].coding[0].display | titlecase}}
+                    </span>
+                </td>
             </ng-container>
             <!--result - valueQuantity.value -->
             <ng-container matColumnDef="result">
@@ -78,8 +108,11 @@
                     Normal Range
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.referenceRange?.[0].low.value}}{{element.referenceRange?.[0].low.unit}}
-                    to {{element.referenceRange?.[0].high.value}}{{element.referenceRange?.[0].high.unit}}</td>
+                    {{element.referenceRange?.[0].low.value && element.referenceRange?.[0].low.unit ?
+                    `${element.referenceRange?.[0].low.value} to
+                    ${element.referenceRange?.[0].high.value} (${element.referenceRange?.[0].low.unit})
+                    `: 'N / A'}}
+                </td>
 
             </ng-container>
             <!--status - status -->
@@ -87,7 +120,19 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="status" sortActionDescription="Sort by Status">
                     Status
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.status | titlecase}}</td>
+                <td mat-cell *matCellDef="let element">
+                    <div #sc
+                        [attr.class]="'small-chips'+' '+'status-'+statuStyles[element.status]['color']+' g-just-flex gap-8'">
+
+                        <span> {{element.status}}
+
+                        </span>
+                        <mat-icon>
+                            {{statuStyles[element.status]['icon']}}
+                        </mat-icon>
+
+                    </div>
+                </td>
             </ng-container>
             <!-- practitioner - performer.reference -->
             <ng-container matColumnDef="practitioner">

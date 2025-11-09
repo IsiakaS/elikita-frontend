@@ -2,6 +2,7 @@ export interface formMetaData {
     formName: string,
     formDescription: string,
     submitText?: string,
+    showSubmitButton?: boolean,
 
 }
 

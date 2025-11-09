@@ -1,8 +1,8 @@
 @if (resource) {
-<mat-card class="profile-card px-15 pb-20 detail-base">
+<mat-card class="profile-card pb-20 detail-base" style="width: 100%;">
     <mat-card-header>
         <mat-card-title>
-            <div class="g-just-flex gap-8">
+            <div class="g-just-flex gap-8" style="flex-wrap: wrap;">
                 <div class="round-icon-wrapper contrast">
                     <mat-icon>
                         medication
@@ -24,7 +24,7 @@
             <div class="other-details">
                 @for(key of fieldKeys(resource); track $index;){
 
-                <div class="field-group">
+                <div class="field-group" style="width: 100%; overflow-x: auto;">
                     <div class="field-value" [innerHTML]="renderOtherFields(resource, key)">
 
                     </div>

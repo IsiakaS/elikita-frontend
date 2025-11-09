@@ -1,0 +1,209 @@
+<div class="ms-20 me-20">
+    <div class="my-20">
+        Add Vitals
+    </div>
+    <form [formGroup]="vitalsFormGroup">
+        <!--appearance-->
+        @if((vitalsComponents && vitalsComponents.length > 0
+
+        && vitalsComponents.includes('appearance')
+        ) || isAllComponent || (!vitalsComponents && !isAllComponent)
+        ){
+        <div class="appearance">
+            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                <mat-label>Patient Appearance</mat-label>
+                <mat-select formControlName="appearance">
+                    @for(option of ['Well', 'Unwell', 'Pale', 'Flushed', 'Icteric',
+                    'Lethargic', 'Active', 'Agitated', 'Calm', 'Compliant', 'Combative'
+                    ]; track $index;){
+                    <mat-option value="{{option}}">
+                        {{option}}
+                    </mat-option>
+
+                    }
+                </mat-select>
+                <mat-icon matIconPrefix>face</mat-icon>
+            </mat-form-field>
+        </div>
+
+
+        }
+        <!--gait-->
+        @if((vitalsComponents && vitalsComponents.length > 0
+
+        && vitalsComponents.includes('gait')
+        ) || isAllComponent || (!vitalsComponents && !isAllComponent)
+        ){
+        <div class="gait">
+            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                <mat-label>Patient Gait</mat-label>
+                <mat-select formControlName="gait">
+                    @for(option of ['Walks Normally', 'Walks with Support', 'Walks with Limp', 'Unable to Walk']
+                    ; track $index;){
+                    <mat-option value="{{option}}">
+                        {{option}}
+                    </mat-option>
+
+                    }
+                </mat-select>
+                <mat-icon matIconPrefix>directions_walk</mat-icon>
+            </mat-form-field>
+        </div>
+        }
+
+        @if((vitalsComponents && vitalsComponents.length > 0
+
+        && vitalsComponents.includes('bmi')
+        ) || isAllComponent || (!vitalsComponents && !isAllComponent)
+        ){
+        <div class="bmi" style="flex: 1 0 100%;">
+            <div class="fields">
+
+                <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                    <mat-label>Patient Height</mat-label>
+                    <input type="number" matInput #height formControlName="height">
+                    <mat-icon matIconPrefix>height</mat-icon>
+                    <span class="unit" matTextSuffix>cm</span>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                    <mat-label>Patient Weight</mat-label>
+                    <input type="number" matInput #weight formControlName="weight">
+                    <mat-icon matIconPrefix>monitor_weight</mat-icon>
+                    <span class="unit" matTextSuffix>kg</span>
+                </mat-form-field>
+            </div>
+            @if(height && weight && height.value && weight.value &&
+            patientBMI && patientBMICategory && bmiBands && bmiBands.length > 0
+            ){
+            <div class="meter-background">
+                <div class="meter-foreground">
+                    @for(band of bmiBands; track $index;){
+                    <div class="band" matTooltip="{{band.category}}" [matTooltipPosition]="'above'" [ngStyle]="{'background-color': band.color, 'width': ($first || $last)? ($first?(band.bmiRange[1]! - 0): (100 - band.bmiRange[0]!))+'%':
+                            (band?.bmiRange?.[1] || 100) - (band?.bmiRange?.[0] || 0) +'%'}">
+
+
+
+                    </div>
+                    }
+                    <div class="position-indicator" [ngStyle]="{'left': patientBMI < 100 ? patientBMI+ '%' : '98%'}">
+
+
+                    </div>
+                </div>
+            </div>
+            <!-- // POSITION iNDICATOR -->
+
+            <div class="justify-content-start gap-12 g-just-flex indicator-text">
+
+                <mat-icon [style.color]="patientBMICategory.color">{{patientBMICategory.icon}}</mat-icon>
+                {{patientBMI.toFixed(2)+' kg/m²'}}
+                <span class="category-text">
+                    <!--patient-->
+                    {{patientBMICategory.category}}
+                </span>
+
+            </div>
+
+
+            }
+        </div>
+        }
+        @if((vitalsComponents && vitalsComponents.includes('bloodPressure')) || isAllComponent || (!vitalsComponents &&
+        !isAllComponent)
+        ){
+        <div class="blood-pressure" style="flex: 1 0 100%;">
+            <mat-form-field appearance="outline" class="me-30 mb-0" floatLabel="always">
+                <mat-label>Patient Blood Pressure</mat-label>
+                <input type="text" matInput #bloodPressure formControlName="bloodPressure">
+                <mat-icon matIconPrefix>monitor_heart</mat-icon>
+                <span class="unit" matTextSuffix>mmHg</span>
+
+            </mat-form-field>
+            @if(vitalsFormGroup.get(['bloodPressure'])?.touched &&
+
+            vitalsFormGroup.get(['bloodPressure'])?.value &&
+            !isBloodPressureValid(vitalsFormGroup.get(['bloodPressure'])?.value)
+            ){
+            <mat-error class="small-subtitle" style=" margin-top: -20px;">
+                <span>
+                    Please enter a valid blood pressure value in the format "systolic/diastolic" (e.g., 120/80).
+                </span>
+            </mat-error>
+            }
+            @if(
+            vitalsFormGroup.get(['bloodPressure'])?.value &&
+            isBloodPressureValid(vitalsFormGroup.get(['bloodPressure'])?.value) &&
+            patientBloodPressureCategory
+            ){
+
+            <div class="justify-content-start gap-12 g-just-flex indicator-text">
+
+                <mat-icon
+                    [style.color]="patientBloodPressureCategory.color">{{patientBloodPressureCategory.icon}}</mat-icon>
+                {{vitalsFormGroup.get(['bloodPressure'])?.value + ' mmHg'}}
+                <span class="category-text">
+                    <!--patient-->
+                    {{patientBloodPressureCategory.category}}
+                </span>
+
+            </div>
+            }
+        </div>
+        }
+        <!--temperature-->
+        @if((vitalsComponents && vitalsComponents.includes('temperature')) || isAllComponent || (!vitalsComponents &&
+        !isAllComponent)
+        ){
+        <div class="temperature">
+            <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
+                <mat-label>Patient Temperature</mat-label>
+                <input type="number" matInput #temperature formControlName="temperature">
+                <mat-icon matIconPrefix>ac_unit</mat-icon>
+                <span class="unit" matTextSuffix>°C</span>
+            </mat-form-field>
+
+        </div>}
+        <!--pulseRate-->
+        @if((vitalsComponents && vitalsComponents.includes('pulseRate')) || isAllComponent || (!vitalsComponents &&
+        !isAllComponent)
+        ){
+        <div class="pulse-rate">
+            <mat-form-field appearance="outline" class="me-20 mb-20" floatLabel="always">
+                <mat-label>Patient Pulse Rate</mat-label>
+                <input type="number" matInput #pulseRate formControlName="pulseRate">
+                <mat-icon matIconPrefix>favorite</mat-icon>
+                <span class="unit" matTextSuffix>bpm</span>
+            </mat-form-field>
+
+        </div>
+        }
+        <!--respiratoryRate-->
+        @if((vitalsComponents && vitalsComponents.includes('respiratoryRate')) || isAllComponent || (!vitalsComponents
+        &&
+        !isAllComponent)
+        ){
+        <div class="respiratory-rate">
+            <mat-form-field appearance="outline" class="me-20 mb-20" floatLabel="always">
+                <mat-label>Patient Respiratory Rate</mat-label>
+                <input type="number" matInput #respiratoryRate formControlName="respiratoryRate">
+                <mat-icon matIconPrefix>air</mat-icon>
+                <span class="unit" matTextSuffix>bpm</span>
+            </mat-form-field>
+        </div>
+        }
+        <!--oxygenSaturation-->
+        @if((vitalsComponents && vitalsComponents.includes('oxygenSaturation')) || isAllComponent || (!vitalsComponents
+        &&
+        !isAllComponent)
+        ){
+        <div class="oxygen-saturation">
+            <mat-form-field appearance="outline" class="me-2`0 mb-20" floatLabel="always">
+                <mat-label>Patient Oxygen Saturation</mat-label>
+                <input type="number" matInput #oxygenSaturation formControlName="oxygenSaturation">
+                <mat-icon matIconPrefix>air</mat-icon>
+                <span class="unit" matTextSuffix>Sp02</span>
+            </mat-form-field>
+        </div>
+        }
+    </form>
+</div>

@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" style="padding-top: 30px;">
     <div class="absolute-bg">
         <div class="w70">
 
@@ -6,6 +6,17 @@
         <div class="w30">
 
         </div>
+    </div>
+    <div class="top-nav">
+        <!-- <a [routerLink]="['/home']" routerLinkActive="router-link-active">
+            Home
+        </a> -->
+        <a [routerLink]="['/register']" routerLinkActive="router-link-active">
+            Register
+        </a>
+        <a [routerLink]="['/login']" routerLinkActive="router-link-active">
+            Sign In
+        </a>
     </div>
     <div class="maths-title">
         <h1> Elikita2
@@ -133,8 +144,10 @@
                             </div>
                         </div>
                         <div class="social-login-body">
-                            <a class="colored-icon" (click)="signInWithGoogle()">
-                                <i class="fa-brands fa-google"></i>
+                            <a class="colored-icon" (click)="signInWithGoogle()" style="color: var(--mat-sys-surface);
+                            background-color: var(--mat-sys-primary);
+                            ">
+                                G
                             </a>
                             <!-- <a class="colored-icon" (click)="signInWithFacebook()"><i class="fa-brands fa-facebook-f"></i></a> -->
 

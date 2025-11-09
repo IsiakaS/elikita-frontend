@@ -1,0 +1,74 @@
+label,
+.form-group-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group-label {
+    margin-bottom: 12px;
+}
+
+form.going-dutch {
+    display: flex;
+    justify-content: flex-start;
+    width: 750px;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    gap: 50px;
+
+    &>div {
+        width: 320px;
+        max-width: 100%;
+        background-color: var(--mat-sys-surface-variant);
+        box-sizing: border-box;
+        border-radius: 6px;
+        // background-color: red;
+    }
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+
+
+}
+
+.abs-pos {
+    position: sticky;
+
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--mat-sys-surface-variant);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding-right: 16px;
+    z-index: 999;
+}
+
+.mat-mdc-card-content {
+    padding: 0px 0px 16px 0px;
+}
+
+.time-sl {
+    background-color: var(--mat-sys-surface-container-high);
+
+    padding: 0.275rem 1.5rem;
+    color: var(--mat-sys-on-surface);
+}
+
+.gon {
+    @media (max-width: 767px) {
+        flex: 1 0 300px;
+        height: max-content;
+    }
+}
+
+.cards-wrapper {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+}

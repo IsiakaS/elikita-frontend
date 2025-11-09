@@ -1,0 +1,16 @@
+<mat-card class="p-20" style="width: max-content">
+
+    <mat-card-header>
+        <mat-card-title>Lab Supply</mat-card-title>
+        <mat-card-subtitle>View lab supplies and equipment</mat-card-subtitle>
+    </mat-card-header>
+    <div class="mt-20"></div>
+    <mat-divider></mat-divider>
+    <div class="mb-10"></div>
+    @if(testingTabeledOption.rawTableData !== null){
+
+    <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData" [columns]="testingTabeledOption.columns"
+        [rawTableData]="testingTabeledOption.rawTableData" [tableHeaderMetaData]="testingTabeledOption.headerFilter">
+
+    </app-tabled-option>}
+</mat-card>

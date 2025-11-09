@@ -1,0 +1,398 @@
+/* Patient Data Review Container */
+.patient-data-review-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Sections Grid - displays sections side by side when space allows */
+.sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+/* Section Card - each section is a card */
+.section-card {
+    background: var(--mat-sys-surface);
+    border-radius: 16px;
+    border: 1px solid var(--mat-sys-outline-variant);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: fit-content;
+
+    &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-color: var(--mat-sys-primary);
+    }
+
+    mat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: var(--mat-sys-surface-container-low);
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
+        border-radius: 16px 16px 0 0;
+    }
+
+    mat-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-surface);
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    mat-card-content {
+        padding: 24px !important;
+    }
+}
+
+/* Edit All Button */
+.edit-all-btn {
+    color: var(--mat-sys-on-surface-variant);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+    }
+
+    &:hover {
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+        transform: scale(1.1);
+    }
+}
+
+/* Add Button */
+.add-btn {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Fields List - vertical list of field rows */
+.fields-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Field Row - each field is a row with label and value inline, separated by border */
+.field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    gap: 20px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: var(--mat-sys-surface-container-lowest);
+        padding-left: 12px;
+        padding-right: 12px;
+        margin-left: -12px;
+        margin-right: -12px;
+        border-radius: 8px;
+    }
+}
+
+.field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: capitalize;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+.field-value {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+    text-align: right;
+    word-break: break-word;
+
+    &.single-value {
+        text-align: left;
+        width: 100%;
+    }
+}
+
+/* Array Items List - expands width first, then height */
+.array-items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: 16px;
+}
+
+.array-item {
+    background: var(--mat-sys-surface);
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: fit-content;
+    box-sizing: border-box;
+    width: 100%;
+
+    &:hover {
+        border-color: var(--mat-sys-primary);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+}
+
+.array-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.item-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--mat-sys-on-primary-container);
+    background: var(--mat-sys-primary-container);
+    padding: 6px 14px;
+    border-radius: 16px;
+    letter-spacing: 0.5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+
+    button {
+        min-width: 28px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--mat-sys-on-surface-variant);
+
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+        }
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.edit-btn {
+    &:hover {
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+    }
+}
+
+.delete-btn {
+    &:hover {
+        background-color: var(--mat-sys-error-container);
+        color: var(--mat-sys-on-error-container);
+    }
+}
+
+.array-item-content {
+    padding-top: 0;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--mat-sys-on-surface-variant);
+
+    p {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    button {
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        letter-spacing: 0.5px;
+    }
+}
+
+/* Navigation Section */
+.navigation-section {
+    display: flex;
+    justify-content: flex-end;
+    padding: 24px 0 16px;
+}
+
+.next-btn {
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Dialog Actions */
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 20px 0 0;
+    border-top: 1px solid var(--mat-sys-outline-variant);
+    margin-top: 24px;
+
+    button {
+        padding: 10px 24px;
+        font-weight: 600;
+        border-radius: 8px;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+
+    .array-items-list {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .patient-data-review-container {
+        padding: 16px;
+        gap: 20px;
+    }
+
+    .sections-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .array-items-list {
+        grid-template-columns: 1fr;
+    }
+
+    .section-card {
+        mat-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 20px;
+        }
+    }
+
+    .add-btn {
+        align-self: flex-start;
+        width: 100%;
+    }
+
+    .field-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 0;
+    }
+
+    .field-label {
+        min-width: auto;
+    }
+
+    .field-value {
+        text-align: left;
+    }
+
+    .array-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .action-buttons {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+
+    .dialog-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+
+        button {
+            width: 100%;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .patient-data-review-container {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .section-card {
+        mat-card-header {
+            padding: 12px 16px;
+        }
+
+        mat-card-content {
+            padding: 16px !important;
+        }
+    }
+
+    .field-row {
+        padding: 10px 0;
+    }
+
+    .navigation-section {
+        .next-btn {
+            width: 100%;
+        }
+    }
+}

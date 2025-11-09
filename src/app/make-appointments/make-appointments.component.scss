@@ -1,0 +1,24 @@
+.date-slot {
+    display: flex;
+    flex-wrap: wrap;
+
+    .mat-mdc-card.demo-inline-calendar-card {
+        flex: 1 1 280px;
+    }
+
+    mat-card {
+        flex: 1 1 49%;
+
+        mat-chip-option {
+            display: inline-block;
+            margin-right: 30px;
+            margin-bottom: 20px;
+        }
+
+    }
+
+    button {
+        margin-top: 20px;
+        width: 100%;
+    }
+}

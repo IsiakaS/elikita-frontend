@@ -6,7 +6,9 @@
 
         a {
             text-decoration: none;
-            display: block;
+            display: flex;
+            justify-content: flex-start;
+            margin: 8px 10px;
             width: 100%;
             padding: 10px 0px;
             color: var(--mat-sys-on-surface);
@@ -17,6 +19,9 @@
 
 .sidemenu-wrapper {
     height: 100%;
+    width: 100%;
+    padding-right: 10px;
+    box-sizing: border-box;
 }
 
 .menus {
@@ -25,4 +30,20 @@
     flex-direction: column;
     justify-content: space-between;
     padding-bottom: 15px;
+}
+
+a {
+    cursor: pointer !important;
+}
+
+.sidemenu-wrapper.collapse-menu .menus .menu-group-list ul a span {
+    display: none;
+}
+
+.sidemenu-wrapper.collapse-menu .menus .menu-group-header {
+    display: none;
+}
+
+.sidemenu-wrapper.collapse-menu .menus .menu-group-list ul {
+    padding: 0px;
 }

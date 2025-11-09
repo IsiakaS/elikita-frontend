@@ -1,0 +1,76 @@
+@if(data){
+<div class="g-just-flex gap-0 my-12 link-group" style="justify-content: flex-start; align-items: center;">
+    <div class="g-just-flex gap-5 link-group-words" style="
+                            
+                            justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+        <div class="top">
+            {{data | codeableRef2 : valueDeepPath}}
+            @if(linkInReferences.returnLinkFromReferences(
+            data
+            ) && ((data.reference &&
+            !data.reference.display))){
+
+            <a class="icon-link" [href]="linkInReferences.returnLinkFromReferences(
+                                                    data)" style="height: max-content;">
+
+                <mat-icon>link</mat-icon>
+            </a>
+            }
+
+
+        </div>
+        @if(linkInReferences.returnLinkFromReferences(
+        data
+        ) && ((data.reference &&
+        !data.reference.display))
+        && referenceDeepPath
+        ) {
+        <div class="bottom subtitle-text-color-2">
+            @if((data |
+            fetchFromReference : referenceDeepPath )| async){
+            {{(data |
+            fetchFromReference : referenceDeepPath )| async}}
+            }@else{
+            <div style="width:10px; height: 10px;">
+                <mat-progress-spinner mode="indeterminate" style="width:10px; height: 10px;">
+
+                </mat-progress-spinner>
+            </div>
+
+            }
+
+
+        </div>
+        }
+    </div>
+    <div>
+        @if(linkInReferences.returnLinkFromReferences(
+        data
+        ) && ((data.reference &&
+        !data.reference.display))
+        && referenceDeepPath
+        ) {
+        <div (click)="alltds()" class="link-group-icon">
+            <!-- <div class="link-group-icon"> -->
+            <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                    <mat-panel-title style="margin-right: 0px;">
+                        <mat-icon class="subtitle-text-color-2"
+                            style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <ng-template matExpansionPanelContent>
+                    <!-- <span>jjjj</span> -->
+                    <div style="width: 250px;" #actualBase>
+
+                        <app-detail-base [url]="linkInReferences.returnLinkFromReferences(
+                                        data
+                                        ) || ''"></app-detail-base>
+                    </div>
+                </ng-template>
+            </mat-expansion-panel>
+        </div>
+        }
+    </div>
+</div>
+}

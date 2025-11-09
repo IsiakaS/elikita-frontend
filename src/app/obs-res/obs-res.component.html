@@ -1,0 +1,41 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-18">
+            <div class="g-just-flex flex-wrap justify-content-start gap-30" style="align-items: unset;">
+                @for(exam of examArray.controls; track $index;){
+                @let name = exam.get('name')?.value;
+                @let value = exam.get('value')?.value;
+
+
+                <div class="aafield" style="width: 280px; max-width: 100%;">
+                    <label for="" style="display: block; margin-bottom: 4px;"> {{name.split('$#$').length > 1 ?
+                        name.split('$#$')[1] : name | titlecase}}</label>
+                    <mat-form-field appearance="fill" style="width: 100%;">
+                        <textarea [attr.rows]="3" value="{{value}}" matInput>
+
+                            </textarea>
+
+                    </mat-form-field>
+                </div>
+
+
+                }
+                <div class="aafield g-just-flex" style="
+                margin:20px; box-sizing: border-box;
+                padding: 0px 20px;
+                background-color: var(--mat-sys-surface-variant);">
+                    <button mat-flat-button (click)="addMorePhysicalExam()">
+                        <mat-icon>add</mat-icon>
+                        Add More Physical Examination
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

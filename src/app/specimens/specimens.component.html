@@ -1,0 +1,17 @@
+<mat-card class="p-20" style="width: max-content">
+
+    <mat-card-header>
+        <mat-card-title>Specimens</mat-card-title>
+        <mat-card-subtitle>View Available specimens here, you can add specimens for a lab test in the test request
+            page</mat-card-subtitle>
+    </mat-card-header>
+    <div class="mt-20"></div>
+    <mat-divider></mat-divider>
+    <div class="mb-10"></div>
+    @if(testingTabeledOption.rawTableData !== null){
+
+    <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData" [columns]="testingTabeledOption.columns"
+        [rawTableData]="testingTabeledOption.rawTableData" [tableHeaderMetaData]="testingTabeledOption.headerFilter">
+
+    </app-tabled-option>}
+</mat-card>

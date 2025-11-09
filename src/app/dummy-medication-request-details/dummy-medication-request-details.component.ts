@@ -270,7 +270,7 @@ export class DummyMedicationRequestDetailsComponent {
 
     let chosenSubject = (medication.subject as Reference);
     console.log(chosenMedicine, chosenSubject);
-    debugger;
+    // debugger;
     // console.log(this.allMedications, , medicine);
     forkJoin({
       status: this.formFieldsDataService.getFormFieldSelectData('medication_dispense', 'status'),

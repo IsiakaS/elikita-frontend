@@ -1,0 +1,28 @@
+@if((breadCrumbService.breadCrumbBuild | async) && (breadCrumbService.breadCrumbBuild | async)!.length > 0) {
+<nav class="breadcrumb-navigation px-15">
+    @for( crumb of (breadCrumbService.breadCrumbBuild | async); track $index; let first = $first; let last = $last) {
+    @if(!first){
+    <div class="path-wrapper g-just-flex gap-10">
+        <a class="actual-path g-just-flex gap-10" [routerLink]="crumb.path" routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">
+
+            @if(crumb.pathIcon ){
+            <span class="path-icon">
+                <mat-icon>{{ crumb.pathIcon }}</mat-icon>
+            </span>
+            }
+            <span class="breadcrumb-item">
+                {{ crumb.pathTitle }}
+            </span>
+        </a>
+        @if(!last){
+        <span class="breadcrumb-separator">
+            <mat-icon>chevron_right</mat-icon>
+        </span>
+        }
+    </div>
+    }
+
+
+    }
+</nav>}

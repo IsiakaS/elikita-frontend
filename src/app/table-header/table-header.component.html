@@ -1,7 +1,8 @@
-<div class="filter my-15 mb-8 top align-items-center g-just-flex flex-wrap flex-between gap-20">
+@if(hasData){
+<div class="filter my-20 mb-18 top align-items-center g-just-flex flex-wrap flex-between gap-20">
     <div class="filter-top-left flex-wrap  g-just-flex gap-10">
         @for(topFilter of patientsTableFilterArray; track $index){
-        <mat-expansion-panel style="width:min-content" class="table-header-panels">
+        <!-- <mat-expansion-panel style="width:min-content" class="table-header-panels">
             <mat-expansion-panel-header>
                 <mat-panel-title>{{topFilter[0] | titlecase}}</mat-panel-title>
             </mat-expansion-panel-header>
@@ -12,25 +13,51 @@
                     }}</mat-checkbox>}
             </div>
         </mat-expansion-panel>
+        -->
+        <div class="expansion-wrapper">
+            <div class="expansion-trigger" expansion-target="ec" (click)="expand(ec)">
+                <div class="expansion-header g-just-flex    ">
+                    <div class="expansion-title">
+                        {{topFilter[0] | titlecase}}
+                    </div>
+
+                    <mat-icon class="expansion-icon">
+                        chevron_right
+                    </mat-icon>
+
+                </div>
+            </div>
+            <div class="expansion-content" #ec>
+                <div [formGroup]="patientsFiltersFormControlObject[topFilter[0]]">
+                    @for(eachOption of topFilter[1]; track $index){
+                    <mat-checkbox class="mb-12 w-100 top-filter-control" [formControlName]="eachOption">{{
+                        eachOption | titlecase
+                        }}</mat-checkbox>}
+                </div>
+            </div>
+        </div>
         }
     </div>
 
 
     <div class="filter-top-right">
-        <mat-form-field appearance="outline">
-            <input type="text" matInput placeholder="Search patients by name, gender, age or location">
+        <mat-form-field appearance="outline" style="max-width: 180px;">
+            <input type="text" matInput placeholder="{{searchBoxTitle??'Search'}}">
             <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
 
     </div>
 </div>
-<div class="filter active filters bottom mb-12 g-just-flex flex-wrap justify-content-start">
+<div class="filter active filters bottom mb-25 g-just-flex flex-wrap justify-content-start">
     <div class="botttom-right g-just-flex flex-wrap justify-content-start">
-        <mat-chip-set>
+        <mat-chip-set class="mxc">
             @for(topFilter of patientsTableFilterArray; track $index){
+            <!-- <mat-chip class="chip8 m-8 py-5 px-10"><span> {{topFilter[1][0] | -->
 
-            <mat-chip><span>{{topFilter[0] | titlecase}}: {{topFilter[1][0] | titlecase}}</span>
-                <button matChipRemove> <mat-icon>close</mat-icon></button>
+            <mat-chip class="chip8 m-8 py-5 px-10"><span>{{topFilter[0].length < 10?(topFilter[0] | titlecase)+": ":""}} {{topFilter[1][0] |
+
+                    titlecase}}</span>
+                <button matChipRemove class=" ms-8"> <mat-icon>close</mat-icon></button>
             </mat-chip>}
             <!-- <mat-chip><span>Gender: Female</span>
                 <button matChipRemove> <mat-icon>close</mat-icon></button>
@@ -39,3 +66,4 @@
     </div>
     <div class="bottom-left g-just-flex flex-wrap justify-content-end"></div>
 </div>
+}

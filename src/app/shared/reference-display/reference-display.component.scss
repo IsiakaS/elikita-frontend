@@ -1,0 +1,48 @@
+tr td {
+    z-index: 9999999999999;
+    position: relative;
+    overflow: visible;
+
+    max-width: 280px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &.restrict-width {
+        width: max-content;
+        max-width: 280px;
+
+    }
+}
+
+td>.link-group {
+    width: max-content;
+    max-width: 100%;
+}
+
+td>.link-group>.link-group-words {
+    width: max-content;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .top {
+        text-transform: capitalize;
+        white-space: nowrap;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+td>.link-group-icon {
+    flex: 0 0 30px;
+}
+
+.bottom {
+    text-transform: capitalize;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

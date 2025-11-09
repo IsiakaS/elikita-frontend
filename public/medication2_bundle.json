@@ -1,0 +1,970 @@
+{
+  "resourceType": "Bundle",
+  "id": "med-requests-bundle-10-samples-20250707",
+  "meta": {
+    "lastUpdated": "2025-07-07T12:06:49+01:00",
+    "profile": ["http://hl7.org/fhir/5.0/StructureDefinition/Bundle"]
+  },
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:1a2b3c4d-e5f6-7g8h-9i0j-1k2l3m4n5o6p",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-lisinopril-001",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "860975",
+              "display": "Lisinopril 10 MG Oral Tablet"
+            }
+          ],
+          "text": "Lisinopril 10mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-ade-id",
+          "display": "Mr. Ade Kunle"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-opd-A",
+          "display": "Hypertension Review - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:00:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-fatima-id",
+          "display": "Dr. Fatima Aliyu"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth once daily in the morning.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-001"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6q7",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-amlodipine-002",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "203657",
+              "display": "Amlodipine 5 MG Oral Tablet"
+            }
+          ],
+          "text": "Amlodipine 5mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-ade-id",
+          "display": "Mr. Ade Kunle"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-opd-A",
+          "display": "Hypertension Review - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:00:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-fatima-id",
+          "display": "Dr. Fatima Aliyu"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth once daily in the evening.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-001"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7r8",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-metformin-003",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "860975",
+              "display": "Metformin hydrochloride 500 MG Oral Tablet"
+            }
+          ],
+          "text": "Metformin 500mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-ade-id",
+          "display": "Mr. Ade Kunle"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-opd-A",
+          "display": "Hypertension Review - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:00:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-fatima-id",
+          "display": "Dr. Fatima Aliyu"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth twice daily with meals.",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 60,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-001"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4d5e6f7g-8h9i-0j1k-2l3m4n5o6s9",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-amoxicillin-004",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "urgent",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "197361",
+              "display": "Amoxicillin 250 MG Oral Capsule"
+            }
+          ],
+          "text": "Amoxicillin 250mg Capsule"
+        },
+        "subject": {
+          "reference": "Patient/patient-chidi-id",
+          "display": "Mr. Chidi Obi"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-acute-B",
+          "display": "Acute Infection Visit - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:05:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-amina-id",
+          "display": "Dr. Amina Sani"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one capsule by mouth three times daily for 7 days.",
+            "timing": {
+              "repeat": {
+                "frequency": 3,
+                "period": 1,
+                "periodUnit": "d",
+                "duration": 7,
+                "durationUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "cap",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{cap}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 21,
+            "unit": "cap",
+            "system": "http://unitsofmeasure.org",
+            "code": "{cap}"
+          },
+          "expectedSupplyDuration": {
+            "value": 7,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-002"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8t0u1",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-paracetamol-005",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "198426",
+              "display": "Acetaminophen 500 MG Oral Tablet"
+            }
+          ],
+          "text": "Paracetamol 500mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-chidi-id",
+          "display": "Mr. Chidi Obi"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-acute-B",
+          "display": "Acute Infection Visit - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:05:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-amina-id",
+          "display": "Dr. Amina Sani"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take two tablets by mouth every 6 hours as needed for fever/pain.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 6,
+                "periodUnit": "h",
+                "asNeeded": true
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 2,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 20,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 5,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-002"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9u2v3",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-insulin-006",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "stat",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "860905",
+              "display": "Insulin, Human, Regular 100 UNT/ML Injectable Solution"
+            }
+          ],
+          "text": "Human Insulin"
+        },
+        "subject": {
+          "reference": "Patient/patient-maryam-id",
+          "display": "Mrs. Maryam Idris"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-er-C",
+          "display": "Diabetic Ketoacidosis ER Visit - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:10:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-bello-id",
+          "display": "Dr. Bello Musa"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Administer 10 units subcutaneously stat.",
+            "timing": {
+              "event": ["2025-07-07T12:10:00+01:00"]
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "263887005",
+                  "display": "Subcutaneous route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 10,
+                  "unit": "units",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "U"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 1,
+            "unit": "vial",
+            "system": "http://unitsofmeasure.org",
+            "code": "{vial}"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-ER-003"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7h8i9j0k-1l2m-3n4o-5p6q-7r8s9t0v4w5",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-vitamin-d-007",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "993510",
+              "display": "Cholecalciferol 1000 UNT Oral Capsule"
+            }
+          ],
+          "text": "Vitamin D3 1000 IU Capsule"
+        },
+        "subject": {
+          "reference": "Patient/patient-biodun-id",
+          "display": "Mrs. Biodun Taiwo"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-followup-D",
+          "display": "Follow-up Osteoporosis - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T11:45:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-chidi-id",
+          "display": "Dr. Chidi Ezenwa"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one capsule by mouth once daily.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "cap",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{cap}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 90,
+            "unit": "cap",
+            "system": "http://unitsofmeasure.org",
+            "code": "{cap}"
+          },
+          "expectedSupplyDuration": {
+            "value": 90,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8i9j0k1l-2m3n-4o5p-6q7r-8s9t0u1v5w6",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-atorvastatin-008",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "199427",
+              "display": "Atorvastatin 20 MG Oral Tablet"
+            }
+          ],
+          "text": "Atorvastatin 20mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-ade-id",
+          "display": "Mr. Ade Kunle"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-opd-B",
+          "display": "Repeat Consultation - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T11:30:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-fatima-id",
+          "display": "Dr. Fatima Aliyu"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth at bedtime.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-004"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2w7x8",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-aspirin-009",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "197316",
+              "display": "Aspirin 81 MG Oral Tablet, Enteric Coated"
+            }
+          ],
+          "text": "Aspirin 81mg EC Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-ade-id",
+          "display": "Mr. Ade Kunle"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-opd-B",
+          "display": "Repeat Consultation - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T11:30:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-fatima-id",
+          "display": "Dr. Fatima Aliyu"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth once daily.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-004"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w9x0",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medreq-r5-warfarin-010",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "priority": "stat",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "860950",
+              "display": "Warfarin 5 MG Oral Tablet"
+            }
+          ],
+          "text": "Warfarin 5mg Tablet"
+        },
+        "subject": {
+          "reference": "Patient/patient-usman-id",
+          "display": "Mr. Usman Bello"
+        },
+        "encounter": {
+          "reference": "Encounter/encounter-20250707-er-D",
+          "display": "ER DVT Diagnosis - 2025-07-07"
+        },
+        "authoredOn": "2025-07-07T12:08:00+01:00",
+        "requester": {
+          "reference": "Practitioner/dr-amina-id",
+          "display": "Dr. Amina Sani"
+        },
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "Take one tablet by mouth once daily. Adjust dose per INR.",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 1,
+                  "unit": "tab",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{tab}"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30,
+            "unit": "tab",
+            "system": "http://unitsofmeasure.org",
+            "code": "{tab}"
+          },
+          "expectedSupplyDuration": {
+            "value": 30,
+            "unit": "d",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        },
+        "groupIdentifier": {
+          "system": "http://example.org/clinic/med-order-batch",
+          "value": "PRES-2025-07-07-BATCH-005"
+        }
+      }
+    }
+  ]
+}

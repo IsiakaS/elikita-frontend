@@ -1,0 +1,35 @@
+.rounded-buttons-group {
+    width: max-content;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: var(--mat-sys-surface-container);
+    border-radius: 20px;
+    overflow: auto;
+    width: max-content;
+    max-width: 100%;
+
+
+    button {
+        border-radius: 20px;
+        padding: 8px;
+        font: inherit;
+        border: none;
+        background-color: transparent;
+        width: 33%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.selected {
+            background-color: var(--mat-sys-primary);
+            color: var(--mat-sys-on-primary);
+        }
+    }
+
+
+}
+
+tr {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}

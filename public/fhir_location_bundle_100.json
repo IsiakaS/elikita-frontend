@@ -1,0 +1,1997 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc1",
+        "name": "Building 1",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "building",
+              "display": "Building"
+            }
+          ]
+        },
+        "status": "active"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc2",
+        "name": "Building 2",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "building",
+              "display": "Building"
+            }
+          ]
+        },
+        "status": "active"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc3",
+        "name": "Building 3",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "building",
+              "display": "Building"
+            }
+          ]
+        },
+        "status": "active"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc4",
+        "name": "Wing 4",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc3"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc5",
+        "name": "Wing 5",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc2"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc6",
+        "name": "Wing 6",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc2"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc7",
+        "name": "Wing 7",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc3"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc8",
+        "name": "Wing 8",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc3"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc9",
+        "name": "Wing 9",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "wing",
+              "display": "Wing"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc1"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc10",
+        "name": "Ward 10",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc9"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc11",
+        "name": "Ward 11",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc9"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc12",
+        "name": "Ward 12",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc6"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc13",
+        "name": "Ward 13",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc7"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc14",
+        "name": "Ward 14",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc8"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc15",
+        "name": "Ward 15",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc8"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc16",
+        "name": "Ward 16",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc5"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc17",
+        "name": "Ward 17",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc5"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc18",
+        "name": "Ward 18",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc4"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc19",
+        "name": "Ward 19",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc8"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc20",
+        "name": "Ward 20",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc6"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc21",
+        "name": "Ward 21",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc9"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc22",
+        "name": "Ward 22",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc9"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc23",
+        "name": "Ward 23",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc4"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc24",
+        "name": "Ward 24",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "ward",
+              "display": "Ward"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc6"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc25",
+        "name": "Room 25",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc10"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc26",
+        "name": "Room 26",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc12"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc27",
+        "name": "Room 27",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc15"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc28",
+        "name": "Room 28",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc11"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc29",
+        "name": "Room 29",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc13"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc30",
+        "name": "Room 30",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc16"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc31",
+        "name": "Room 31",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc21"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc32",
+        "name": "Room 32",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc14"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc33",
+        "name": "Room 33",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc19"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc34",
+        "name": "Room 34",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc15"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc35",
+        "name": "Room 35",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc18"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc36",
+        "name": "Room 36",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc14"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc37",
+        "name": "Room 37",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc15"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc38",
+        "name": "Room 38",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc14"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc39",
+        "name": "Room 39",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc24"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc40",
+        "name": "Room 40",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc18"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc41",
+        "name": "Room 41",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc18"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc42",
+        "name": "Room 42",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc11"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc43",
+        "name": "Room 43",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc17"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc44",
+        "name": "Room 44",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc10"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc45",
+        "name": "Room 45",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc19"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc46",
+        "name": "Room 46",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc23"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc47",
+        "name": "Room 47",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc24"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc48",
+        "name": "Room 48",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc14"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc49",
+        "name": "Room 49",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "room",
+              "display": "Room"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc21"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc50",
+        "name": "Bed 50",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc47"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc51",
+        "name": "Bed 51",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc28"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc52",
+        "name": "Bed 52",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc42"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc53",
+        "name": "Bed 53",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc49"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc54",
+        "name": "Bed 54",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc34"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc55",
+        "name": "Bed 55",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc43"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc56",
+        "name": "Bed 56",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc27"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc57",
+        "name": "Bed 57",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc39"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc58",
+        "name": "Bed 58",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc46"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc59",
+        "name": "Bed 59",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc49"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc60",
+        "name": "Bed 60",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc41"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc61",
+        "name": "Bed 61",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc46"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc62",
+        "name": "Bed 62",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc25"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc63",
+        "name": "Bed 63",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc47"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc64",
+        "name": "Bed 64",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc34"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc65",
+        "name": "Bed 65",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc40"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc66",
+        "name": "Bed 66",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc49"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc67",
+        "name": "Bed 67",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc41"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc68",
+        "name": "Bed 68",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc43"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc69",
+        "name": "Bed 69",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc47"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc70",
+        "name": "Bed 70",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc29"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc71",
+        "name": "Bed 71",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc30"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc72",
+        "name": "Bed 72",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc29"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc73",
+        "name": "Bed 73",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc38"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc74",
+        "name": "Bed 74",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc27"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc75",
+        "name": "Bed 75",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc31"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc76",
+        "name": "Bed 76",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc38"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc77",
+        "name": "Bed 77",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc46"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc78",
+        "name": "Bed 78",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc31"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc79",
+        "name": "Bed 79",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc39"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc80",
+        "name": "Bed 80",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc41"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc81",
+        "name": "Bed 81",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc37"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc82",
+        "name": "Bed 82",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc43"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc83",
+        "name": "Bed 83",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc35"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc84",
+        "name": "Bed 84",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc45"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc85",
+        "name": "Bed 85",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc37"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc86",
+        "name": "Bed 86",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc42"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc87",
+        "name": "Bed 87",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc49"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc88",
+        "name": "Bed 88",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc38"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc89",
+        "name": "Bed 89",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc38"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc90",
+        "name": "Bed 90",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc44"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc91",
+        "name": "Bed 91",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc39"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc92",
+        "name": "Bed 92",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc34"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc93",
+        "name": "Bed 93",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc37"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc94",
+        "name": "Bed 94",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc43"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc95",
+        "name": "Bed 95",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc46"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc96",
+        "name": "Bed 96",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc35"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc97",
+        "name": "Bed 97",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc26"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc98",
+        "name": "Bed 98",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc31"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc99",
+        "name": "Bed 99",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc36"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc100",
+        "name": "Bed 100",
+        "form": {
+          "coding": [
+            {
+              "system": "http://example.org/fhir/location-form",
+              "code": "bed",
+              "display": "Bed"
+            }
+          ]
+        },
+        "status": "active",
+        "partOf": {
+          "reference": "Location/loc47"
+        }
+      }
+    }
+  ]
+}

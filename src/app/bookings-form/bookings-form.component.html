@@ -1,0 +1,88 @@
+<mat-card class="preview-schedule" style="height: max-content;
+    
+    flex: 1 1 max-content;
+    max-width: 100%">
+    <mat-card-header>
+        <mat-card-title>
+            Book a consultation
+        </mat-card-title>
+        <mat-card-subtitle>
+            The patient encounter details will be sent to the consulting doctor
+        </mat-card-subtitle>
+    </mat-card-header>
+    <div class="gap my-10"></div>
+    <mat-card-content>
+        <div class="mb-20">
+            @if(selectDoctorForm){
+            <app-dynamic-forms-v2 [formFields]="[selectDoctorForm]"></app-dynamic-forms-v2>
+            }
+        </div>
+        <div class="booking-title mb-12" style=" font-size: 1rem;
+        color: var(--mat-sys-primary);
+        ">
+            Book from the consulting doctor's available schedule
+        </div>
+        <div class="preview-cards-wrapper g-just-flex  justify-content-start" style="
+                gap: 50px;
+                align-items: flex-start">
+            <div class="calendar-preview">
+                <!-- <mat-form-field appearance="outline" style=" display: block;"> -->
+
+                <!-- <input matInput [matDatepicker]="previewSD" placeholder="01/30/2025"
+                        [value]="scheduleForm?.get(['date', 'start'])?.value" style="height: 0px;">
+                    <mat-hint>MM/DD/YYYY</mat-hint> -->
+                <!-- <mat-datepicker-toggle matIconSuffix [for]="pickerSD"></mat-datepicker-toggle> -->
+
+                <mat-calendar [(selected)]="selected" style="width: 300px; max-width: 100%;" [minDate]="toUseToday"
+                    [maxDate]="FourDaysFromNow"></mat-calendar>
+                <!-- </mat-form-field> -->
+            </div>
+            <div class="time-preview" style="width: 350px; max-width: 100%;">
+                <div class="time-preview-title mb-20" style="text-align: center;">
+                    Selected Time Slot
+                </div>
+                @if(true
+                ){
+                <div class="time-wrapper g-just-flex justify-content-start gap-30 flex-wrap">
+
+                    <mat-chip-listbox class="chip-list">
+
+
+
+
+                        @for(time of selectedTimeArray; track $index;){
+                        <mat-chip-option value="{{time}}" style="
+                            display: inline-block;
+                            min-width: 80px;
+                            display: flex;
+                            text-align: center;
+                            
+                            justify-content: center;
+                            margin-right: 20px;
+                            ">
+
+                            {{time}}
+                        </mat-chip-option>
+
+                        }@empty {
+
+                        }
+                    </mat-chip-listbox>
+                </div>
+
+                }@else {
+                <div> No Time Selected Yet</div>
+                }
+            </div>
+
+        </div>
+
+        <div class="py-15 g-just-flex" style="justify-content: flex-end;">
+            <button mat-flat-button>
+                Send Consultation Request
+            </button>
+        </div>
+
+    </mat-card-content>
+
+</mat-card>

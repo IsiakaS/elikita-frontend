@@ -1,0 +1,244 @@
+<div class="m-30">
+    <mat-stepper>
+        <mat-step>
+            <ng-template matStepLabel>CheckLists</ng-template>
+            <div class="py-20">
+                <mat-card>
+                    <mat-card-header>
+                        <mat-card-title>
+                            Doctor / Health Worker Mandatory CheckList
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            Check the following boxes to ascertain that the corresponding actions / precautions have
+                            been taken
+                        </mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="py-20">
+                            @for(list of encounterCheckList; track $index;){
+                            <p>
+                                <mat-slide-toggle labelPosition="after">
+                                    <span style="font-size: 1.1rem; margin-left: 20px;">
+                                        {{list}}
+                                    </span>
+                                </mat-slide-toggle>
+                            </p>
+                            }
+
+
+                        </div>
+                    </mat-card-content>
+
+                </mat-card>
+            </div>
+            <button mat-flat-button matStepperNext>Next</button>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Patient Details</ng-template>
+            <div class="forms">
+                <app-add-vitals></app-add-vitals>
+            </div>
+            <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+                <button mat-flat-button matStepperPrevious>Back</button>
+                <button mat-flat-button matStepperNext>Next</button>
+
+            </div>
+        </mat-step>
+        <!-- //bmi stepp calculation
+        <mat-step>
+            <ng-template matStepLabel>BMI</ng-template>
+            <div class="forms">
+                <app-dynamic-forms-v2 [formFields]="bmiFormFields" [formMetaData]="bmiFormMetaData"
+                    (formSubmitted)="bmiFormSubmitted($event)">
+
+                </app-dynamic-forms-v2>
+            </div>
+            <div class="bmi-interprete">
+                @if(bmiFormSubmittedError && !patientBMICategory){
+                <div class="error-message my- 15 indicator-text g-just-flex gap-12 justify-content-start"
+                    style="background-color: var(--mat-sys-surface-container); width: max-content">
+                    <mat-icon>report_problem</mat-icon>
+                    <span [style.color]="'var(--mat-sys-error)'"
+                        [style.font-size]="'0.9rem'">{{bmiFormSubmittedError}}</span>
+                </div>
+                }
+                @if(patientBMI && patientBMICategory){
+                <div class="meter-background">
+                    <div class="meter-foreground">
+                        @for(band of bmiBands; track $index;){
+                        <div class="band" matTooltip="{{band.category}}" [matTooltipPosition]="'above'" [ngStyle]="{'background-color': band.color, 'width': ($first || $last)? ($first?(band.bmiRange[1]! - 0): (100 - band.bmiRange[0]!))+'%':
+                            (band?.bmiRange?.[1] || 100) - (band?.bmiRange?.[0] || 0) +'%'}">
+
+
+
+                        </div>
+                        }
+                        <div class="position-indicator"
+                            [ngStyle]="{'left': patientBMI < 100 ? patientBMI+ '%' : '98%'}">
+
+
+                        </div>
+                    </div>
+                </div>-->
+        <!-- // POSITION iNDICATOR -->
+
+        <!-- <div class="justify-content-start gap-12 g-just-flex indicator-text">
+
+                    <mat-icon [style.color]="patientBMICategory.color">{{patientBMICategory.icon}}</mat-icon>
+                    {{patientBMI.toFixed(2)+' kg/m²'}}
+                    <span class="category-text"> -->
+        <!--patient-->
+        <!--  {{patientBMICategory.category}}
+                    </span>
+
+                </div>
+
+                }
+            </div>
+            <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
+                <button mat-flat-button matStepperPrevious>Back</button>
+                <button mat-flat-button matStepperNext>Next</button>
+
+            </div>
+        </mat-step> -->
+        <mat-step>
+            <ng-template matStepLabel>Encounter Details</ng-template>
+            <div class="forms">
+                <app-dynamic-forms-v2 [formFields]="data!.formFieldsToUse.details">
+
+                </app-dynamic-forms-v2>
+                <div class="my-15"></div>
+                <app-dynamic-forms-v2 [formFields]="data!.formFieldsToUse.reason"
+                    (formSubmitted)="populateSymptoms($event)" [formMetaData]="symptomsFormMetaData">
+
+                </app-dynamic-forms-v2>
+
+            </div>
+            <div [formGroup]="encounterReasonForm"
+                class="symptoms-wrapper g-just-flex gap-12 justify-content-start mb-30 ">
+
+                <!-- @for(symptom of patientPresentedSymptoms; track $index;
+                let index = $index;
+                ){ -->
+                <div formArrayName="symptoms" class="symptom-array">
+                    @for(eachSymptom of symptoms.controls; track $index;
+                    let index = $index;
+                    ){
+
+                    @if(patientPresentedSymptoms.length){
+                    @let symptom = patientPresentedSymptoms[index];
+                    <div class="justify-content-start gap-12 g-just-flex indicator-text">
+
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    <span class="category-text">
+
+                                        {{(symptom.symptom.code+'$#$'+symptom.symptom.display+'$#$'+symptom.symptom.system)
+                                        | splitHash
+                                        : "1"}}
+                                    </span>
+                                </mat-panel-title>
+
+                            </mat-expansion-panel-header>
+                            <div class="forms" [formGroupName]="index">
+                                <!-- {{symptoms.controls[index].value | json}} -->
+                                <label for="severity" style="display: block; margin-bottom: 8px;">Symptom
+                                    Severity</label>
+                                <mat-form-field>
+                                    <!-- /  <mat-select [(value)]="symptoms.controls[index].get(['severity'])!.value" matselect>
+                                        @for(option of "mild | moderate | severe".split(" | "); track $index;){
+                                        <option [value]="option">
+                                            {{option}}
+                                        </option>
+                                        }
+                                    </mat-select> -->
+                                    <input [formControlName]="'severity'" matInput [matAutocomplete]="auto" />
+                                    <mat-autocomplete #auto="matAutocomplete">
+                                        @for(option of (matAutocompletei.severity[index] | async); track $index;){
+                                        <mat-option [value]="option">
+                                            {{ option }}
+                                        </mat-option>
+                                        }
+                                    </mat-autocomplete>
+
+                                </mat-form-field>
+                                <!--clinicalStatus-->
+                                <div class="afield">
+                                    <label for="clinicalStatus" style="display: block; margin-bottom: 8px;">Clinical
+                                        Status</label>
+                                    <mat-form-field>
+                                        <input type="text" [formControlName]="'clinicalStatus'" matInput
+                                            [matAutocomplete]="auto" />
+                                        <mat-autocomplete #auto="matAutocomplete">
+                                            @for(option of (matAutocompletei.clinicalStatus[index] | async); track
+                                            $index;){
+                                            <mat-option [value]="option">
+                                                {{ option }}
+                                            </mat-option>
+                                            }
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                                <!--Verification Status-->
+
+                                <div class="afield">
+                                    <label for="verificationStatus"
+                                        style="display: block; margin-bottom: 8px;">Verification Status</label>
+                                    <mat-form-field>
+                                        <input type="text" [formControlName]="'verificationStatus'" matInput
+                                            [matAutocomplete]="auto" />
+                                        <mat-autocomplete #auto="matAutocomplete">
+                                            @for(option of (matAutocompletei.verificationStatus[index] | async); track
+                                            $index;){
+                                            <mat-option [value]="option">
+                                                {{ option }}
+                                            </mat-option>
+                                            }
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                                <div class="afield">
+                                    <!--onsetDateTime-->
+                                    <label for="onsetDateTime" style="display: block; margin-bottom: 8px;">Onset
+                                        Date/Time</label>
+                                    <mat-form-field>
+                                        <input matInput [formControlName]="'onsetDateTime'" [matDatepicker]="picker">
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+
+                            </div>
+                        </mat-expansion-panel>
+
+
+
+                        <button class="rounded-icon-wrapper g-just-flex" style="border: none; outline: none; width: 20px; height: 20px;
+                        cursor: pointer;"
+                            (click)="removeSymptom(symptom.symptom.code+'$#$'+symptom.symptom.display+'$#$'+symptom.symptom.system )">
+                            <mat-icon style="font-size: 15px; height: 15px; width: 15px;">close</mat-icon>
+                        </button>
+
+                    </div>
+                    }
+                    }
+                </div>
+            </div>
+            <app-dynamic-forms-v2 [formFields]="data!.formFieldsToUse.notes">
+
+            </app-dynamic-forms-v2>
+            <div class="my-15"></div>
+            <app-dynamic-forms-v2 [formFields]="data!.formFieldsToUse.actors">
+
+            </app-dynamic-forms-v2>
+            <div class="submission-arena g-just-flex flex-wrap justify-content-end gap-12 mt-20">
+                <button mat-flat-button color="primary" (click)="setEncounter()">
+                    Submit Encounter
+                </button>
+            </div>
+        </mat-step>
+    </mat-stepper>
+</div>
+
+{{encounterReasonForm.value | json}}

@@ -16,6 +16,7 @@ import { TitleCasePipe } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { RecordHolderService } from '../patients-record/record-holder.service';
 import { AgePipe } from '../age.pipe';
+import { BreadcrumbService } from '../shared/breadcrumb.service';
 
 
 @Component({
@@ -47,10 +48,15 @@ export class PatientsComponent {
     'gender', 'age',
     'address'
   ]
+
+  breadCrumbService = inject(BreadcrumbService);
+
   constructor() {
 
   }
   ngOnInit() {
+
+    //this.breadCrumbService.buildBreadcrumb(this.route.pathFromRoot);
     this.tableDataSource.connect = () => {
       return this.tableDataLevel2;
     }
@@ -82,8 +88,11 @@ export class PatientsComponent {
   private router = inject(Router);
   private patientRecordHolder = inject(RecordHolderService);
   showRow(row: any) {
-
-    this.router.navigate([row.identifier.value], { relativeTo: this.route });
+    if (this.route.routeConfig?.path?.split('/').includes("admitted-patients")) {
+      this.router.navigate([row.identifier.value], { relativeTo: this.route });
+    } else {
+      this.router.navigate([row.identifier.value], { relativeTo: this.route });
+    }
   }
 
 }

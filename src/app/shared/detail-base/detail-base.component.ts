@@ -42,6 +42,8 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
 
 @Component({
   selector: 'app-detail-base',
+
+
   imports:
     [MatCardModule, MatButtonModule,
       MatFormField, MatDividerModule, DatePipe, RouterLink,
@@ -71,9 +73,9 @@ export class DetailBaseComponent {
       context: new HttpContext().set(LoadingUIEnabled, false)
     }
     ).pipe(map((dataBundle) => {
-      console.log(dataBundle);
+      //   console.log(dataBundle);
       if (dataBundle) {
-        console.log(dataBundle)
+        // console.log(dataBundle)
         return dataBundle
       } else {
         return ""
@@ -155,7 +157,7 @@ export class DetailBaseComponent {
   }
 
   renderOtherFields(data: any, key: string = '', parentWrapper: any = null): any {
-    console.log(parentWrapper);
+    //console.log(parentWrapper);
     const elements: string[] = [];
 
     const isPrimitive = (val: any) =>
@@ -170,12 +172,12 @@ export class DetailBaseComponent {
     const value = data[key];
 
     if (isPrimitive(value)) {
-      console.log('primitive', value);
+      //  console.log('primitive', value);
       const el = document.createElement('div');
-      el.innerHTML = `
+      el.innerHTML = `<div class="mb-8">
       ${['system', 'code', 'display'].includes(key.split('.')[key.split('.').length - 1]) ? "" :
           ` ${key.split('.')[key.split('.').length - 1]} - `
-        }${value}`;
+        }${value} </div>`;
       //       el.innerHTML =     ` <div class="field-group">
       //                                         <div class="field-value">
       // ${value}
@@ -184,12 +186,12 @@ export class DetailBaseComponent {
       //                                            ${key.split('.')[key.split('.').length - 1]}  
       //                                         </div>
       //                                     </div>`;
-      console.log(el.innerHTML);
+      // console.log(el.innerHTML);
 
       // <strong>: </strong> ${value}`;
 
       if (!parentWrapper) {
-        console.log(el.innerHTML)
+        // console.log(el.innerHTML)
         if (['system', 'code', 'meta'].includes(key.split('.')[key.split('.').length - 1])) {
           return "";
         }
@@ -198,7 +200,7 @@ export class DetailBaseComponent {
         if (['system', 'code'].includes(key.split('.')[key.split('.').length - 1])) {
           return parentWrapper.innerHTML;
         }
-        console.log(parentWrapper.innerHTML);
+        // console.log(parentWrapper.innerHTML);
         if ((parentWrapper as HTMLElement).children.length) {
           (parentWrapper as HTMLElement).children[(parentWrapper as HTMLElement).children.length - 1].appendChild(el);
         } else {
@@ -217,12 +219,16 @@ export class DetailBaseComponent {
           parentWrapper = document.createElement('div');
           parentWrapper.classList.add('detail-group');
         }
-        for (const k of Object.keys(value[0])) {
-          this.renderOtherFields(value[0], k, parentWrapper);
+        if (isPrimitive(value[0])) {
+          this.renderOtherFields(value, '0', parentWrapper);
+        } else {
+          for (const k of Object.keys(value[0])) {
+            this.renderOtherFields(value[0], k, parentWrapper);
+          }
         }
         //  this.renderOtherFields(value, '0', parentWrapper);
       } else {
-        console.log('object', value)
+        // console.log('object', value)
         if (parentWrapper) {
           let childWrapper = document.createElement('div');
           childWrapper.classList.add('detail-group');
@@ -231,7 +237,7 @@ export class DetailBaseComponent {
             parentWrapper.appendChild(childWrapper);
           }
 
-          console.log(parentWrapper);
+          // console.log(parentWrapper);
         } else {
           parentWrapper = document.createElement('div');
           parentWrapper.classList.add('detail-group');
@@ -254,7 +260,7 @@ export class DetailBaseComponent {
     // for (const e of elements) {
     //   document.querySelector(".other-details")!.innerHTML += e;
     // }
-    console.log(parentWrapper);
+    // console.log(parentWrapper);
     return parentWrapper.innerHTML
     // ? parentWrapper.innerHTML : '';
 

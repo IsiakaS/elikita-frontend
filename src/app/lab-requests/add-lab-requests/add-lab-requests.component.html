@@ -1,0 +1,44 @@
+<div class="component-wrapper g-just-flex p-20">
+    <div style="position: relative;"
+        [ngClass]="{'mb50': isChosenOption, 'mb-100': isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData}">
+        <mat-form-field appearance="outline" floatLabel="always"
+            style="display:block; justify-content:center; margin:auto; width:max-content; padding-bottom: 20px;">
+            <mat-label>
+                Single or Group
+            </mat-label>
+            <mat-hint>
+                Request a Single or Group of Lab Tests
+            </mat-hint>
+            <mat-select [formControl]="isMultiple">
+                <mat-option value="Single">Single</mat-option>
+                <mat-option value="Multiple">Group</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        @if(isChosenOption && formFields && formMetaData){
+        @for(form of medicineForms; track $index; ){
+        <app-dynamic-forms-v2 [formFields]="formFields" [formMetaData]="formMetaData"></app-dynamic-forms-v2>
+        }
+        }
+        @if(isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData){
+        <!-- A "request more test and finish-OR-WHATEVER IS APPROPPRIATE" button LOCATED TO THE END OF THE CONTAINER WITH 40PX GAP -->
+        <div class="g-just-flex gap-30 justify-content-end mt-20 dactions flex-wrap">
+
+
+            <button mat-button (click)="addMoreMedicineRequest();">
+                <mat-icon>add</mat-icon>
+                <span>Add Tests</span>
+            </button>
+
+            <button mat-flat-button>
+                <mat-icon>check</mat-icon>
+                <span>Finish</span>
+            </button>
+        </div>
+
+
+
+        }@else{ }
+    </div>
+
+</div>

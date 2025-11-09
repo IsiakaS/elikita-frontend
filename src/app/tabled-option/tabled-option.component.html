@@ -1,0 +1,282 @@
+@if(tableHeaderMetaData){
+<app-table-header [patientsTableFilterArray]="tableHeaderMetaData"
+    [patientsFiltersFormControlObject]="tableHeaderFilterControls">
+
+</app-table-header>
+}
+
+@if(tableData && columns){
+
+<table mat-table matSort [dataSource]="tableData" class="mat-elevation-z8 demo-table">
+
+    <!--name - coding.code.display-->
+    @for(column of columns; track $index;){
+    @if(columnMetaData && columnMetaData.get(column)){
+    @let metaData = columnMetaData.get(column);
+    @if(metaData?.dataType == 'IndividualReferenceField' ||
+    metaData?.dataType == 'CodeableReferenceField'
+    ){
+
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            {{(metaData?.columnName || column) | titlecase}}
+        </th>
+        <td mat-cell *matCellDef="let element; let i = index;" #td class="restrict-width">
+            <div class="g-just-flex gap-0 my-12 link-group" style="justify-content: flex-start; align-items: center;">
+                <div class="g-just-flex gap-5 link-group-words" style="
+                            
+                            justify-content: flex-start; align-items: flex-start; flex-direction: column;">
+                    <div class="top">
+
+                        @if(metaData?.dataType === 'IndividualReferenceField' && element[column]?.reference){
+                        {{element[column] | references2}}
+                        }@else {
+                        {{element[column] | codeableRef2}}
+
+
+                        }
+
+                    </div>
+                    @if(isLinkObj[column] && isLinkObj[column].get(i) && ((element[column].reference &&
+                    !element[column].display) ) &&
+                    (column === 'subject' ||
+
+                    column === 'performer' ||
+                    column === 'requester' ||
+                    column === 'participant'
+                    )
+                    ) {
+                    <div class="bottom subtitle-text-color-2">
+                        @if((element[column] | fetchFromReference : 'name': 0 : 'family' )| async){
+                        {{element[column] | fetchFromReference : 'name': 0 : 'family' | async}}
+                        }@else{
+                        <div style="width:10px; height: 10px;">
+                            <mat-progress-spinner mode="indeterminate" style="width:10px; height: 10px;">
+
+                            </mat-progress-spinner>
+                        </div>
+
+                        }
+
+
+                    </div>
+                    }
+                </div>
+                <div>
+                    @if(isLinkObj[column] && isLinkObj[column].get(i) && ((element[column].reference &&
+                    !element[column].display))) {
+                    <div (click)="alltds(td, actualBaseWrapper)" #actualBaseWrapper class="link-group-icon">
+
+
+                        <mat-expansion-panel hideToggle="true" class="detail-base" style="box-shadow: none;">
+                            <mat-expansion-panel-header style="margin: 0px; padding: 0px;">
+                                <mat-panel-title style="margin-right: 0px;">
+                                    <mat-icon class="subtitle-text-color-2"
+                                        style="margin: 0px; padding: 0px;">chevron_right</mat-icon>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <ng-template matExpansionPanelContent>
+                                <!-- <span>jjjj</span> -->
+                                <div style="width: 250px;" #actualBase class="actualBase">
+
+                                    <app-detail-base [url]="isLinkObj[column].get(i)"></app-detail-base>
+                                </div>
+                                <!-- <div style="width: 250px;">
+
+                                    <app-detail-base [url]="isLinkObj[column].get(i)"></app-detail-base>
+                                </div> -->
+                            </ng-template>
+                        </mat-expansion-panel>
+                    </div>
+                    }
+                </div>
+            </div>
+
+
+        </td>
+    </ng-container>
+
+    }
+    @else if(metaData?.dataType == 'CodeableConceptField' && metaData?.displayStyle !== "chips"
+    ){
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            {{(metaData?.columnName || column) | titlecase}}
+        </th>
+
+        <td mat-cell *matCellDef="let element; let i = index;">
+            @if(element[column]){
+            <span class="restrict-length">
+                {{element[column] | codeableConcept2}}
+            </span>
+
+            }@else {
+            N/A
+            }
+        </td>
+    </ng-container>
+
+
+    } @else if((metaData?.dataType == 'CodeableConceptField' && metaData?.displayStyle === "chips")
+    || metaData?.displayStyle == "chips"
+    ){
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            {{column}}
+        </th>
+        <td mat-cell *matCellDef="let element">
+            @if(element[column]){
+            <div #sc style="margin: 0px !important;" [attr.class]="'small-chips'+' '+'status-'+(statusStyles[
+                  metaData?.dataType == 'CodeableConceptField'? (element[column] | codeableConcept2 | lowercase) : (element[column] | lowercase)
+
+                    ]?.color || '')+' g-just-flex gap-8'">
+
+                <span> {{
+                    metaData?.dataType == 'CodeableConceptField'? (element[column] | codeableConcept2 | lowercase) :
+                    (element[column] | lowercase)
+                    }}
+
+                </span>
+                <!-- {{statusStyles[(element.verificationStatus | codeableConcept2 | lowercase)]?.['icon']}}
+                        {{element.verificationStatus | codeableConcept2}} -->
+                <mat-icon>
+                    {{statusStyles[
+                    metaData?.dataType == 'CodeableConceptField'? (element[column] | codeableConcept2 | lowercase) :
+                    (element[column] | lowercase)
+                    ]?.['icon'] || "" }}
+                </mat-icon>
+
+            </div>
+            } @else {
+            <span class="restrict-length">N/A</span>
+            }
+        </td>
+    </ng-container>
+
+
+    }
+    @else if( metaData?.inputType == 'datetime-local'
+    ){
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            {{metaData?.columnName || column | titlecase}}
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <span class="restrict-length">
+                {{(element?.[column]?(element?.[column] | date:"shortDate"): "N/A")}}
+            </span>
+        </td>
+    </ng-container>
+    } @else if( metaData?.inputType == 'money'
+    ){
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            @if(column.split('.').length > 1){
+            {{metaData?.columnName || column.split('.').slice(-1)[0] | titlecase}}
+
+            }@else{
+            {{metaData?.columnName || column | titlecase}}
+            }
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <span class="restrict-length">
+                @let toUseColumn = column.split('$#$');
+
+                @if(toUseColumn[0].split('.').length > 1){
+                @let deepPath = toUseColumn[0].split('.');
+                @if(deepPath.length > 1){
+                @let amount =element[deepPath[0]]?.[deepPath[1]];
+
+                @if(toUseColumn[1].split('.').length > 1){
+                @let deepPath2 = toUseColumn[1].split('.');
+                @if(deepPath2.length > 1){
+                @let currency = element[deepPath2[0]]?.[deepPath2[1]];
+                @if(amount && currency){
+                {{amount | priceFormat :currency}}
+                }@else {
+                {{amount || "N/A"}}
+                }
+
+                }
+
+
+                }@else {
+                @let currency = element?.[toUseColumn[1]];
+                @if(amount && currency){
+                {{amount | priceFormat :currency}}
+                }@else {
+                {{amount || "N/A"}}
+                }
+                }
+                }
+
+                }@else{
+                @let amount = element?.[toUseColumn[0]];
+                @let currency = element?.[toUseColumn[1]];
+                @if(amount && currency){
+                {{amount | priceFormat :currency}}
+                }@else {
+                {{amount || "N/A"}}
+                }
+                }
+
+            </span>
+        </td>
+    </ng-container>
+    } @else {
+    <ng-container matColumnDef="{{column}}">
+        <th mat-header-cell *matHeaderCellDef>
+            @if(column.split('.').length > 1){
+            {{metaData?.columnName || column.split('.').slice(-1)[0] | titlecase}}
+
+            }@else{
+            {{metaData?.columnName || column | titlecase}}
+            }
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <span class="restrict-length">
+                @if(column.split('.').length > 1){
+                @let deepPath = column.split('.');
+                @if(deepPath.length > 1){
+
+                @if(metaData?.inputType === 'link'){
+                <a href="{{processDeepPath(element, deepPath)}}" target="_blank">
+                    <mat-icon>
+                        open_in_new
+                    </mat-icon>
+                </a>
+                }@else{
+                {{processDeepPath(element, deepPath)}}
+                }
+                }
+                }@else{
+                {{element?.[column] || "N/A"}}
+                }
+            </span>
+        </td>
+    </ng-container>
+    }
+
+
+    }
+    }
+    @if(isToBeSelected){
+
+    <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>
+            Actions
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-button (click)="passSelectedRowAsReference(element)">
+                {{['Specimen', 'Patient', 'Practitioner', 'Observation'].includes(element.resourceType) ? 'Select' :
+                'View'}}
+            </button>
+        </td>
+    </ng-container>
+    }
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: columns">
+    </tr>
+</table>
+}

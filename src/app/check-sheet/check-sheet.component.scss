@@ -1,0 +1,63 @@
+.red-pills {
+    background: var(--mat-sys-surface);
+    border: none !important;
+}
+
+.inst-unit {
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 20px;
+    padding: 2px 12px 2px 6px;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    align-items: center;
+}
+
+.each-medicine {
+    background-color: var(--mat-sys-surface-container);
+    width: max-content;
+    // padding-right: 26px !important;
+    text-align: center;
+    align-items: center;
+
+    .med-name {
+        text-transform: capitalize;
+    }
+
+    &:hover {
+        background-color: var(--mat-sys-primary);
+        color: var(--mat-sys-on-primary);
+        cursor: pointer;
+
+        .med-name {
+            text-decoration: underline;
+        }
+
+        .rounded-icon-wrapper {
+            background-color: var(--mat-sys-on-primary) !important;
+
+            align-items: center;
+
+            span.material-symbols-outlined {
+                color: var(--mat-sys-primary) !important;
+            }
+        }
+    }
+
+
+    .rounded-icon-wrapper {
+        border: 1px solid var(--mat-sys-surface-container);
+
+        align-items: center;
+
+        .mat-icon {
+            color: var(--mat-sys-surface-container) !important;
+        }
+    }
+}
+
+.diag-fields>.mat-mdc-form-field {
+    width: 450px;
+    display: block;
+    max-width: 100%
+}
