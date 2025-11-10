@@ -6,7 +6,7 @@
                     Patients
                 </mat-card-title>
                 <mat-card-subtitle>
-                    Find, search and add patients registration data
+                    Active patients registration data (non-deceased)
                 </mat-card-subtitle>
             </div>
             <div class="right gap-10 g-just-flex" style="flex-wrap: wrap;">
@@ -71,21 +71,31 @@
 
 
         <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
-            <!-- Position Column -->
+            <!-- Name Column -->
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
                     Name
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.name.family | titlecase}} {{element.name.given[0] |
-                    titlecase}}</td>
+                <td mat-cell *matCellDef="let element" [title]="element.name | patientName">
+                    {{element.name | patientName}}
+                </td>
             </ng-container>
 
             <!-- Name Column -->
             <ng-container matColumnDef="phone">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by phone">
-                    Phone
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by contacts">
+                    Contacts
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.telecom.value}}</td>
+                <td mat-cell *matCellDef="let element">
+                    <div class="stacked-cell">
+                        <div class="primary-line" [title]="element.telecom | patientContacts:'phone':1">
+                            {{element.telecom | patientContacts:'phone':1}}
+                        </div>
+                        <div class="secondary-line" [title]="element.telecom | patientContacts:'email':1">
+                            {{element.telecom | patientContacts:'email':1}}
+                        </div>
+                    </div>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="gender">
@@ -96,17 +106,25 @@
             </ng-container>
             <ng-container matColumnDef="age">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by age">
-                    Age
+                    Age / DOB
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.birthDate | age}} </td>
+                <td mat-cell *matCellDef="let element">
+                    <div class="stacked-cell">
+                        <div class="primary-line" [title]="element.birthDate | patientAge:false">
+                            {{element.birthDate | patientAge:false}}
+                        </div>
+                        <div class="secondary-line" [title]="element.birthDate | date:'MMM d, yyyy'">
+                            {{element.birthDate | date:'MMM d, yyyy'}}
+                        </div>
+                    </div>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="address">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by adress">
                     Address
                 </th>
-                <td mat-cell *matCellDef="let element">{{element.address.city}}, {{element.address.state}},
-                    {{element.address.country}}</td>
+                <td mat-cell *matCellDef="let element">{{element.address | patientAddress}}</td>
             </ng-container>
 
 
@@ -115,6 +133,15 @@
             </tr>
             <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns: patientsTableDisplayedColumns;"></tr>
         </table>
+
+        <!-- No Data State -->
+        @if (isDataEmpty()) {
+        <app-empty-state 
+            [icon]="currentEmptyState.icon" 
+            [title]="currentEmptyState.title"
+            [subtitle]="currentEmptyState.subtitle">
+        </app-empty-state>
+        }
 
     </mat-card-content>
 </mat-card>

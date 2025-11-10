@@ -13,3 +13,93 @@ mat-card-header {
         width: min-content;
     }
 }
+
+// Table cell styling with max-width and ellipsis
+table.demo-table {
+    width: 100%;
+    table-layout: fixed; // Enable fixed table layout for consistent column widths
+    
+    th, td {
+        padding: 12px 16px;
+        vertical-align: top; // Align content to top for consistent row height
+        
+        // Default text overflow handling
+        overflow: hidden;
+        
+        // Individual column max-widths and specific styling
+        &.mat-column-name {
+            max-width: 200px;
+            min-width: 150px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        &.mat-column-phone {
+            max-width: 200px;
+            min-width: 160px;
+            // Normal flow, inner wrapper handles stacking
+        }
+        
+        &.mat-column-gender {
+            max-width: 100px;
+            min-width: 80px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        &.mat-column-age {
+            max-width: 120px;
+            min-width: 100px;
+            text-align: center;
+            // Normal flow, inner wrapper handles stacking
+        }
+        
+        &.mat-column-address {
+            max-width: 250px;
+            min-width: 180px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+    
+    // Header styling
+    th {
+        font-weight: 600;
+        background-color: var(--mat-sys-surface-container-low, #f5f5f5);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    
+    // Row hover effect
+    tr:hover {
+        background-color: var(--mat-sys-surface-container-lowest, #fafafa);
+        cursor: pointer;
+    }
+}
+
+// Utility classes for stacked content
+.stacked-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%; // Ensure full width of parent td
+    min-height: auto; // Let content determine height
+    
+    .primary-line {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+    
+    .secondary-line {
+        font-size: 0.85em;
+        opacity: 0.7;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+}
