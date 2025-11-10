@@ -80,12 +80,20 @@ export class PatientWrapperComponent {
     }).subscribe(({ params, data }) => {
       this.patientId = params['id'];
       console.log('Patient ID:', this.patientId);
-      // You can fetch patient data here if needed
+      
+      this.resolvedData = data['patientData'];
+      console.log('Resolved patient data:', this.resolvedData);
+      
+      // Handle case where patient data couldn't be loaded
+      if (!this.resolvedData) {
+        console.error('No patient data found for ID:', this.patientId);
+        // You could show an error message or redirect here
+        // For now, we'll continue but components should handle null data
+      }
+      
+      // Initialize encounter state
       this.encounterState = this.ecounterService.getEncounterState(this.patientId);
       console.log('Encounter State:', this.encounterState);
-      this.resolvedData = data['patientData']
-      console.log(this.resolvedData);
-
     })
   }
 

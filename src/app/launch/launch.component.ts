@@ -22,11 +22,11 @@ export class LaunchComponent {
 
     FHIR.oauth2.authorize({
       clientId: 'aca0e463-0e12-4f03-b353-7f8cc7a39d36',
-      scope: 'openid profile fhirUser patient',
+      scope: 'fhirUser',
       redirectUri: origin + '/auth/callback',
       // noRedirect: true,
       iss: 'https://elikita-server.daalitech.com',
-      pkceMode: 'required',
+      pkceMode: 'unsafeV1',
 
 
 
