@@ -146,7 +146,7 @@ export class PractitionerRegistrationComponent {
     formMeta: formMetaData = {
         formName: 'Practitioner Registration',
         formDescription: 'Register a new healthcare practitioner',
-        submitText: 'Next'
+        submitText: 'Save & Next'
     };
     designatedRegForm?: formMetaData
     designatedFormFields?: FormFields[];
@@ -709,15 +709,43 @@ export class PractitionerRegistrationComponent {
 
     errorService = inject(ErrorService);
 
+    /**
+     * Validate that Practitioner has a usable name
+     * Returns true if at least one of family, any given, or text is non-empty
+     */
+    private hasValidName(pract: any): boolean {
+        const names = pract?.name;
+        if (!Array.isArray(names) || names.length === 0) return false;
+        return names.some((n: any) => {
+            const family = (n?.family ?? '').toString().trim();
+            const givenArr = Array.isArray(n?.given)
+                ? n.given.map((g: any) => (g ?? '').toString().trim()).filter(Boolean)
+                : [];
+            const text = (n?.text ?? '').toString().trim();
+            return Boolean(family) || givenArr.length > 0 || Boolean(text);
+        });
+    }
+
 
     onSubmit(values: any) {
-        // alert(JSON.stringify(values));
         // Map form values to FHIR Practitioner resource
         this.practitioner = this.transformToFhirPractitioner(values);
+
+        // Validate: ensure Practitioner has a name before proceeding
+        if (!this.hasValidName(this.practitioner)) {
+            this.errorService.openandCloseError('Missing name: please enter first and/or last name.');
+            return;
+        }
+
         // Move to the next Angular Material tab
         this.selectedTabIndex = 1;
     }
     onFinalSubmit() {
+        // Defensive check before POST
+        if (!this.hasValidName(this.practitioner)) {
+            this.errorService.openandCloseError('Cannot submit: practitioner name is required.');
+            return;
+        }
         this.http.post('https://elikita-server.daalitech.com/Practitioner', this.practitioner).subscribe({
             next: () => {
                 this.snackBar.openFromComponent(SuccessMessageComponent, {

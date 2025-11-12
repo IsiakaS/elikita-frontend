@@ -3,12 +3,12 @@
         <mat-card-title>Practitioner Registration</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex" [preserveContent]="true">
             <mat-tab label="Registration">
                 <div class="tab-content">
                     @if(formMeta && designatedFormFields){
                     <app-dynamic-forms-v2 [formMetaData]="formMeta" [formFields]="designatedFormFields"
-                        (formSubmitted)="onSubmit($event)">
+                        [resetOnSubmit]="false" (formSubmitted)="onSubmit($event)">
                     </app-dynamic-forms-v2>
                     }
                 </div>

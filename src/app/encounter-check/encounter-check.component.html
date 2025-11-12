@@ -17,13 +17,17 @@
                         <div class="py-20">
                             @for(list of encounterCheckList; track $index;){
                             <p>
-                                <mat-slide-toggle labelPosition="after">
+                                <mat-slide-toggle labelPosition="after"
+                                    [formControl]="checkListControls.at($index)">
                                     <span style="font-size: 1.1rem; margin-left: 20px;">
                                         {{list}}
                                     </span>
                                 </mat-slide-toggle>
                             </p>
                             }
+                            <div class="my-10" *ngIf="areAllChecklistTrue()" style="color: var(--mat-sys-primary); font-weight: 500;">
+                                All mandatory checklist items have been completed.
+                            </div>
 
 
                         </div>
@@ -31,7 +35,10 @@
 
                 </mat-card>
             </div>
-            <button mat-flat-button matStepperNext>Next</button>
+            <div class="g-just-flex gap-12 justify-content-between" style="width:100%;">
+                <button mat-stroked-button color="warn" *ngIf="dialogRef" (click)="closeWithConfirm()">Close</button>
+                <button mat-flat-button matStepperNext>Next</button>
+            </div>
         </mat-step>
         <mat-step>
             <ng-template matStepLabel>Patient Details</ng-template>

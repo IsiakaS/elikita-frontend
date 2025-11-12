@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, inject, Inject, Input, Optional, Output, QueryList, ViewChildren } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { AddOtherDialogComponent } from '../add-other-dialog/add-other-dialog.component';
 import {
   formMetaData,
   CodeField, CodeableConceptField, IndividualField, IndividualReferenceField, GroupField,
@@ -14,7 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete'
 import { MatInputModule } from '@angular/material/input';
-import { debounce, debounceTime, map, Observable, of, startWith } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounce, debounceTime, map, Observable, of, startWith } from 'rxjs';
 import { AsyncPipe, CommonModule, JsonPipe, TitleCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { formFields } from '../dynamic-forms.interface';
@@ -56,6 +57,8 @@ export class DynamicFormsV2Component {
   @Input() resetOnSubmit: boolean = true;
   fb = inject(FormBuilder);
   fieldAutoCompleteObject: { [key: string]: Observable<any> | undefined } = {};
+  // Holds latest backend-loaded options per field to enable client-side filtering
+  backendOptions: { [key: string]: BehaviorSubject<any[]> } = {};
   aForm!: FormGroup;
   minutes: any[] = [];
   @Output() formSubmitted = new EventEmitter<any>();
@@ -191,7 +194,7 @@ export class DynamicFormsV2Component {
     // }
     else {
 
-  let control = this.fb.control('');
+      let control = this.fb.control('');
       let searchableObject: any[] = [];
       // if (Array.isArray(field.data)) {
       //   searchableObject = field.data;
@@ -266,7 +269,28 @@ export class DynamicFormsV2Component {
 
       console.log(this.searchableObject, "this.searcheableobject")
       if (field.generalProperties.fieldType == "CodeableConceptFieldFromBackEnd") {
-        this.fieldAutoCompleteObject[field.generalProperties.fieldApiName] = of([])
+        // Prepare a subject to cache backend results and filter locally as user types
+        const api = field.generalProperties.fieldApiName;
+        if (!this.backendOptions[api]) {
+          this.backendOptions[api] = new BehaviorSubject<any[]>([]);
+        }
+        const ctrl = fG.get(api) as FormControl;
+        this.fieldAutoCompleteObject[api] = combineLatest([
+          ctrl.valueChanges.pipe(startWith("")),
+          this.backendOptions[api].asObservable()
+        ]).pipe(
+          map(([f, options]) => {
+            if (!f) { f = ""; }
+            const term = String(f).toLowerCase();
+            return (options || []).filter((g: any) => {
+              if (typeof g === "object") {
+                const keys = Object.keys(g);
+                return keys.some((key) => String(g[key]).toLowerCase().includes(term));
+              }
+              return String(g).toLowerCase().includes(term);
+            });
+          })
+        );
       } else {
         this.fieldAutoCompleteObject[field.generalProperties.fieldApiName] = control.valueChanges.pipe(startWith(""), map((f: any) => {
           if (!f) {
@@ -329,38 +353,47 @@ export class DynamicFormsV2Component {
   searchCodeableConceptFromBackEnd(fieldApiName: string, value: string) {
     if (value.trim() !== "") {
       const url = this.searchableObject[fieldApiName];
-      this.fieldAutoCompleteObject[fieldApiName] = this.http.get(`${url}&filter=${value.trim()}`).pipe(
+      const allowOthers = !!this.formFields?.find((f: FormFields) => f.generalProperties.fieldApiName === fieldApiName)?.generalProperties?.allowedOthers;
+      this.http.get(`${url}&filter=${value.trim()}`).pipe(
         map((data: any) => {
-          return data.expansion.contains.map((item: any) => {
-            // return {
-            //   code: item.code,
-            //   display: item.display,
-            //   system: item.system
-            // };
-            ///alert(`${item.code}$#$${item.display}$#$${item.system}`);
-            return `${item.code}$#$${item.display}$#$${item.system}`;
-          }
-          );
+          const base: any[] = (data?.expansion?.contains || []).map((item: any) => `${item.code}$#$${item.display}$#$${item.system}`);
+          // de-duplicate results within a single backend response
+          const deduped = Array.from(new Set(base));
+          return allowOthers && !deduped.includes('Others') ? [...deduped, 'Others'] : deduped;
         })
-      )
+      ).subscribe((options: any[]) => {
+        // Merge with existing cached options and de-duplicate to avoid clearing the list
+        const current = this.backendOptions[fieldApiName]?.getValue?.() || [];
+        const merged = Array.from(new Set([...(current || []), ...(options || [])]));
+        if (!this.backendOptions[fieldApiName]) {
+          this.backendOptions[fieldApiName] = new BehaviorSubject<any[]>(merged);
+        } else {
+          this.backendOptions[fieldApiName].next(merged);
+        }
+      });
     }
   }
-  // Collect a custom value when 'Others' is chosen (simple prompt to avoid extra component wiring)
+  // Open Material dialog to collect a custom value when 'Others' is chosen
   openAddOtherValueDialog(fieldApiName: string, control: FormControl, field: FormFields) {
     const name = field.generalProperties.fieldLabel || field.generalProperties.fieldName;
-    const result = window.prompt(`Enter a custom value for ${name}:`, "");
-    if (result && typeof result === 'string' && result.trim() !== '') {
-      const trimmed = result.trim();
-      control.setValue(trimmed);
-      const currentList = this.searchableObject[fieldApiName];
-      if (Array.isArray(currentList) && !currentList.includes(trimmed)) {
-        const withoutOthers = currentList.filter((v: any) => v !== 'Others');
-        this.searchableObject[fieldApiName] = [...withoutOthers, trimmed, 'Others'];
+    const dialogRef = this.matDialog.open(AddOtherDialogComponent, {
+      width: '420px',
+      data: { fieldName: name }
+    });
+    dialogRef.afterClosed().subscribe((result: string | undefined) => {
+      if (result && typeof result === 'string' && result.trim() !== '') {
+        const trimmed = result.trim();
+        control.setValue(trimmed);
+        const currentList = this.searchableObject[fieldApiName];
+        if (Array.isArray(currentList) && !currentList.includes(trimmed)) {
+          const withoutOthers = currentList.filter((v: any) => v !== 'Others');
+          this.searchableObject[fieldApiName] = [...withoutOthers, trimmed, 'Others'];
+        }
+      } else {
+        // Reset to blank if cancelled or empty
+        control.setValue('');
       }
-    } else {
-      // Reset to blank if cancelled or empty
-      control.setValue('');
-    }
+    });
   }
   displayCodeDisplay(codeDisplay: string): string {
     return codeDisplay;

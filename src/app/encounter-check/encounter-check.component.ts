@@ -3,7 +3,7 @@ import { commonImports } from '../shared/table-interface';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { formMetaData } from '../shared/dynamic-forms.interface2';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-forms-v2.component';
 import { CodeableConceptField, CodeField, codingDataType, GroupField, IndividualField, IndividualReferenceField, ReferenceFieldArray, SingleCodeField } from '../shared/dynamic-forms.interface2';
 import { CommonModule, JsonPipe } from '@angular/common';
@@ -12,7 +12,7 @@ import { SplitHashPipe } from '../shared/split-hash.pipe';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
 import { AddVitalsComponent } from '../patient-observation/add-vitals/add-vitals.component';
 import { MatSelectModule } from '@angular/material/select';
-import { FormArray, FormBuilder, FormGroup, FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, FormControl } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { map, Observable, of, startWith } from 'rxjs';
@@ -32,9 +32,13 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
 })
 export class EncounterCheckComponent {
   fb = inject(FormBuilder);
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any) {
-    if (data) {
-      console.log(data);
+  // Optional dialogRef indicates we're running inside a MatDialog
+  dialogRef = inject(MatDialogRef<EncounterCheckComponent>, { optional: true });
+  // Use inject() for dialog data to avoid constructor param decorators issues
+  data = inject(MAT_DIALOG_DATA, { optional: true }) as any;
+  constructor() {
+    if (this.data) {
+      console.log(this.data);
     }
     this.encounterReasonForm = this.fb.group({
       symptoms: this.fb.array([
@@ -52,6 +56,12 @@ export class EncounterCheckComponent {
       ])
 
     })
+  }
+  // Checklist values tracking
+  checkListControls: FormArray<FormControl<boolean>> = this.fb.array<FormControl<boolean>>([]);
+  ngOnInit() {
+    // initialize checklist controls to match items length
+    this.encounterCheckList.forEach(() => this.checkListControls.push(this.fb.control(false) as FormControl<boolean>));
   }
   matAutocompletei = { clinicalStatus: <Observable<any>[]>[], verificationStatus: <Observable<any>[]>[], severity: <Observable<any>[]>[], };
 
@@ -528,7 +538,34 @@ export class EncounterCheckComponent {
   patientBMICategory?: { category: string, color: string, icon: string } | null;
 
   setEncounter() {
-    this.encounterService.setEncounterState(this.encounterService.getPatientId(), 'in-progress');
+    // Optionally validate checklist completion
+    // if (!this.areAllChecklistTrue()) {
+    //   // You can surface a message here if strict completion is required
+    // }
 
+    // Close dialog and signal to caller that encounter was initiated
+    this.dialogRef?.close({ encounterInitiated: true, checklist: this.checkListControls.getRawValue() });
+
+  }
+
+  // Compute: are all checklist items toggled on?
+  areAllChecklistTrue(): boolean {
+    return this.checkListControls?.controls?.every((c: any) => !!c.value) ?? false;
+  }
+
+  // Determine if there are unsaved changes
+  private hasUnsavedChanges(): boolean {
+    const anyChecklist = (this.checkListControls?.value || []).some((v: boolean) => !!v);
+    const anySymptoms = (this.patientPresentedSymptoms || []).length > 0;
+    const formDirty = this.encounterReasonForm?.dirty;
+    return Boolean(anyChecklist || anySymptoms || formDirty);
+  }
+
+  // Ask user to confirm before closing dialog
+  closeWithConfirm() {
+    const proceed = confirm('Unsubmitted values would not be saved if you close this dialog. Do you want to close?');
+    if (proceed) {
+      this.dialogRef?.close({ encounterInitiated: false, checklist: this.checkListControls.getRawValue() });
+    }
   }
 }

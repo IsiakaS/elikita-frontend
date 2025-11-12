@@ -116,6 +116,7 @@ export class EncounterServiceService {
         maxHeight: '90vh',
         maxWidth: '900px',
         autoFocus: false,
+        disableClose: true,
         data: {
 
           formMetaDataToUse: <formMetaData>{
@@ -205,9 +206,10 @@ export class EncounterServiceService {
                 fieldLabel: 'Patient Symptom',
                 fieldType: "CodeableConceptFieldFromBackEnd",
                 isArray: false,
-                isGroup: false
+                isGroup: false,
+                allowedOthers: true
               },
-              data: g.reason
+              data: ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/condition-code&_format=json'],
             },
             <SingleCodeField>{
               generalProperties: <generalFieldsData>{
@@ -326,9 +328,8 @@ export class EncounterServiceService {
 
       dRef.afterClosed().subscribe((result) => {
         console.log(result);
-        // Handle the result of the dialog here
-        // if (result) {
-        if (true) {
+        // Only initiate encounter if component signalled completion
+        if (result && result.encounterInitiated) {
           this.setEncounterState(patientId, 'in-progress');
           this.sn.openFromComponent(SuccessMessageComponent, {
             data: {
