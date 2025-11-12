@@ -1,3 +1,13 @@
+// Navigation links for sidebar/menu
+export const appLinks = [
+  {
+    label: 'Practitioners',
+    path: '/practitioners',
+    icon: 'badge',
+    roles: ['admin', 'receptionist']
+  },
+  // ...add other links as needed
+];
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Router, UrlSegment, UrlTree } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -156,6 +166,9 @@ export const capacityObject = {
     'viewSelf': ['patient', 'doctor', 'nurse', 'lab', 'pharmacy', 'admin', 'receptionist'],
     'update': ['admin', 'receptionist'],
     'delete': ['admin', 'receptionist'],
+
+  },
+  practitioner: {
 
   },
   medication: {

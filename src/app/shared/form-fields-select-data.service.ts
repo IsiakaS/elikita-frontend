@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable, Subject, throwError } from 'rxjs';
 import { LoadingUIEnabled } from '../loading.interceptor';
 import { Bundle, BundleEntry, CodeableConcept, CodeSystem, HealthcareService, Practitioner, Reference, ValueSet, Location, Patient, Encounter } from 'fhir/r5';
+import { ReferenceDataType } from './dynamic-forms.interface2';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,11 @@ export class FormFieldsSelectDataService {
     },
 
     'encounter': {
+      'class': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActEncounterCode&_format=json',
+      'priority': 'https://tx.fhir.org/r4/ValueSet?url=http://terminology.hl7.org/ValueSet/v3-ActPriority&_format=json',
+      'participant': 'https://elikita-server.daalitech.com/Practitioner?_format=json',
       'reason': "/dummy.json",
+      'reason_use': 'https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason-use&_format=json'
     },
     'serviceRequest': {
       'status': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-status&_format=json",
@@ -175,6 +180,77 @@ export class FormFieldsSelectDataService {
 
       return `${item.code}$#$${item.display}$#$${item.system}`;
     });
+  }
+
+  valueSetToConcept(value: ValueSet | any) {
+    const concepts: { code: string; display: string; system: string }[] = [];
+
+    const expansion = value?.expansion?.contains ?? [];
+    expansion.forEach((item: any) => {
+      if (item?.code) {
+        concepts.push({
+          code: item.code ?? '',
+          display: item.display ?? '',
+          system: item.system ?? ''
+        });
+      }
+    });
+
+    if (!concepts.length && Array.isArray(value?.compose?.include)) {
+      value.compose.include.forEach((include: any) => {
+        const includeConcepts = include?.concept ?? [];
+        includeConcepts.forEach((concept: any) => {
+          if (concept?.code) {
+            concepts.push({
+              code: concept.code ?? '',
+              display: concept.display ?? '',
+              system: include?.system ?? concept?.system ?? ''
+            });
+          }
+        });
+      });
+    }
+
+    const system = concepts.length ? concepts[0].system : (expansion?.[0]?.system ?? value?.compose?.include?.[0]?.system ?? '');
+
+    return {
+      system,
+      concept: concepts
+    };
+  }
+
+  practitionerBundleToReferenceData(value: Bundle<Practitioner> | null = null): ReferenceDataType[] {
+    if (!value?.entry?.length) {
+      return [];
+    }
+
+    return value.entry
+      .map((entry: BundleEntry<Practitioner>) => {
+        const resource = entry.resource;
+        if (!resource) {
+          return null;
+        }
+
+        const identifier = resource.identifier?.[0]?.value;
+        const id = resource.id ?? identifier ?? '';
+        if (!id) {
+          return null;
+        }
+
+        const reference = `${resource.resourceType ?? 'Practitioner'}/${id}`;
+        const primaryName = resource.name?.[0];
+        const display = primaryName?.text
+          ?? [primaryName?.given?.join(' '), primaryName?.family].filter(Boolean).join(' ').trim()
+          ?? resource.id
+          ?? 'Unnamed Practitioner';
+
+        return {
+          reference,
+          display,
+          type: resource.resourceType ?? 'Practitioner'
+        } as ReferenceDataType;
+      })
+      .filter((ref): ref is ReferenceDataType => !!ref?.reference);
   }
 
   baseFunctionToTurnPractitionerIntoReference(value: Bundle<Practitioner> | Bundle<Patient> | null = null) {
@@ -510,8 +586,27 @@ export class FormFieldsSelectDataService {
       },
     },
     encounter: {
-      reason: (value: any) => {
-        return ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason&_format=json']
+      class: (value: ValueSet) => {
+        return this.valueSetToConcept(value);
+      },
+      priority: (value: ValueSet) => {
+        return this.valueSetToConcept(value);
+      },
+      participant: (value: Bundle<Practitioner>) => {
+        return this.practitionerBundleToReferenceData(value);
+      },
+      reason: (_value: any) => {
+        alert('encounter reason called');
+        return ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason&_format=json'];
+      },
+      reason_use: (_value: any) => {
+        return [
+          "CC$#$Chief Complaint$#$http://hl7.org/fhir/encounter-reason-use",
+          "HC$#$Health Concern$#$http://hl7.org/fhir/encounter-reason-use",
+          "AD$#$Admitting Diagnosis$#$http://hl7.org/fhir/encounter-reason-use",
+          "RV$#$Reason for Visit$#$http://hl7.org/fhir/encounter-reason-use",
+          "HM$#$Health Maintenance$#$http://hl7.org/fhir/encounter-reason-use"
+        ];
 
       }
 

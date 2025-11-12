@@ -5,7 +5,8 @@
         <div class="fields-wrapper g-just-flex gap-22">
 
             @for(field of group.groupMembers; track $index;){
-            @let fieldValue = retrieveValueFromDeepPath(resources[field.key], field.valueDeepPath);
+            @let rawFieldValue = retrieveValueFromDeepPath(resources[field.key], field.valueDeepPath);
+            @let fieldValue = rawFieldValue;
             @if(fieldValue){
             <div class="field-group" #fg>
                 <div class="field-value">
@@ -26,6 +27,12 @@
                         }@else{
                         @if(field.keyDataType == 'dateTime'){
                         {{fieldValue | date : 'short'}}
+                        }@else if(field.keyDataType === 'phone'){
+                        <a [href]="'tel:' + ((fieldValue + '') | lowercase)" class="plain-link">{{(fieldValue + '' ) |
+                            lowercase}}</a>
+                        }@else if(field.keyDataType === 'email'){
+                        <a [href]="'mailto:' + ((fieldValue + '') | lowercase)" class="plain-link">{{(fieldValue + '' )
+                            | lowercase}}</a>
                         }@else{
                         {{(fieldValue+"" | titlecase)|| 'N/A'}}
                         }

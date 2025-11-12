@@ -1,0 +1,55 @@
+td>.link-group>.link-group-words {
+    width: 100%;
+
+}
+
+tbody tr {
+    gap: 20px;
+}
+
+td {
+    padding-right: 30px;
+}
+
+.mag {
+    margin-left: 25px;
+    margin-right: 25px;
+
+    @media (max-width: 552px) {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+}
+
+/* Per-component compact Angular Material menu styles.
+     MatMenu content renders in an overlay; we scope via a menu panel class and ::ng-deep. */
+:host ::ng-deep .compact-menu {
+
+    /* reduce default item height and padding */
+    .mat-mdc-menu-item {
+        min-height: 36px;
+        padding: 0 10px;
+    }
+
+    /* align icon and text, and reduce icon size */
+    .mat-mdc-menu-item .mat-mdc-menu-item__content {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mat-mdc-menu-item .mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    /* keep long labels on one line with ellipsis */
+    .mat-mdc-menu-item span {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

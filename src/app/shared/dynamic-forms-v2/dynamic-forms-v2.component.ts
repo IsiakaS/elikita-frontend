@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, inject, Inject, Input, Optional, Output, QueryList, ViewChildren } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import {
   formMetaData,
   CodeField, CodeableConceptField, IndividualField, IndividualReferenceField, GroupField,
@@ -63,6 +63,7 @@ export class DynamicFormsV2Component {
   // Inject dialog dependencies
   data = inject(MAT_DIALOG_DATA, { optional: true });
   dialogRef = inject(MatDialogRef<DynamicFormsV2Component>, { optional: true });
+  matDialog = inject(MatDialog);
 
   constructor() {
     if (this.data) {
@@ -190,7 +191,7 @@ export class DynamicFormsV2Component {
     // }
     else {
 
-      let control = this.fb.control('');
+  let control = this.fb.control('');
       let searchableObject: any[] = [];
       // if (Array.isArray(field.data)) {
       //   searchableObject = field.data;
@@ -229,6 +230,13 @@ export class DynamicFormsV2Component {
             break;
         }
         console.log(searchableObject);
+        // Append 'Others' option if allowed and not already present (for non-backend codeable concept fields etc.)
+        if (field.generalProperties.allowedOthers
+          && field.generalProperties.fieldType !== 'CodeableConceptFieldFromBackEnd'
+          && !searchableObject.includes('Others')
+        ) {
+          searchableObject = [...searchableObject, 'Others'];
+        }
 
 
       }
@@ -304,6 +312,15 @@ export class DynamicFormsV2Component {
         }))
       }
 
+      // Listen for selection of 'Others' to open custom value dialog
+      if (field.generalProperties.allowedOthers) {
+        control.valueChanges.subscribe((val: any) => {
+          if (val === 'Others') {
+            this.openAddOtherValueDialog(field.generalProperties.fieldApiName, control, field);
+          }
+        });
+      }
+
     }
     //  console.log((this.fieldAutoCompleteObject));
 
@@ -326,6 +343,23 @@ export class DynamicFormsV2Component {
           );
         })
       )
+    }
+  }
+  // Collect a custom value when 'Others' is chosen (simple prompt to avoid extra component wiring)
+  openAddOtherValueDialog(fieldApiName: string, control: FormControl, field: FormFields) {
+    const name = field.generalProperties.fieldLabel || field.generalProperties.fieldName;
+    const result = window.prompt(`Enter a custom value for ${name}:`, "");
+    if (result && typeof result === 'string' && result.trim() !== '') {
+      const trimmed = result.trim();
+      control.setValue(trimmed);
+      const currentList = this.searchableObject[fieldApiName];
+      if (Array.isArray(currentList) && !currentList.includes(trimmed)) {
+        const withoutOthers = currentList.filter((v: any) => v !== 'Others');
+        this.searchableObject[fieldApiName] = [...withoutOthers, trimmed, 'Others'];
+      }
+    } else {
+      // Reset to blank if cancelled or empty
+      control.setValue('');
     }
   }
   displayCodeDisplay(codeDisplay: string): string {

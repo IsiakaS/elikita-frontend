@@ -13,6 +13,10 @@ export const backendUrlforSamplesToken2 = new InjectionToken<string>('backend-2 
 export const backendUrlforSamplesValue2 = 'https://server.fire.ly'
 
 
+export const backendEndPointToken = new InjectionToken<string>('backend api base url');
+export const backendEndPointValue = "https://elikita-server.daalitech.com"
+// export const backendEndPointValue = "https://hapi.fhir.org/baseR4"
+
 export const frontendUrlValue = "/app"
 export const appConfig: ApplicationConfig = {
 
@@ -21,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideAnimationsAsync(),
     provideRouter(routes),
+    { provide: backendEndPointToken, useValue: backendEndPointValue },
     { provide: DateAdapter, useFactory: adapterFactory },
 
     provideHttpClient(

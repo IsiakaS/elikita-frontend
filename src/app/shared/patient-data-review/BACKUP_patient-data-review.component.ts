@@ -100,6 +100,7 @@ export class PatientDataReviewComponent implements OnInit {
                     this.groupedArrayFields[apiName] = [];
                 }
             } else {
+                alert("hey, i am not array")
                 // Simple field (including group fields that are not arrays)
                 this.simpleFields.push({
                     field: field,

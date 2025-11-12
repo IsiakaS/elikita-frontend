@@ -1,0 +1,42 @@
+.resource-data-review {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.sections-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.section-card {
+    background: var(--section-bg, #fff);
+}
+
+.fields-list {
+    display: grid;
+    gap: 8px;
+}
+
+.field-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.array-item {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+}
+
+.array-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.empty-state {
+    opacity: 0.7;
+    font-style: italic;
+}

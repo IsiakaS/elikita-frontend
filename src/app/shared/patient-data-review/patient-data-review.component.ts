@@ -38,6 +38,7 @@ export class PatientDataReviewComponent implements OnInit {
     // Outputs for standalone mode (real-time updates)
     @Output() fieldEdited = new EventEmitter<FieldEditEvent>();
     @Output() navigateNext = new EventEmitter<void>();
+    @Output() navigatePrev = new EventEmitter<void>();
 
     // Dialog mode - inject dialog data
     dialogData = inject(MAT_DIALOG_DATA, { optional: true });
@@ -50,15 +51,15 @@ export class PatientDataReviewComponent implements OnInit {
     groupedArrayFields: { [key: string]: any[] } = {}; // Grouped by fieldApiName
 
     ngOnInit() {
-        // If in dialog mode, use dialog data
-        if (this.dialogData) {
-            this.formFields = this.dialogData.formFields || [];
-            this.submittedData = this.dialogData.submittedData || {};
-            this.showEditButtons = this.dialogData.showEditButtons ?? true;
+        const isDialogPayload = !!this.dialogRef && !!this.dialogData && (
+            Array.isArray((this.dialogData as any).formFields) || (this.dialogData as any).submittedData !== undefined
+        );
+        if (isDialogPayload) {
+            this.formFields = (this.dialogData as any).formFields || [];
+            this.submittedData = (this.dialogData as any).submittedData || {};
+            this.showEditButtons = (this.dialogData as any).showEditButtons ?? true;
             this.mode = 'dialog';
         }
-
-        // Categorize fields
         this.categorizeFields();
     }
 
@@ -66,8 +67,9 @@ export class PatientDataReviewComponent implements OnInit {
      * Categorize fields into simple (non-array) and array fields
      */
     categorizeFields() {
-        if (!this.formFields) return;
-
+        if (!this.formFields) {
+            return;
+        }
         this.simpleFields = [];
         this.arrayFields = [];
         this.groupedArrayFields = {};
@@ -575,6 +577,20 @@ export class PatientDataReviewComponent implements OnInit {
             this.dialogRef.close({
                 submittedData: this.submittedData,
                 action: 'next'
+            });
+        }
+    }
+
+    /**
+     * Handle navigate to previous action
+     */
+    onNavigatePrev() {
+        if (this.mode === 'standalone') {
+            this.navigatePrev.emit();
+        } else if (this.mode === 'dialog' && this.dialogRef) {
+            this.dialogRef.close({
+                submittedData: this.submittedData,
+                action: 'prev'
             });
         }
     }

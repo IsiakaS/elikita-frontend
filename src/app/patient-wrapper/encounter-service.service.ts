@@ -23,6 +23,7 @@ import { TopbreadcrumbComponent } from '../topbreadcrumb/topbreadcrumb.component
 import { TopProfileComponent } from '../top-profile/top-profile.component';
 import { PatientSidedetailsComponent } from '../patient-sidedetails/patient-sidedetails.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { StateService } from '../shared/state.service';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 import { BehaviorSubject } from 'rxjs';
@@ -85,39 +86,31 @@ export class EncounterServiceService {
   }
 
   router = inject(Router)
+  stateService = inject(StateService)
   addEncounter(patientId: string) {
+    alert("added here");
     // alert(patientId);
     // Logic to add an encounter
     console.log('Add Encounter clicked');
+    // Check if there is already a current encounter in state
+    let currentEncounter: any = null;
+    this.stateService.currentEncounter.subscribe(enc => currentEncounter = enc).unsubscribe();
+    if (currentEncounter && currentEncounter.status == 'in-progress') {
+      this.sn.openFromComponent(SuccessMessageComponent, {
+        data: { message: 'Practitioner approved. You can now find them on the Practitioners page.', action: 'View Practitioner' },
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+      });
+      return;
+    }
+
     forkJoin({
-      class: this.http.get("/encounter/encounter_class.json"),
-      priority: this.http.get("/encounter/encounter_priority.json"),
-      reference: this.http.get("/encounter/encounter_reference.json"),
-      participant: this.http.get("/encounter/encounter_participant.json") as Observable<ReferenceDataType>,
+      class: this.formFieldsDataService.getFormFieldSelectData('encounter', 'class'),
+      priority: this.formFieldsDataService.getFormFieldSelectData('encounter', 'priority'),
+      participant: this.formFieldsDataService.getFormFieldSelectData('encounter', 'participant'),
       reason: this.formFieldsDataService.getFormFieldSelectData('encounter', 'reason'),
-      reason_use: this.http.get("/encounter/encounter_reason_use.json"),
-
-    }).pipe(map((all: any) => {
-      const keys = Object.keys(all);
-      keys.forEach((key) => {
-        console.log(all[key]);
-        if (all[key].hasOwnProperty('system') && all[key].hasOwnProperty('property')) {
-          all[key] = {
-            ...all[key], concept: all[key].concept.map((e: any) => {
-
-              const system = all[key].system;
-              console.log(key);
-              return { ...e, system }
-
-
-            })
-          }
-        } else {
-          all[key] = all[key]
-        }
-      })
-      return all;
-    })).subscribe((g: any) => {
+    }).subscribe((g: any) => {
       console.log(g);
       const dRef = this.dialog.open(EncounterCheckComponent, {
         maxHeight: '90vh',
@@ -174,7 +167,7 @@ export class EncounterServiceService {
                   isArray: true,
                   isGroup: false
                 },
-                data: <ReferenceDataType>g.participant
+                data: g.participant as ReferenceDataType[]
 
 
 
@@ -205,7 +198,6 @@ export class EncounterServiceService {
 
             //   },
             //   groupFields: {
-            //     'reason':
             'reason': <FormFields[]>[<CodeableConceptFieldFromBackEnd>{
               generalProperties: {
                 fieldApiName: 'reason',
@@ -1182,7 +1174,7 @@ export class EncounterServiceService {
                   isArray: false,
                   isGroup: false
                 },
-                data: g.type
+                data: g.participant as ReferenceDataType[]
 
               },
               {

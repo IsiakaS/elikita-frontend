@@ -1,0 +1,662 @@
+@if (data) {
+<mat-card class="profile-card px-15 pb-20">
+    <mat-card-header>
+        <mat-card-title>
+            <div class="g-just-flex gap-8">
+                <div class="round-icon-wrapper contrast">
+                    <mat-icon>
+                        person
+                    </mat-icon>
+                </div>
+                <span> Practitioner Details</span>
+            </div>
+        </mat-card-title>
+
+    </mat-card-header>
+    <mat-card-content>
+        <div class="my-10">
+            <mat-divider>
+
+            </mat-divider>
+            <div class="my-20"></div>
+            <div class="g-just-flex special-header-wrapper  my-20 mb-12 gap-10"
+                style="justify-content: space-between; flex-wrap: wrap;">
+
+                <div class="special-header g-just-flex gap-15" style="align-items: center; flex-wrap: wrap;
+                max-width: 100%; width: 100%;
+                ">
+                    <div class="icon" style="flex: 0 1 140px; max-width: 140px;">
+                        <!--photo or one from dummy-->
+                        <img src="{{data.photo?.[0]?.url || 'https://www.dummyimg.in/placeholder'}}" style="
+                           height: 120px; width: 120px;
+                            border-radius: 50%;
+                            " alt="" srcset="">
+
+                    </div>
+
+                    <div class="words g-just-flex flex-column gap-15"
+                        style="align-items: flex-start; font-size: 1.1rem;  flex: 1 1 200px;">
+                        <strong>
+                            <em>
+                                <span>
+                                    @if(data.name && data.name.length > 0){
+                                    @let name = data.name[0];
+                                    {{name.family | uppercase}} {{name.given?.join(" ")}}
+                                    }@else {
+                                    <span>No Name Provided</span>
+                                    }
+                                </span>
+
+
+                            </em>
+
+                        </strong>
+
+                        <div class="g-just-flex gap-20"
+                            style="display: flex !important; flex-wrap: wrap; justify-content: flex-start;">
+                            <!-- <div
+                                style="flex: 1 1 100%; gap: 12px; display: flex !important; flex-wrap: wrap; justify-content: flex-start;"> -->
+
+                            @if(data){
+                            @let approvedOrNot = data && data.active ? 'Approved' : 'Pending';
+                            <div #sc
+                                [attr.class]="'small-chips' +' '+' status-'+statuStyles[approvedOrNot.toLowerCase()]['color']+' g-just-flex gap-8'"
+                                style="display: flex !important;
+                                    background-color: var(--mat-sys-surface-variant);
+                                    ">
+
+                                <span> {{approvedOrNot}}
+
+                                </span>
+                                <mat-icon>
+                                    {{statuStyles[approvedOrNot.toLowerCase()]['icon']}}
+                                </mat-icon>
+
+                            </div>
+                            }
+                            <!-- </div> -->
+                            <!-- <mat-divider></mat-divider> -->
+                            <!-- <div style="flex: 1 1 100%; gap: 12px; display: flex !important; flex-wrap: wrap;"> -->
+                            @if(practitionerRole$ | async){
+                            <!-- {{(practitionerRole$ | async) | json}} -->
+                            @for(practitionerRole of (practitionerRole$ | async); track $index) {
+                            <!-- @let practitionerRole = practitionerRoleo.resource; -->
+                            <div #sc
+                                [attr.class]="'small-chips' +' '+' status-'+statuStyles[practitionerRole?.code == 'no role'?'no role': practitionerRole.code | codeableConcept2]['color']+' g-just-flex gap-8'"
+                                style="display: flex !important; align-items: center; position: relative; ">
+                                <span>
+                                    <mat-icon>
+                                        {{statuStyles[practitionerRole?.code == 'no role'?'no role':
+                                        practitionerRole.code | codeableConcept2]['icon']}}
+                                    </mat-icon>
+                                </span>
+                                <span>
+                                    {{practitionerRole?.code == 'no role' ? 'No Role Assigned' :
+                                    practitionerRole.code | codeableConcept2}}
+                                </span>
+                                <!-- <button mat-icon-button aria-label="Delete Role" style="margin-left: 8px;
+                                       "  > -->
+                                @if(!(practitionerRole?.code == 'no role')){
+                                <mat-icon class="delete-btn" (click)="deleteRole(practitionerRole)"
+                                    style="color: var(--mat-sys-on-surface-variant);">delete</mat-icon>
+                                }
+                                <!-- </button> -->
+                            </div>
+                            }
+                            }
+                            <!-- </div> -->
+
+                        </div>
+
+
+                        <!-- <a
+                        href="{{allMedications[0].medication.reference && allMedications[0].medication.reference.reference? allMedications[0].medication.reference.reference:''}}">
+
+                        {{allMedications[0].medication.concept?allMedications[0].medication.concept!.coding![0]!.display:
+                        allMedications[0].medication.reference?.display
+                        || allMedications[0].medication.reference?.reference ||
+                        allMedications[0].medication.reference?.identifier
+                        }}
+                    </a> -->
+                    </div>
+                </div>
+                <div class="action-button mb-15 gap-18" style="flex-wrap: wrap;">
+                    @if(canAddPatientRegistration()) {
+                    @if(data && !data.active) {
+                    <a mat-flat-button class=" header-group" (click)="approvePractitioner()">
+                        <mat-icon>
+                            check_circle
+                        </mat-icon>
+                        <span>Approve</span>
+                    </a>
+                    }
+                    <a mat-flat-button class="header-group" (click)="rejectPractitioner()">
+                        <mat-icon>
+                            cancel
+                        </mat-icon>
+                        <span>Reject</span>
+                    </a>
+                    @if(currentRoles && data && data.active) {
+                    <a mat-flat-button class="header-group" (click)="updateRole()">
+                        <mat-icon>
+                            person_add
+                        </mat-icon>
+                        <span>Add Role</span>
+                    </a>
+                    }
+                    }
+                </div>
+            </div>
+            <mat-tab-group>
+
+                <mat-tab label="Details">
+                    <div class="cards-wrapper my-30">
+                        @if(data.name && data.name.length > 0){
+                        <mat-card>
+
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <!-- <div class="header-icon">
+
+                        </div> -->
+                                    <div class="header-words  ">
+                                        <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                            <mat-icon>
+                                                <!-- aan icon for name -->
+                                                person
+                                            </mat-icon> <mat-card-title>
+                                                Name</mat-card-title>
+                                        </div>
+                                        <!-- <mat-card-subtitle class="subtitle-text-color" style="font-size: 1rem;">
+                                    Medicine Details
+                                </mat-card-subtitle> -->
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+
+
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+
+                                                        {{data.name[0].family || 'N/A'}}
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Last Name / Surname' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+
+                                                        {{data.name[0].given?.[0] || 'N/A'}}
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'First Name' | titlecase}}
+                                                </div>
+                                            </div>
+                                            @if(data.name[0].given && data.name[0].given.length > 1){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+                                                        @for(otherName of data.name[0].given; track $index) {
+                                                        @if($index > 0) {
+                                                        {{otherName || 'N/A'}}
+                                                        }
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Other Names' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+
+
+
+                                            <!-- 
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            <div #sc
+                                                [attr.class]="'small-chips'+' '+'status-'+intentStyles[allMedications[0].intent]['color']+' g-just-flex gap-8'">
+
+
+                                                <span> {{allMedications[0].intent}}
+
+                                                </span>
+                                                <mat-icon>
+                                                    {{intentStyles[allMedications[0].intent]['icon']}}
+                                                </mat-icon>
+
+                                            </div>
+                                        </div>
+                                        <div class="field-title">
+                                            {{'Intent' | titlecase}}
+                                        </div>
+                                    </div> -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+
+
+                        </mat-card>
+                        }
+
+
+                        @if(data.gender || data.birthDate ){
+                        <mat-card>
+
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <!-- <div class="header-icon">
+
+                        </div> -->
+                                    <div class="header-words  ">
+                                        <div class="title-flex" class="g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                            <mat-icon>
+                                                <!-- aan icon for bio data -->
+                                                info
+
+                                            </mat-icon> <mat-card-title>
+                                                Bio Data</mat-card-title>
+                                        </div>
+                                        <!-- <mat-card-subtitle class="subtitle-text-color" style="font-size: 1rem;">
+                                    Medicine Details
+                                </mat-card-subtitle> -->
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+
+                                            @if(data.birthDate){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+
+                                                        {{(data.birthDate | date : "mediumDate") || 'N/A'}}
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Date of Birth' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+                                            @if(data.birthDate){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+
+                                                        {{data.birthDate? (data.birthDate | age) +" Years": 'N/A'}}
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Age' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+                                            @if(data.gender){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+
+
+                                                        {{(data.gender | titlecase) || 'N/A'}}
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Gender' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+
+
+
+
+
+                                            <!-- 
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            <div #sc
+                                                [attr.class]="'small-chips'+' '+'status-'+intentStyles[allMedications[0].intent]['color']+' g-just-flex gap-8'">
+
+
+                                                <span> {{allMedications[0].intent}}
+
+                                                </span>
+                                                <mat-icon>
+                                                    {{intentStyles[allMedications[0].intent]['icon']}}
+                                                </mat-icon>
+
+                                            </div>
+                                        </div>
+                                        <div class="field-title">
+                                            {{'Intent' | titlecase}}
+                                        </div>
+                                    </div> -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+
+
+                        </mat-card>
+                        }
+                        @if(data.address && data.address.length > 0){
+                        <mat-card>
+
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <!-- <div class="header-icon">
+
+                        </div> -->
+                                    <div class="header-words  ">
+                                        <div class="title-flex
+                                    g-just-flex gap-8" style="
+                    align-items: flex-start;
+                    justify-content: flex-start;
+                    ">
+                                            <mat-icon>
+                                                <!-- aan icon for address -->
+                                                home
+                                            </mat-icon> <mat-card-title>
+                                                Address</mat-card-title>
+                                        </div>
+                                        <!-- <mat-card-subtitle class="subtitle-text-color" style="font-size: 1rem;">
+                                    Medicine Details
+                                </mat-card-subtitle> -->
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+
+                                            @for(address of data.address; track $index) {
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.line?.join(", ") || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Address Line' | titlecase}} @if(address.line &&
+                                                    address.line.length > 1)
+                                                    {
+                                                    {{address.line.length - 1}} Other Lines
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.city || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'City' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.state || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'State' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.district || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'District' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.country || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Country' | titlecase}}
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{address.postalCode || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Postal Code' | titlecase}}
+                                                </div>
+
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </mat-card-content>
+                        </mat-card>}
+                        @if(data.telecom && data.telecom.length > 0){
+                        <mat-card>
+
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <!-- <div class="header-icon">
+
+                        </div> -->
+                                    <div class="header-words  ">
+                                        <div class="title-flex g-just-flex gap-8" style="
+                    align-items: flex-start;        
+                    justify-content: flex-start;
+                    ">
+
+                                            <mat-icon>
+                                                <!-- aan icon for contact -->
+                                                contact_phone
+                                            </mat-icon> <mat-card-title>
+                                                Contact Details</mat-card-title>
+                                        </div>
+                                        <!-- <mat-card-subtitle class="subtitle-text-color" style="font-size: 1rem;">
+                                    Medicine Details
+                                </mat-card-subtitle> -->
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+
+                                <div *ngFor="let telecom of data.telecom">
+                                    <div class="field-group">
+                                        <div class="field-value">
+                                            <div #sc class="value-with-icon">
+                                                {{telecom.value || 'N/A'}}
+                                            </div>
+                                        </div>
+                                        <div class="field-title">
+                                            @if(telecom.use || telecom.system){ @if(telecom.system){
+                                            {{
+                                            (telecom.system | titlecase) }}
+                                            }@if(telecom.use) {
+                                            {{" - " +telecom.use | titlecase}}
+                                            }}@else {
+                                            {{'Contact'}}
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Attachment">
+                    @if(data.photo && data.photo.length > 0) {
+                    <div class="cards-wrapper my-30">
+                        @for(att of data.photo; track $index) {
+                        <mat-card>
+                            <mat-card-header>
+                                <div class="g-just-flex gap-15" style="
+                    align-items: flex-start;
+                    justify-content: flex-start; 
+                    ">
+                                    <div class="header-words  ">
+                                        <div class="title-flex g-just-flex gap-8" style="
+                    align-items: flex-start;        
+                    justify-content: flex-start;
+                    ">
+                                            <mat-icon>attach_file</mat-icon>
+                                            <mat-card-title>Attachment</mat-card-title>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div class="my-10 mt-20">
+                                    <div class="my-10"></div>
+                                    <div class="card-content-details">
+                                        <div class="fields-wrapper g-just-flex gap-15">
+                                            <div class="field-group" style="min-width: 280px;">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        @if(att.url){
+                                                        <img [src]="att.url" alt="attachment"
+                                                            style="max-height: 160px; border-radius: 6px;" />
+                                                        }@else if(att.data && att.contentType){
+                                                        <img [src]="'data:' + att.contentType + ';base64,' + att.data"
+                                                            alt="attachment"
+                                                            style="max-height: 160px; border-radius: 6px;" />
+                                                        }@else {
+                                                        <mat-icon>insert_drive_file</mat-icon>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Preview' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.title || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Title' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.contentType || 'N/A'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Content Type' | titlecase}}
+                                                </div>
+                                            </div>
+
+                                            @if(att.creation){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        {{att.creation | date: 'medium'}}
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Created' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+
+                                            @if(att.url){
+                                            <div class="field-group">
+                                                <div class="field-value">
+                                                    <div #sc class="value-with-icon">
+                                                        <a [href]="att.url" target="_blank">Open</a>
+                                                    </div>
+                                                </div>
+                                                <div class="field-title">
+                                                    {{'Link' | titlecase}}
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+                    </div>
+                    }@else {
+                    <div class="g-just-flex flex-column gap-15" style="align-items: center; justify-content: center;">
+                        <mat-icon class="icon" style="font-size: 3rem;">info</mat-icon>
+                        <span class="subtitle-text-color-2">No Attachment Found</span>
+                    </div>}
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </mat-card-content>
+</mat-card>}

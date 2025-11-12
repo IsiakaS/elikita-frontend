@@ -16,6 +16,8 @@ export interface generalFieldsData {
     isHidden?: boolean,
     value?: any,
     isArray: boolean,
+    // When true, an 'Others' option is appended (if not present) and selecting it lets user add a custom value
+    allowedOthers?: boolean,
     dependence_id?: string,
     controllingField?: {
         isAControlField: boolean,

@@ -308,6 +308,12 @@ export class SidemenuComponent {
           title: "Patient Registration",
           icon: "person_add"
         },
+        //practitioner management
+        {
+          link: "/app/practitioners",
+          title: "Practitioners",
+          icon: "person"
+        },
         {
           link: "/app/medicine-stock",
           title: "Medicine Stock",

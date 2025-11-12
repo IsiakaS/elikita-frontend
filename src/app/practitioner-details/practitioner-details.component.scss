@@ -1,0 +1,22 @@
+/* Add styles for practitioner details component as needed */
+.practitioner-details {
+    max-width: 600px;
+    margin: 24px auto;
+}
+
+.details-section {
+    margin-bottom: 24px;
+}
+
+.action-buttons button {
+    margin-right: 12px;
+}
+
+.small-chips .delete-btn {
+    display: none;
+    < !--
+}
+
+.small-chips:hover .delete-btn {
+    display: inline-flex;
+}

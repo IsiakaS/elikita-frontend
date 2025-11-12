@@ -5,6 +5,59 @@ export const baseStatusStyles: {
         label: string;
     };
 } = {
+    // Practitioner roles
+    admin: {
+        icon: 'admin_panel_settings',
+        color: 'blue',
+        label: 'Admin'
+    },
+    receptionist: {
+        icon: 'person',
+        color: 'teal',
+        label: 'Receptionist'
+    },
+
+    doctor: {
+        icon: 'medical_services',
+        color: 'red',
+        label: 'Doctor'
+    },
+    nurse: {
+        icon: 'local_hospital',
+        color: 'green',
+        label: 'Nurse'
+    },
+    lab: {
+        icon: 'science',
+        color: 'purple',
+        label: 'Lab'
+    },
+    pharmacy: {
+        icon: 'local_pharmacy',
+        color: 'orange',
+        label: 'Pharmacy'
+    },
+    patient: {
+        icon: 'person',
+        color: 'gray',
+        label: 'Patient'
+    },
+    cashier: {
+        icon: 'attach_money',
+        color: 'amber',
+        label: 'Cashier'
+    },
+    consultant: {
+        icon: 'psychology',
+        color: 'indigo',
+        label: 'Consultant'
+    },
+    unknown: {
+        icon: 'help_outline',
+        color: 'gray',
+        label: 'Unknown'
+    },
+
 
     // food | medication | environment | biologic - alergy type
     //issued & balance
@@ -140,9 +193,9 @@ export const baseStatusStyles: {
         color: "gray",
         label: "Draft"
     },
-    unknown: {
+    'no role': {
         icon: "help_outline",
-        color: "#757575",
+        color: "gray",
         label: "Unknown"
     },
     //order

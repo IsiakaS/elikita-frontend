@@ -1,0 +1,81 @@
+<div class="resource-data-review">
+    <div class="sections-grid">
+        <!-- Simple Fields -->
+        @if (simpleFields.length > 0) {
+        <mat-card class="section-card">
+            <mat-card-header>
+                <mat-card-title>Details</mat-card-title>
+                @if (showEditButtons) {
+                <button mat-icon-button (click)="editSimpleFields()" title="Edit all">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                }
+            </mat-card-header>
+            <mat-card-content>
+                <div class="fields-list">
+                    @for (sf of simpleFields; track sf.fieldApiName) {
+                    <div class="field-row">
+                        <span class="field-label">{{ sf.fieldLabel }}</span>
+                        <span class="field-value">{{ sf.data }}</span>
+                    </div>
+                    }
+                </div>
+            </mat-card-content>
+        </mat-card>
+        }
+
+        <!-- Array Fields -->
+        @for (apiName of getGroupedArrayKeys(); track apiName) {
+        <mat-card class="section-card">
+            <mat-card-header>
+                <mat-card-title>{{ apiName }}</mat-card-title>
+                @if (showEditButtons) {
+                <button mat-raised-button color="primary" (click)="addArrayItem(apiName)">Add New</button>
+                }
+            </mat-card-header>
+            <mat-card-content>
+                @if (getArrayItemsForField(apiName).length === 0) {
+                <div class="empty-state">No entries.</div>
+                } @else {
+                <div class="array-items-list">
+                    @for (arrayItem of getArrayItemsForField(apiName); track arrayItem.index) {
+                    <div class="array-item">
+                        <div class="array-item-header">
+                            <span class="item-number">#{{ arrayItem.index + 1 }}</span>
+                            @if (showEditButtons) {
+                            <div class="actions">
+                                <button mat-icon-button (click)="editArrayItem(arrayItem)"
+                                    title="Edit"><mat-icon>edit</mat-icon></button>
+                                <button mat-icon-button (click)="deleteArrayItem(arrayItem)"
+                                    title="Delete"><mat-icon>delete</mat-icon></button>
+                            </div>
+                            }
+                        </div>
+                        <div class="array-item-content">
+                            @if (arrayItem.field.generalProperties.isGroup) {
+                            <div class="fields-list">
+                                @for (k of objectKeys(arrayItem.data); track k) {
+                                @if (!isSubfieldHidden(arrayItem, k) && arrayItem.data[k] !== '' && arrayItem.data[k]
+                                !== undefined && arrayItem.data[k] !== null) {
+                                <div class="field-row">
+                                    <span class="field-label">{{ getSubfieldLabel(arrayItem, k) }}</span>
+                                    <span class="field-value">{{ arrayItem.data[k] }}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                            } @else {
+                            <div class="field-row">
+                                <span class="field-value">{{ arrayItem.data }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </mat-card-content>
+        </mat-card>
+        }
+    </div>
+</div>

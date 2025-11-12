@@ -2,12 +2,12 @@ import { Component, Input } from '@angular/core';
 import { CodeableConcept2Pipe } from "../shared/codeable-concept2.pipe";
 import { CodeableReferenceDisplayComponent } from "../shared/codeable-reference-display/codeable-reference-display.component";
 import { ReferenceDisplayComponent } from "../shared/reference-display/reference-display.component";
-import { DatePipe, JsonPipe, TitleCasePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe, LowerCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-details-cardz',
   imports: [CodeableConcept2Pipe, DatePipe,
-    TitleCasePipe, JsonPipe,
+    TitleCasePipe, LowerCasePipe,
     CodeableReferenceDisplayComponent, ReferenceDisplayComponent],
   templateUrl: './details-cardz.component.html',
   styleUrls: ['../dummy-medication-request-details/dummy-medication-request-details.component.scss', './details-cardz.component.scss']

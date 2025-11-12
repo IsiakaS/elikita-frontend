@@ -112,7 +112,8 @@
                         <div class="suggested-tasks">
                             <div class="suggested-tasks-wrapper">
                                 @if((auth.user | async)?.role === 'doctor' ){
-                                <div class="suggested-task" [ngClass]="{success: (encounterService.getEncounterState(patientId) | async ) == 'in-progress' ||
+                                <div class="suggested-task" (click)="encounterService.addEncounter(patientId)"
+                                    [ngClass]="{success: (encounterService.getEncounterState(patientId) | async ) == 'in-progress' ||
                                  (encounterService.getEncounterState(patientId) | async) == 'completed'
                                  }">
 
@@ -122,8 +123,7 @@
 
                                     </div>
 
-                                    <div (click)="encounterService.addEncounter(patientId)"
-                                        class="me-12 panel-description" matTooltip=" An encounter is an engagement with the patient either at the outpatient
+                                    <div class="me-12 panel-description" matTooltip=" An encounter is an engagement with the patient either at the outpatient
                                             ward on in the admission ward">
                                         Add an Encounter
                                     </div>

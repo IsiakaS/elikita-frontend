@@ -42,32 +42,24 @@
 
             <div class="cards-wrapper">
                 @for(group of detailsBuilderObject.groups; track $index;){
+                @if(group.groupMembers?.length > 0){
                 <mat-card>
-
                     <mat-card-header>
-                        <div class="g-just-flex gap-15" style="
-                    align-items: flex-start;
-                    justify-content: flex-start; 
-                    ">
-
-                            <div class="header-words  ">
-                                <div class="title-flex" class="g-just-flex gap-8" style="
-                    align-items: flex-start;
-                    justify-content: flex-start; 
-                    ">
-                                    <mat-icon>{{group.groupIcon}}</mat-icon> <mat-card-title>
-                                        {{group.groupName}}</mat-card-title>
+                        <div class="g-just-flex gap-15" style="align-items: flex-start; justify-content: flex-start;">
+                            <div class="header-words">
+                                <div class="title-flex g-just-flex gap-8"
+                                    style="align-items: flex-start; justify-content: flex-start;">
+                                    <mat-icon>{{group.groupIcon}}</mat-icon>
+                                    <mat-card-title>{{group.groupName | titlecase}}</mat-card-title>
                                 </div>
-
                             </div>
                         </div>
                     </mat-card-header>
                     <mat-card-content>
                         <app-details-cardz [group]="group" [resources]="realHospitalDetails"></app-details-cardz>
                     </mat-card-content>
-
-
                 </mat-card>
+                }
                 }
             </div>
         </div>

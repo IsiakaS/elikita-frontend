@@ -44,19 +44,29 @@ export class AppComponent {
     // document.body.classList.toggle('dark-theme', this.isDark);
   }
   ngOnInit() {
-    // this.auth.login("lab123", "lab123");
+    // Developer mode: set user to doctor and route to a specific patient's summary
+    const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/summary';
+    const current = this.auth.user.getValue();
+    if (!current || current.role !== 'doctor') {
+      // Ensure login redirects to our target route
+      this.auth.triedUrl = target;
+      this.auth.login('doctor123', 'doctor123');
+    } else {
+      // Already a doctor: navigate directly
+      this.router.navigateByUrl(target);
+    }
     this.router.events.subscribe((event) => {
-
       if (event instanceof NavigationStart) {
-
-        this.loaderService.openLoader()
+        this.loaderService.openLoader();
       }
-      if (event instanceof NavigationEnd ||
-        event instanceof NavigationCancel
-        || event instanceof NavigationError) {
+      if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError
+      ) {
         this.loaderService.closeLoader();
       }
-    })
+    });
   }
 
 

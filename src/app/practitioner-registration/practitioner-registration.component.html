@@ -1,0 +1,32 @@
+<mat-card class="practitioner-registration">
+    <mat-card-header>
+        <mat-card-title>Practitioner Registration</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+            <mat-tab label="Registration">
+                <div class="tab-content">
+                    @if(formMeta && designatedFormFields){
+                    <app-dynamic-forms-v2 [formMetaData]="formMeta" [formFields]="designatedFormFields"
+                        (formSubmitted)="onSubmit($event)">
+                    </app-dynamic-forms-v2>
+                    }
+                </div>
+            </mat-tab>
+            <mat-tab label="Photo">
+                <div class="tab-content">
+                    <app-upload-ui allowedFilesCategoryLabel="Image" uploadFieldName="Photo"
+                        [allowedFiles]="photoAllowedFiles" [maxFileSize]="photoMaxFileSize" [maxFiles]="photoMaxFiles"
+                        [azureStorageAccountName]="azureStorageAccountName" [azureContainerName]="azureContainerName"
+                        [azureSasToken]="azureSasToken" (filesChanged)="onPhotosUploaded($event)">
+                    </app-upload-ui>
+                </div>
+
+                <!--final submission here-->
+                <button mat-raised-button color="primary" (click)="onFinalSubmit()">Submit</button>
+            </mat-tab>
+
+        </mat-tab-group>
+
+    </mat-card-content>
+</mat-card>

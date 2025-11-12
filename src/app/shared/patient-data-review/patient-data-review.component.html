@@ -8,7 +8,7 @@
                 <mat-card-title>Personal Information</mat-card-title>
                 @if (showEditButtons) {
                 <button mat-icon-button class="edit-all-btn" (click)="editSimpleFields()" title="Edit all fields">
-                    <mat-icon>edit_outline</mat-icon>
+                    <span class="material-icons">edit</span>
                 </button>
                 }
             </mat-card-header>
@@ -63,11 +63,11 @@
                             <div class="action-buttons">
                                 <button mat-icon-button class="edit-btn" (click)="editArrayItem(arrayItem)"
                                     title="Edit this item">
-                                    <mat-icon>edit_outline</mat-icon>
+                                    <span class="material-icons" style="font-size:18px;">edit</span>
                                 </button>
                                 <button mat-icon-button class="delete-btn" (click)="deleteArrayItem(arrayItem)"
                                     title="Delete this item">
-                                    <mat-icon>delete_outline</mat-icon>
+                                    <span class="material-icons" style="font-size:18px;">delete</span>
                                 </button>
                             </div>
                             }
@@ -106,7 +106,10 @@
 
     <!-- Navigation Button -->
     @if (mode === 'standalone') {
-    <div class="navigation-section">
+    <div class="navigation-section g-just-flex gap-10" style="justify-content: flex-end;">
+        <button mat-button color="primary" class="prev-btn" (click)="onNavigatePrev()">
+            ← Back
+        </button>
         <button mat-raised-button color="primary" class="next-btn" (click)="onNavigateNext()">
             Next →
         </button>
@@ -115,7 +118,8 @@
 
     <!-- Dialog Mode Buttons -->
     @if (mode === 'dialog') {
-    <div class="dialog-actions">
+    <div class="dialog-actions g-just-flex gap-10" style="justify-content: flex-end;">
+        <button mat-button (click)="onNavigatePrev()">Back</button>
         <button mat-button (click)="closeDialog()">Cancel</button>
         <button mat-raised-button color="primary" (click)="onNavigateNext()">Continue</button>
     </div>

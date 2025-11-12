@@ -21,8 +21,8 @@ export const patRegResolver: ResolveFn<Bundle> | [] = (route, state) => {
   // If server expects versioned path like /r4, change to `${baseUrl}/r4/Patient`.
   // Only filter by active on the server; exclude deceased client-side after retrieval as requested.
   // Prefer :not to include records where active is missing; if unsupported, fall back to broader fetch.
-  const primary = `${baseUrl}/Patient?_format=json&_count=50&active:not=true`;
-  const fallback = `${baseUrl}/Patient?_format=json&_count=50`;
+  const primary = `${baseUrl}/Patient?_format=json&active:not=true`;
+  const fallback = `${baseUrl}/Patient?_format=json`;
 
   return http.get<Bundle>(primary).pipe(
     catchError(err => {

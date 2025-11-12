@@ -38,6 +38,8 @@ type PatientRegData = Patient & { status: string };
 })
 export class PatientRegComponent implements tablePropInt {
   statusStyles = baseStatusStyles;
+  // Track current route segment (e.g. 'pending', 'approved', 'deceased') for contextual UI logic
+  currentSegment: string = 'pending';
   islink = inject(LinkInReferencesService);
   utilityService: UtilityService = inject(UtilityService);
   route: ActivatedRoute = inject(ActivatedRoute);
@@ -77,6 +79,8 @@ export class PatientRegComponent implements tablePropInt {
       distinctUntilChanged()
     );
     combineLatest([this.store.patients$, segment$]).subscribe(([patients, segment]) => {
+      // Persist the segment for template conditional rendering of action menu items
+      this.currentSegment = segment;
       // derive status and filter based on current path segment
       const enriched: PatientRegData[] = patients.map(p => ({ ...p, status: p.active === true ? 'approved' : 'pending' }));
       let filtered: PatientRegData[] = [];
@@ -158,7 +162,7 @@ export class PatientRegComponent implements tablePropInt {
 
       {
         maxHeight: '93vh',
-        data: element
+        data: this.stripSyntheticFields(element)
 
       });
     ref.afterClosed().subscribe((result) => {
@@ -177,21 +181,31 @@ export class PatientRegComponent implements tablePropInt {
   }
 
   editPatient(element: Patient) {
-    const ref = this.dialog.open(PatientRegistrationEditComponent, { data: element });
+    const ref = this.dialog.open(PatientRegistrationEditComponent, {
+      data: this.stripSyntheticFields(element),
+      width: '720px',
+      maxWidth: '92vw',
+      maxHeight: '93vh'
+    });
     ref.afterClosed().subscribe(result => {
       if (result?.updated) {
-        const patch = result.patch as { family?: string; given?: string };
-        const updated: Patient = {
+        // New path: dialog returns full resource
+        const resource: Patient | undefined = result.resource as Patient | undefined;
+        const toSave: Patient = resource ?? {
+          // Back-compat path if only patch was returned (older dialog versions)
           ...element,
           name: [{
             ...(element.name?.[0] || {}),
-            family: patch.family ?? element.name?.[0]?.family,
-            given: [patch.given ?? element.name?.[0]?.given?.[0] ?? '']
+            family: result.patch?.family ?? element.name?.[0]?.family,
+            given: [result.patch?.given ?? element.name?.[0]?.given?.[0] ?? '']
           }]
         } as Patient;
-        // Persist to server then update store
+
+        // Ensure no UI-only synthetic fields (like 'status') are sent to server
+        delete (toSave as any).status;
+
         const baseUrl = 'https://elikita-server.daalitech.com';
-        this.http.put<Patient>(`${baseUrl}/Patient/${element.id}`, updated, {
+        this.http.put<Patient>(`${baseUrl}/Patient/${element.id}`, toSave, {
           headers: { 'Content-Type': 'application/fhir+json' }
         }).subscribe({
           next: (saved) => {
@@ -216,6 +230,12 @@ export class PatientRegComponent implements tablePropInt {
 
   canAddPatientRegistration(): boolean {
     return this.auth.can('patient', 'add');
+  }
+
+  private stripSyntheticFields(p: any): Patient {
+    // Remove UI-only fields such as 'status' before passing to dialogs or saving
+    const { status, ...rest } = p || {};
+    return rest as Patient;
   }
 
 }

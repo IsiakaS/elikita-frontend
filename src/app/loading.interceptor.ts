@@ -1,4 +1,4 @@
-import { HttpContextToken, HttpEvent, HttpEventType, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpEvent, HttpEventType, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoaderComponent } from './loader/loader.component';
@@ -22,7 +22,9 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     if (req.method === 'GET' && cacheStorage.cache.hasOwnProperty(req.urlWithParams)) {
       console.log('[cache] HIT for', req.urlWithParams);
       dref.close();
-      return of(cacheStorage.cache[req.urlWithParams] as HttpEvent<Response>);
+      const cached = cacheStorage.cache[req.urlWithParams];
+      // Ensure a proper HttpResponse is returned
+      return of(new HttpResponse({ ...cached }));
     }
 
     return next(req).pipe(tap((event: HttpEvent<any>) => {
@@ -56,6 +58,7 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
               delete cacheStorage.cache[k];
               return;
             }
+            delete cacheStorage.cache[k];
             // Invalidate collection/list caches (e.g., /Patient?search... or exact /Patient)
             if (k.startsWith(patientCollectionPrefix) && (k.includes('/Patient?') || k.endsWith('/Patient'))) {
               delete cacheStorage.cache[k];

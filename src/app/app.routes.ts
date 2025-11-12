@@ -1,3 +1,7 @@
+import { PractitionerListComponent } from './practitioner-list/practitioner-list.component';
+import { PractitionerDetailsComponent } from './practitioner-details/practitioner-details.component';
+import { PractitionerRegistrationComponent } from './practitioner-registration/practitioner-registration.component';
+
 import { Routes } from '@angular/router';
 import { PatientsComponent } from './patients/patients.component';
 import { patientsResolver } from './patients.resolver';
@@ -72,6 +76,21 @@ import { PatientRegistrationApprovedComponent } from './patient-registration-cen
 import { PatientRegistrationDeceasedComponent } from './patient-registration-center/patient-registration-deceased.component';
 
 export const routes: Routes = [
+
+    {
+        path: 'practitioners/:id',
+        component: PractitionerDetailsComponent,
+        data: {
+            title: 'Practitioner Details',
+            breadCrumbTitle: 'Practitioner Details',
+            breadCrumbIcon: 'badge',
+            roles: ['admin', 'receptionist']
+        }
+    },
+    {
+        path: "practitioner-register",
+        component: PractitionerRegistrationComponent
+    },
     {
         path: "testing",
         component: TestingComponent,
@@ -233,6 +252,16 @@ export const routes: Routes = [
         canActivateChild: [appAuthGuard],
         children: [
             //medicine-stock
+            {
+                path: 'practitioners',
+                component: PractitionerListComponent,
+                data: {
+                    title: 'Pending Practitioners',
+                    breadCrumbTitle: 'Practitioners',
+                    breadCrumbIcon: 'badge',
+
+                }
+            },
             {
                 path: "org-reg",
                 component: HospitalRegistrationComponent,
