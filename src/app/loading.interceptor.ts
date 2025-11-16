@@ -26,8 +26,18 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
       // Ensure a proper HttpResponse is returned
       return of(new HttpResponse({ ...cached }));
     }
+    let clone
+    if (req.url.includes("_count=200")) {
+      clone = req.clone({
+        url: req.url + "&_sort=-date"
+      });
+      // return next(clone);
+    } else {
+      clone = req.clone();
+    }
 
-    return next(req).pipe(tap((event: HttpEvent<any>) => {
+    return next(clone).pipe(tap((event: HttpEvent<any>) => {
+
       if (event.type === HttpEventType.Response) {
         console.log('[network] response for', req.method, req.urlWithParams);
         // Store only GET responses

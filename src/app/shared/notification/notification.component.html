@@ -1,0 +1,6 @@
+<div class="notification-stack" aria-live="polite" aria-atomic="true">
+    <div *ngFor="let n of notes$ | async; trackBy: track" class="note" [ngClass]="n.type" role="alert">
+        <span class="msg">{{ n.message }}</span>
+        <button type="button" class="close-btn" (click)="close(n.id)" aria-label="Close">&times;</button>
+    </div>
+</div>

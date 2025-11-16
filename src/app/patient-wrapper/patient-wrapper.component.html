@@ -32,7 +32,9 @@
                 </div>
                 <!-- {{encounterState | async}} -->
                 @if((auth.user | async)?.role === 'doctor' ){
-                @if((encounterState | async) === 'unknown' ){
+                @if(!(ecounterService.stateService.currentEncounter | async)?.status || (
+                (ecounterService.stateService.currentEncounter | async)?.status !== 'in-progress' &&
+                (ecounterService.stateService.currentEncounter | async)?.status !== 'planned' )){
 
                 <a mat-flat-button extended matTooltip="Add a new encounter for this patient" aria-label="Add Encounter"
                     style="z-index: 9999999999999999999;" tabindex="0" class="add-encounter" (click)="addEncounter()">
@@ -78,11 +80,16 @@
                             <span>Change Encounter Status</span>
                         </div>
                         <mat-menu #encounterM="matMenu">
-                            <a mat-menu-item>
+                            <a mat-menu-item (click)="changeEncounterStatus('on-hold')">
                                 Change Encounter to "On-Hold"
                             </a>
-                            <a mat-menu-item>Change Encounter to "Completed"</a>
-                            <a mat-menu-item>Cancel Encounter</a>
+                            <a mat-menu-item (click)="changeEncounterStatus('finished')">Change Encounter to
+                                "Completed"</a>
+                            <a mat-menu-item (click)="confirmCancelButKeep('cancelled')">
+                                Cancel Encounter But Keep Related Resources</a>
+
+                            <a mat-menu-item (click)="confirmCancelAll('cancelled')">
+                                Cancel Encounter And All Related Resources</a>
 
 
                         </mat-menu>

@@ -1,0 +1,93 @@
+.banner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: .75rem;
+    align-items: start;
+    padding: .75rem 1rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: .95rem;
+}
+
+.icon {
+    line-height: 1;
+    padding-top: .15rem;
+}
+
+.default-icon,
+.custom-icon {
+    display: inline-block;
+    width: 1.25rem;
+    text-align: center;
+}
+
+.title {
+    font-weight: 600;
+    margin-bottom: .25rem;
+}
+
+.message {
+    line-height: 1.4;
+}
+
+.actions {
+    margin-top: .5rem;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+
+    button {
+        background: transparent;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        padding: .25rem .5rem;
+        cursor: pointer;
+        font: inherit;
+    }
+}
+
+.close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    opacity: .7;
+    padding: .25rem;
+    margin-left: .5rem;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+/* Variants */
+.info {
+    background: #e8f1fd;
+    color: #0b5cab;
+    border-color: #b9d3fb;
+}
+
+.success {
+    background: #e8f5e9;
+    color: #1b5e20;
+    border-color: #c8e6c9;
+}
+
+.warning {
+    background: #fff8e1;
+    color: #8a6d1c;
+    border-color: #ffecb3;
+}
+
+.error {
+    background: #ffebee;
+    color: #b71c1c;
+    border-color: #ffcdd2;
+}
+
+.tip {
+    background: #f3f7f2;
+    color: #2e5e2a;
+    border-color: #dbe8d8;
+}

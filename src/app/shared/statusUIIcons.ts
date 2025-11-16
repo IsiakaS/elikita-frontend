@@ -173,6 +173,12 @@ export const baseStatusStyles: {
         label: "Completed"
     },
 
+    finished: {
+        icon: "done_all",
+        color: "dark-green", // dark green
+        label: "Completed"
+    },
+
     cancelled: {
         icon: "cancel",
         color: "deep-red",

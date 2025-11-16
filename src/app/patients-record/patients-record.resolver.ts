@@ -1,14 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
-import { Bundle, BundleEntry, Encounter, Observation } from 'fhir/r4';
+import { Bundle, BundleEntry, Encounter, Observation, Condition } from 'fhir/r4';
 import { delay, map, catchError, of, forkJoin } from 'rxjs';
 import { StateService } from '../shared/state.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
   const http = inject(HttpClient);
   const patientId = route.parent?.params['id'] || route.params['id'];
   const stateService = inject(StateService);
+  const snackBar = inject(MatSnackBar);
+  stateService.setCurrentEncounter(null);
 
   console.log('Resolving patient data for ID:', patientId);
 
@@ -50,32 +53,131 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
       }),
       // delay(500) // Reduced delay for better UX
     ),
-    //fetch patient encounters
-    http.get<Bundle<Encounter>>(`${baseUrl}/Encounter?patient=${patientId}`).pipe(
+    // Fetch patient encounters
+    http.get<Bundle<Encounter>>(`${baseUrl}/Encounter?patient=${patientId}&_count=200`).pipe(
       map((encounters: Bundle<Encounter>) => {
         console.log('Successfully fetched encounters from FHIR server:', encounters);
         //check for encounters in progress
         const encountersInProgress = encounters?.entry?.filter((encounter: BundleEntry<Encounter>) => encounter.resource?.status === 'in-progress');
         if (encountersInProgress && encountersInProgress.length > 0) {
-          //set the first encounter in progress as current encounter
-          stateService.setCurrentEncounter({ ...encountersInProgress[0].resource, status: 'in-progress' });
+          const active = encountersInProgress[0].resource as Encounter;
+          // Ensure period.start present (fallback to current time if missing)
+          if (!active.period) { (active as any).period = { start: new Date().toISOString() }; }
+          else if (!active.period.start) { (active.period as any).start = new Date().toISOString(); }
+          // Attach a derived participantsDisplay for richer notice messaging
+          const participantsDisplay = (active.participant || [])
+            .map(p => p.individual?.display || p.individual?.reference || 'Unknown')
+            .filter(Boolean);
+          stateService.setCurrentEncounter({
+            ...active, status: 'in-progress',
+            patientId: patientId
+          });
+
+          // Notify user with encounter date and participants
+          const dateText = active.period?.start ? new Date(active.period.start).toLocaleString() : 'Unknown date';
+          const participantsText = participantsDisplay.length ? participantsDisplay.join(', ') : 'No participants recorded';
+          snackBar.open(`Encounter already in progress from ${dateText}. Participants: ${participantsText}.`, undefined, {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
         }
 
         return encounters.entry?.map((encounter: BundleEntry<Encounter>) => encounter.resource);
       })),
-    //fetch patient observations,
-    http.get<Bundle<Observation>>(`${baseUrl}/Observation?patient=${patientId}`).pipe(
+    // Fetch patient conditions
+    http.get<Bundle<Condition>>(`${baseUrl}/Condition?patient=${patientId}&_count=200`).pipe(
+      map((conditions: Bundle<Condition>) => {
+        console.log('Successfully fetched conditions from FHIR server:', conditions);
+        return conditions.entry?.map((c: BundleEntry<Condition>) => c.resource) || [];
+      }),
+      catchError(err => {
+        console.warn('Failed to load conditions:', err);
+        return of([]);
+      })
+    ),
+    // Fetch patient observations
+    http.get<Bundle<Observation>>(`${baseUrl}/Observation?patient=${patientId}&_count=200`).pipe(
       map((observations: Bundle<Observation>) => {
         console.log('Successfully fetched observations from FHIR server:', observations);
-        return observations.entry?.map((observation: BundleEntry<Observation>) => observation.resource);
+        return observations.entry?.map((observation: BundleEntry<Observation>) => observation.resource) || [];
+      }),
+      catchError(err => {
+        console.warn('Failed to load observations:', err);
+        return of([]);
+      })
+    )
+    //medicationRequest
+    ,    // Fetch patient medication requests
+    http.get<Bundle<any>>(`${baseUrl}/MedicationRequest?patient=${patientId}&_count=200`).pipe(
+      map((medRequests: Bundle<any>) => {
+        console.log('Successfully fetched medication requests from FHIR server:', medRequests);
+        return medRequests.entry?.map((mr: BundleEntry<any>) => mr.resource) || [];
+      })),
+    //allergies
+    http.get<Bundle<any>>(`${baseUrl}/AllergyIntolerance?patient=${patientId}&_count=200`).pipe(
+      map((allergies: Bundle<any>) => {
+        console.log('Successfully fetched allergies from FHIR server:', allergies);
+        return allergies.entry?.map((a: BundleEntry<any>) => a.resource) || [];
+      })),
+
+    //
+
+
+
+  ]).pipe(map(([patient, encounters, conditions, observations]) => {
+
+    stateService.PatientResources.condition.next(
+      (conditions || []).map((condition: any) => ({
+        referenceId: condition.id ? `Condition/${condition.id}` : null,
+        savedStatus: 'saved',
+        actualResource: condition
       }))
+    )
+    stateService.PatientResources.observations.next(
+      (observations || []).map((observation: any) => ({
+        referenceId: observation.id ? `Observation/${observation.id}` : null,
+        savedStatus: 'saved',
+        actualResource: observation
+      }))
+    )
 
+    stateService.PatientResources.encounters.next(
+      (encounters || []).map((encounter: any) => ({
+        referenceId: encounter.id ? `Encounter/${encounter.id}` : null,
+        savedStatus: 'saved',
+        actualResource: encounter
+      }))
+    );
 
-  ]).pipe(map(([patient, encounters, observations]) => {
-    return patient;
-  })
-  );
+    stateService.PatientResources.currentPatient.next({
+      referenceId: patient.id ? `Patient/${patient.id}` : null,
+      savedStatus: 'saved',
+      actualResource: patient
+    });
 
+    // Preserve direct access to patient name/gender/etc while adding arrays
+    return {
+      ...patient,
+      encounter: encounters || [],
+      condition: conditions || [],
+      observations: observations || []
+    };
+  },
 
-};
+  ),
+    catchError(err => {
+      console.error('❌ Failed to load patient record data:', err);
+      snackBar.open('Failed to load patient record data', undefined, {
+        duration: 5000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      })
+      throw new Error('Failed to load patient record data');
+
+    })
+
+  )
+
+}
 

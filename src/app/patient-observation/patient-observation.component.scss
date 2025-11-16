@@ -32,4 +32,9 @@
 tr {
     padding-top: 8px;
     padding-bottom: 8px;
+
+    td {
+        position: relative;
+        z-index: 9999999;
+    }
 }

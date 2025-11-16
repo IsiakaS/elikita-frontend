@@ -1,5 +1,5 @@
 import { AsyncPipe, TitleCasePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { FormBuilder, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,7 @@ import { AddObservationComponent } from '../patient-observation/add-observation/
 })
 export class ObsResComponent {
   fb = inject(FormBuilder);
+  @Input() initialExam?: Array<{ name: string; value: string }>;
 
   physicalExamForm = this.fb.group({
     // Define your form controls here
@@ -69,14 +70,22 @@ export class ObsResComponent {
     ]
 
   ngOnInit() {
-    this.examArray.controls[0].get(['name'])?.setValue('Heart sounds');
-    this.examArray.controls[0].get(['value'])?.setValue("Patient's heart sounds are normal.");
-    for (const pe of this.samplePhysicalExaminationObservations) {
-
-      this.examArray.push(this.fb.group({
-        'name': [pe.display],
-        'value': [pe.value]
-      }));
+    // If initial exam data provided, use it to prefill; else fall back to samples
+    if (this.initialExam && this.initialExam.length) {
+      // ensure at least one control exists
+      this.examArray.clear();
+      for (const row of this.initialExam) {
+        this.examArray.push(this.fb.group({ 'name': [row.name || ''], 'value': [row.value || ''] }));
+      }
+      if (this.examArray.length === 0) {
+        this.examArray.push(this.fb.group({ 'name': [''], 'value': [''] }));
+      }
+    } else {
+      this.examArray.controls[0].get(['name'])?.setValue('Heart sounds');
+      this.examArray.controls[0].get(['value'])?.setValue("Patient's heart sounds are normal.");
+      for (const pe of this.samplePhysicalExaminationObservations) {
+        this.examArray.push(this.fb.group({ 'name': [pe.display], 'value': [pe.value] }));
+      }
     }
   }
   dialog = inject(MatDialog)

@@ -53,7 +53,7 @@
                     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
                         @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
                         $index){
-                        <mat-option [value]="option.display || option" class="mb-8">
+                        <mat-option [value]="option" class="mb-8">
                             <div class="ticket-like">
                                 <div class="text">
                                     {{(option.display || (option | splitHash:1))| titlecase}}
@@ -88,7 +88,7 @@
                         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
                             @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
                             $index){
-                            <mat-option [value]="option.display || option" class="mb-8">
+                            <mat-option [value]="option" class="mb-8">
                                 <div class="ticket-like">
                                     <div class="text">
                                         {{(option.display || (option | splitHash:1))| titlecase}}
@@ -112,7 +112,7 @@
                         <!-- @for(option of field.Reference; track $index){ -->
                         @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
                         $index){
-                        <mat-option [value]="option.display || option">
+                        <mat-option [value]="option">
 
                             <div class="ticket-like">
                                 <div class="text">
@@ -276,7 +276,7 @@
                         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
                             @for(option of fieldAutoCompleteObject[arInd] | async; track
                             $index){
-                            <mat-option [value]="option.display || option" class="mb-8">
+                            <mat-option [value]="option" class="mb-8">
                                 <div class="ticket-like">
                                     <div class="text">
                                         {{(option.display || (option | splitHash:1))| titlecase}}
@@ -313,7 +313,7 @@
                                 @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async;
                                 track
                                 $index){
-                                <mat-option [value]="option.display || option" class="mb-8">
+                                <mat-option [value]="option" class="mb-8">
                                     <div class="ticket-like">
                                         <div class="text">
                                             {{(option.display || (option | splitHash:1))| titlecase}}
@@ -337,14 +337,14 @@
                             <!-- @for(option of field.Reference; track $index){ -->
                             @for(option of fieldAutoCompleteObject[arInd] | async; track
                             $index){
-                            <mat-option [value]="option.display || option">
+                            <mat-option [value]="option">
 
                                 <div class="ticket-like">
                                     <div class="text">
                                         {{(option.display || (option | splitHash:1))| titlecase}}
                                     </div>
                                     <div class="code">
-                                        {{(option.code || (option | splitHash: 0))}}
+                                        {{(option.reference || (option | splitHash: 0))}}
                                     </div>
                                 </div>
 
@@ -436,7 +436,7 @@
                                 fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
                                 | async; track
                                 $index){
-                                <mat-option [value]="option.display || option" class="mb-8">
+                                <mat-option [value]="option" class="mb-8">
                                     <div class="ticket-like">
                                         <div class="text">
                                             {{((option.display || option | splitHash: 1) | titlecase)}}
@@ -462,7 +462,7 @@
                                 fieldAutoCompleteObject[getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName]
                                 | async; track
                                 $index){
-                                <mat-option [value]="option.display || option">
+                                <mat-option [value]="option">
 
                                     <div class="ticket-like">
                                         <div class="text">
@@ -585,7 +585,7 @@
                                     | async;
                                     track
                                     $index){
-                                    <mat-option [value]="option.display || option" class="mb-8">
+                                    <mat-option [value]="option" class="mb-8">
                                         <div class="ticket-like">
                                             <div class="text">
                                                 {{(option.display || (option | splitHash:1))| titlecase}}
@@ -728,8 +728,7 @@
                     @if(!getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden') ||
                     (getGroupField(field).groupFields[fieldKey].generalProperties.hasOwnProperty('isHidden')
                     && !getGroupField(field).groupFields[fieldKey].generalProperties.isHidden)){
-                    @let arInd =
-                    `${getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}`;
+
 
                     <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always"
                         [ngClass]="{'d-none': getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id}"

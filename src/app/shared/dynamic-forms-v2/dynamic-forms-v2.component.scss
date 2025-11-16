@@ -124,6 +124,7 @@
         text-overflow: ellipsis;
     }
 }
+
 // Custom tooltip styling for date format hints
 ::ng-deep .date-format-tooltip {
     font-size: 14px !important;
@@ -132,4 +133,36 @@
     padding: 8px 12px !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+// Fix oversized / transparent date inputs inside grouped form controls
+// Scope only within this dynamic form component to avoid global side-effects
+:host ::ng-deep .form-group mat-form-field input[matinput][matdatepicker],
+:host ::ng-deep .form-group mat-form-field input[matInput][matdatepicker],
+:host ::ng-deep .form-group mat-form-field input[matinput][matDatepicker],
+:host ::ng-deep .form-group mat-form-field input[matInput][matDatepicker] {
+    background-color: var(--mat-sys-surface) !important;
+    opacity: 1 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    line-height: 40px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box;
+}
+
+// Ensure the mat-form-field outline doesn't get stretched oddly for date inputs
+:host ::ng-deep .form-group mat-form-field.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline {
+    opacity: 1 !important;
+}
+
+// Prevent accidental transparent styling from global theme cascading into datepicker toggle button
+:host ::ng-deep .form-group mat-form-field .mat-datepicker-toggle-default-icon {
+    opacity: 1 !important;
+    color: var(--mat-sys-on-surface-variant);
+}
+
+// Compact hint styling for dates inside groups
+:host ::ng-deep .form-group mat-form-field .mat-mdc-form-field-hint {
+    margin-top: 2px;
 }

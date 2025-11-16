@@ -47,11 +47,17 @@
                                     <mat-icon style="font-size: 16px; width: 16px; height: 16px;
                                                        
                                                         ">location_on</mat-icon>
-
+                                    @if (resolvedData.address?.[0]?.city || resolvedData.address?.[0]?.state ||
+                                    resolvedData.address?.[0]?.country) {
                                     <span>
-                                        {{resolvedData.address[0].city}},
-                                        {{resolvedData.address[0].state}},
-                                        {{resolvedData.address[0].country}}</span>
+                                        {{resolvedData.address?.[0]?.city}},
+                                        {{resolvedData.address?.[0]?.state}},
+                                        {{resolvedData.address?.[0]?.country}}
+
+                                    </span>
+                                    }@else {
+                                    <span>N / A</span>
+                                    }
 
                                 </div>
 
@@ -67,11 +73,16 @@
                                                        
                                                         ">phone</mat-icon>
 
-                                    <span> <a style="text-decoration: none !important;"
-                                            href="tel:{{resolvedData.telecom[0].value}}">
-                                            {{resolvedData.telecom[0].value}}
-                                        </a> </span>
-
+                                    <span>
+                                        @if(resolvedData.telecom?.[0]?.value){
+                                        <a style="text-decoration: none !important;"
+                                            href="tel:{{resolvedData.telecom?.[0]?.value}}">
+                                            {{resolvedData.telecom?.[0]?.value}}
+                                        </a>
+                                        }@else {
+                                        <span>N / A</span>
+                                        }
+                                    </span>
                                 </div>
 
 
@@ -113,8 +124,9 @@
                             <div class="suggested-tasks-wrapper">
                                 @if((auth.user | async)?.role === 'doctor' ){
                                 <div class="suggested-task" (click)="encounterService.addEncounter(patientId)"
-                                    [ngClass]="{success: (encounterService.getEncounterState(patientId) | async ) == 'in-progress' ||
-                                 (encounterService.getEncounterState(patientId) | async) == 'completed'
+                                    [ngClass]="{success: (encounterService.stateService.currentEncounter | async)?.status === 'in-progress' ||
+                                 (encounterService.stateService.currentEncounter | async)?.status === 'finished' ||
+                                    (encounterService.stateService.currentEncounter | async)?.status === 'planned'    
                                  }">
 
 
@@ -196,12 +208,13 @@
     align-items: flex-start;">
                 <div class="sixty-five g-just-flex gap-30 flex-column justify-content-start"
                     style="flex: 1 1 max-content; max-width: 100%; align-items: flex-start;">
+
                     <mat-card style="width: max-content; max-width: 100%;">
                         <mat-card-header>
                             <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
                                 <div class="left">
                                     <mat-card-title class="">
-                                        Encounter - Last Visit
+                                        Recent Encounters
                                     </mat-card-title>
                                     <!-- <mat-card-subtitle>
                                                         Find, search and add patients registration data
@@ -209,11 +222,23 @@
                                 </div>
                                 <div class="right gap-10 g-just-flex">
                                     @if((auth.user | async)?.role === 'doctor' ){
+
                                     <a (click)="encounterService.addEncounter(patientId)" mat-flat-button extended
-                                        class="secondary-button small-button">
+                                        class="secondary-button small-button" [disabled]="
+                                        (encounterService.stateService.currentEncounter | async)?.status &&
+                                    ((encounterService.stateService.currentEncounter | async)?.status == 'in-progress' ||
+                                        (encounterService.stateService.currentEncounter | async)?.status == 'planned')
+                                        ">
                                         <mat-icon>add</mat-icon>
                                         Add Encounter
                                     </a>
+                                    <!-- } @else {
+                                    <a (click)="encounterService.addTask(patientId)" mat-flat-button extended
+                                        class="secondary-button small-button">
+                                        <mat-icon>checklist</mat-icon>
+                                        Tasks
+                                    </a>
+                                    } -->
                                     }
                                     <a mat-flat-button>
                                         See All <mat-icon>chevron_right</mat-icon>
@@ -226,9 +251,9 @@
 
                         <mat-card-content class="my-12">
                             <mat-divider></mat-divider>
-
-                            <table mat-table matSort [dataSource]="resolvedData.encounter"
-                                class="mat-elevation-z8 demo-table">
+                            @if(encounterDataSource && encounterDataSource.length > 0){
+                            <table mat-table [dataSource]="encTabDataSource" class="mat-elevation-z8 demo-table"
+                                style="width: 100%;">
                                 <!-- Position Column -->
                                 <ng-container matColumnDef="date">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header="date"
@@ -239,14 +264,37 @@
                                         date: 'medium'}}</td>
                                 </ng-container>
 
+                                <!--Status Column-->
+                                <ng-container matColumnDef="status">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header="status"
+                                        sortActionDescription="Sort by status">
+                                        Status
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="status" title="{{element.status}}">
+                                        <div appChips [appChips]="element.status" [fontSize]="'14px'"
+                                            title="{{element.status}}" [showText]="true">
+
+                                        </div>
+
+                                    </td>
+                                </ng-container>
+
                                 <!-- Name Column -->
                                 <ng-container matColumnDef="reason">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header
                                         sortActionDescription="Sort by reason">
-                                        Reason
+                                        Presented Symptoms
                                     </th>
                                     <td mat-cell *matCellDef="let element">
-                                        {{element.reasonCode[0]['text']}}
+                                        @if(element.presentedSymptoms){
+                                        @for(elem of element.presentedSymptoms.split(","); track $index){
+                                        <div class="top mb-4">{{elem.trim()}}</div>
+
+                                        }
+                                        }@else{
+                                        N / A
+                                        }
+
                                     </td>
                                 </ng-container>
 
@@ -256,7 +304,8 @@
                                         Diagnosis
                                     </th>
                                     <td mat-cell *matCellDef="let element">
-                                        {{element.diagnosis[0].condition.display}}</td>
+                                        {{ ((element?.diagnosis ?? '').trim() || 'N / A') }}
+                                    </td>
                                 </ng-container>
                                 <ng-container matColumnDef="doctor">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -264,7 +313,9 @@
                                         Physician
                                     </th>
                                     <td mat-cell *matCellDef="let element">
-                                        {{element.participant[0]['individual']['display']}}
+                                        {{element.participant?.[0]?.['individual']?.['display']
+                                        || element.participant?.[0]?.['individual']?.['reference'] || 'N / A'
+                                        }}
                                     </td>
                                 </ng-container>
 
@@ -278,14 +329,21 @@
                                 <tr mat-row *matRowDef="let row; columns: summaryTables.encounter.displayedColumns;">
                                 </tr>
                             </table>
+                            }@else {
+                            <app-empty-state [icon]="'PEOPLE'" [iconSet]="'material-symbols-outlined'"
+                                title="No Encounter Yet"
+                                subtitle="Recent encounters will be shown here"></app-empty-state>
+                            }
                         </mat-card-content>
                     </mat-card>
+
                     <mat-card style="width: max-content; max-width: 100%;">
                         <mat-card-header>
                             <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
                                 <div class="left">
                                     <mat-card-title class="">
-                                        Diagnosis / Condition
+                                        Recent Diagnosis
+
                                     </mat-card-title>
                                     <!-- <mat-card-subtitle>
                                                         Find, search and add patients registration data
@@ -293,13 +351,13 @@
                                 </div>
                                 <div class="right gap-10 g-just-flex">
                                     @if((auth.user | async)?.role === 'doctor' ){
-                                    <a (click)="encounterService.addDiagnosis(patientId)" mat-flat-button extended
+                                    <a (click)="encounterService.addDiagnosisV2()" mat-flat-button extended
                                         class="secondary-button small-button">
                                         <mat-icon>add</mat-icon>
                                         Add Diagnosis
                                     </a>
                                     }
-                                    <a mat-flat-button [routerLink]="['/app/patients/', patientId, 'observations']"
+                                    <a mat-flat-button [routerLink]="['/app/patients/', patientId, 'diagnosis']"
                                         routerLinkActive="router-link-active">
                                         See All <mat-icon>chevron_right</mat-icon>
                                     </a>
@@ -308,12 +366,25 @@
                                 </div>
                             </div>
                         </mat-card-header>
-
+                        @if (filteredConditionDataSource && filteredConditionDataSource.length > 0) {
                         <mat-card-content class="my-12">
                             <mat-divider></mat-divider>
 
-                            <table mat-table matSort [dataSource]="resolvedData.condition"
+                            <table mat-table matSort [dataSource]="filteredConditionDataSource"
                                 class="mat-elevation-z8 demo-table">
+
+                                <ng-container matColumnDef="status">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header="status"
+                                        sortActionDescription="Sort by status">
+                                        Status
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="status" s>
+                                        <div [appChips]="element.status">
+
+                                        </div>
+
+                                    </td>
+                                </ng-container>
 
                                 <!--name - coding.code.display-->
                                 <ng-container matColumnDef="code">
@@ -321,8 +392,9 @@
                                         sortActionDescription="Sort by Name">
                                         Name
                                     </th>
-                                    <td mat-cell *matCellDef="let element">{{element.code.coding[0].display |
-                                        titlecase}}
+                                    <td mat-cell *matCellDef="let element">{{element.code?(element.code |
+                                        codeableConcept2 |
+                                        titlecase): 'N / A' }}
                                     </td>
                                 </ng-container>
 
@@ -332,12 +404,13 @@
                                         sortActionDescription="Sort by Date Recorded">
                                         Date Recorded
                                     </th>
-                                    <td mat-cell *matCellDef="let element">{{element.recordedDate | date: 'medium'}}
+                                    <td mat-cell *matCellDef="let element">{{element.recordedDate?(element.recordedDate
+                                        | date: 'medium'): 'N / A'}}
                                     </td>
                                 </ng-container>
 
                                 <!--category - category.coding.display -->
-                                <ng-container matColumnDef="category">
+                                <!-- <ng-container matColumnDef="category">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
                                         sortActionDescription="Sort by Category">
                                         Category
@@ -345,15 +418,15 @@
                                     <td mat-cell *matCellDef="let element">{{element.category[0].coding[0].code |
                                         titlecase}}
                                     </td>
-                                </ng-container>
-                                reference -->
+                                </ng-container> -->
+
                                 <ng-container matColumnDef="asserter">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header="asserter"
                                         sortActionDescription="Sort by Asserter">
                                         Asserter
                                     </th>
                                     <td mat-cell *matCellDef="let element">
-                                        {{'Abukar Sideeq'}}
+                                        {{ element.asserter?(element.asserter | codeableRef2 | titlecase):' N / A'}}
                                     </td>
                                 </ng-container>
                                 <ng-container matColumnDef="severity">
@@ -361,8 +434,9 @@
                                         sortActionDescription="Sort by Severity">
                                         Severity
                                     </th>
-                                    <td mat-cell *matCellDef="let element">{{element.severity.coding[0].display |
-                                        titlecase}}
+                                    <td mat-cell *matCellDef="let element">{{
+                                        element.severity?(element.severity | codeableConcept2 | titlecase): 'N / A'
+                                        }}
                                     </td>
                                 </ng-container>
 
@@ -374,6 +448,12 @@
 
 
                         </mat-card-content>
+                        }@else {
+                        <app-empty-state [icon]="'HOSPITAL'" [iconSet]="'material-symbols-outlined'"
+                            title="No Diagnosis Yet" subtitle="Recent diagnosis will be shown here">
+
+                        </app-empty-state>
+                        }
                     </mat-card>
                     <mat-card style="width: max-content; max-width: 100%;">
                         <mat-card-header>
@@ -502,19 +582,29 @@
                         </mat-card-header>
                         <mat-card-content>
                             <div class="mt-15">
-                                @for(eachVital of vitals; track $index){
+                                @for(eachVital of vitalMapForTemplate; track $index){
 
                                 <div class="g-just-flex gap-20 mb-20 flex-wrap flex-between">
                                     <div class="field-title g-just-flex gap-12 subtitle-text-color-2">
-                                        <mat-icon style=" font-size: 16px; width: 16px; height: 16px; color:
-                                        var(--mat-sys-primary);">
-                                            {{eachVital[1]['icon']}}</mat-icon>
-                                        {{eachVital[1]['title'] | titlecase }}
+                                        <!-- was:
+                                        <mat-icon style=" font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">
+                                          {{eachVital['icon']}}
+                                        </mat-icon>
+                                        -->
+                                        <mat-icon [fontIcon]="eachVital['icon']"
+                                            style="font-size: 16px; width: 16px; height: 16px; color: var(--mat-sys-primary);">
+                                        </mat-icon>
+                                        {{eachVital['key'] | titlecase }}
                                     </div>
                                     <div class="field-value" style="text-align: flex-end;">
-                                        {{eachVital[1]['value']}}
+                                        {{eachVital['value']}}
                                     </div>
                                 </div>
+                                }@empty {
+                                <app-empty-state [iconSet]="'material-symbols-outlined'" [icon]="'monitor_heart'"
+                                    [title]="'No Vitals Yet'"
+                                    [subtitle]="' Vitals recorded during the last encounter will be shown here'">
+                                </app-empty-state>
                                 }
                             </div>
                         </mat-card-content>

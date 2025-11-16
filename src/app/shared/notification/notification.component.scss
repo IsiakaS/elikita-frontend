@@ -1,0 +1,51 @@
+.notification-stack {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    z-index: 2000;
+}
+
+.note {
+    min-width: 240px;
+    max-width: 360px;
+    padding: .75rem 1rem;
+    border-radius: 4px;
+    font-size: .875rem;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note.success {
+    background: #2e7d32;
+}
+
+.note.error {
+    background: #c62828;
+}
+
+.note.info {
+    background: #1565c0;
+}
+
+.note.warning {
+    background: #ed6c02;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    opacity: .7;
+}

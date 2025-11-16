@@ -15,7 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete'
 import { MatInputModule } from '@angular/material/input';
-import { BehaviorSubject, combineLatest, debounce, debounceTime, map, Observable, of, startWith } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, debounce, debounceTime, map, Observable, of, startWith } from 'rxjs';
 import { AsyncPipe, CommonModule, JsonPipe, TitleCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { formFields } from '../dynamic-forms.interface';
@@ -31,6 +31,9 @@ import flatpickr from "flatpickr"
 import { StretchDirective } from '../../stretch.directive';
 import { UploadUiComponent } from '../../upload-ui/upload-ui.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { backendEndPointToken } from '../../app.config';
+import { NotificationService } from '../notification/notification.service';
+import { InfoDialogService } from '../info-dialog/info-dialog.service';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
@@ -67,8 +70,10 @@ export class DynamicFormsV2Component {
   data = inject(MAT_DIALOG_DATA, { optional: true });
   dialogRef = inject(MatDialogRef<DynamicFormsV2Component>, { optional: true });
   matDialog = inject(MatDialog);
+  notif = inject(NotificationService);
+  infoServ = inject(InfoDialogService);
 
-  constructor() {
+  constructor(@Inject(backendEndPointToken) public backendEndPoint: string) {
     if (this.data) {
       console.log(this.data);
       this.formMetaData = this.data.formMetaData;
@@ -209,6 +214,7 @@ export class DynamicFormsV2Component {
 
         switch (field.generalProperties.fieldType) {
           case "IndividualReferenceField":
+            // alert(JSON.stringify(field.data));
             searchableObject = (field as IndividualReferenceField).data || [];
             break;
           case "CodeableConceptField":
@@ -266,7 +272,13 @@ export class DynamicFormsV2Component {
       }
 
       this.searchableObject[field.generalProperties.fieldApiName] = searchableObject
-
+      // if (field.generalProperties.isArray) {
+      //   // at most 10 entries for array fields
+      //   for (let i = 1; i < 10; i++) {
+      //     const arInd = `${field.generalProperties.fieldApiName}-${i}`;
+      //     this.searchableObject[arInd] = searchableObject
+      //   }
+      // }
       console.log(this.searchableObject, "this.searcheableobject")
       if (field.generalProperties.fieldType == "CodeableConceptFieldFromBackEnd") {
         // Prepare a subject to cache backend results and filter locally as user types
@@ -318,17 +330,34 @@ export class DynamicFormsV2Component {
             }
           }
           console.log(f, field.generalProperties.fieldApiName);
-          f = f.toLowerCase();
+          // f = typeof(f) === "string" ? f.toLowerCase() : f.display?.toLowerCase();
           // alert(f);
           return searchableObject.filter((g: any) => {
-            if (typeof (g) == "object") {
+            if (f) {
+              // alert(typeof (f));
+            }
+            if (typeof (g) == "object" &&
+              typeof (f) == "string"
+            ) {
+              f = f.toLowerCase();
               const keys = Object.keys(g);
 
               return keys.some((key) => {
+
                 return g[key].toLowerCase().includes(f);
               })
+            } else if (typeof (g) == "object" &&
+              typeof (f) == "object"
+            ) {
+              const keys = Object.keys(g);
+              return keys.some((key) => {
+                if (Object.keys(f).includes('display')) {
+                  return g[key].toLowerCase().includes(f.display.toLowerCase());
+                } else {
+                  return false;
+                }
+              })
             } else {
-
 
               return g.toLowerCase().includes(f)
             }
@@ -350,6 +379,7 @@ export class DynamicFormsV2Component {
 
   }
   http = inject(HttpClient);
+  // infoServ = inject(InfoDialogService);
   searchCodeableConceptFromBackEnd(fieldApiName: string, value: string) {
     if (value.trim() !== "") {
       const url = this.searchableObject[fieldApiName];
@@ -360,6 +390,12 @@ export class DynamicFormsV2Component {
           // de-duplicate results within a single backend response
           const deduped = Array.from(new Set(base));
           return allowOthers && !deduped.includes('Others') ? [...deduped, 'Others'] : deduped;
+        }),
+        catchError((err) => {
+          console.error('Error fetching codeable concept options from backend:', err);
+          this.infoServ.show(`Failed to load options from backend.
+            ${allowOthers ? "You can, instead, select \"Others\" from the dropdown and then enter the value" : ""}`, { title: 'Select Options', duration: 4000 });
+          return of(allowOthers ? ['Others'] : []);
         })
       ).subscribe((options: any[]) => {
         // Merge with existing cached options and de-duplicate to avoid clearing the list
@@ -383,7 +419,16 @@ export class DynamicFormsV2Component {
     dialogRef.afterClosed().subscribe((result: string | undefined) => {
       if (result && typeof result === 'string' && result.trim() !== '') {
         const trimmed = result.trim();
-        control.setValue(trimmed);
+        if (field.generalProperties.fieldType === 'CodeableConceptFieldFromBackEnd'
+          || field.generalProperties.fieldType === 'CodeableConceptField') {
+          const system = this.backendEndPoint;
+          control.setValue(`${trimmed}$#$${trimmed}$#$${system}`);
+        } else {
+          control.setValue(trimmed);
+        }
+
+
+        // control.setValue(`${trimmed}`);
         const currentList = this.searchableObject[fieldApiName];
         if (Array.isArray(currentList) && !currentList.includes(trimmed)) {
           const withoutOthers = currentList.filter((v: any) => v !== 'Others');
@@ -399,9 +444,12 @@ export class DynamicFormsV2Component {
     return codeDisplay;
   }
 
-  displayConceptFieldDisplay(conceptField: string): string {
+
+
+  displayConceptFieldDisplay(conceptField: string | { display?: string }): string {
     if (conceptField) {
-      return conceptField.split('$#$')[1] || conceptField;
+      // alert(JSON.stringify(conceptField))
+      return typeof (conceptField) === 'string' ? (conceptField as string).split('$#$')[1] || "" : (conceptField as { display?: string }).display || "" + conceptField;
     }
     return conceptField;
   }
@@ -447,7 +495,9 @@ export class DynamicFormsV2Component {
       if (currentControlLength > 1) {
         this.fieldAutoCompleteObject[`${fieldApiName}-${currentControlLength - 1}`] = control.valueChanges.pipe(startWith(""), map((f: any) => {
           console.log(f);
-          f = f.toLowerCase();
+          if (typeof (f) === "string") {
+            f = f.toLowerCase();
+          }
 
           let searchableObject;
 
@@ -514,6 +564,7 @@ export class DynamicFormsV2Component {
     }
 
     this.formSubmitted.emit(this.aForm.value);
+    this.notif.success('Form submitted');
 
     if (this.resetOnSubmit) {
       this.aForm.reset();

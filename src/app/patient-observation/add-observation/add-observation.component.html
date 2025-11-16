@@ -1,4 +1,13 @@
-<div class="wrapper px-20 add-obs-wrapper" style="background-color: var(--mat-sys-surface);">
+<!-- Sticky top close bar -->
+<div class="g-just-flex justify-content-end"
+    style="position: sticky; top: 0; z-index: 1000; padding: 8px 8px 12px; background: var(--mat-sys-surface);">
+    <button mat-stroked-button color="primary" (click)="dref?.close()">
+        <mat-icon class="me-8">close</mat-icon>
+        Close
+    </button>
+</div>
+
+<div class="wrapper px-20 py-20 add-obs-wrapper" style="background-color: var(--mat-sys-surface);">
 
 
 
@@ -6,6 +15,15 @@
     observationCategory.value !== 'laboratory'
     && observationCategory.value !== 'exam'
     )){
+    <!-- {{isAnyCategory}}
+    {{observationCategory && observationCategory.value !== 'vital-signs' &&
+    observationCategory.value !== 'laboratory'
+    && observationCategory.value !== 'exam'
+    }} -->
+    <!-- Observation Category Selection -->
+    <div class="hint-title mb-10">
+        Choose A Category Below To Add Observation
+    </div>
 
     <mat-chip-listbox (change)="setObsCat($event)" class="chip-list">
         @for(option of generalObsCategory; track $index;){
@@ -39,8 +57,7 @@ margin-right: 12px !important;
             <div class="physical-exam-cat">
                 <mat-chip-listbox class="chip-list gap-15" multiple="true">
                     @for(option of samplePhysicalExaminationObservations; track $index;){
-                    <mat-chip-option value=" {{option.display}}" #err class="me-15 mb-18"
-                        (selectionChange)="sv($event)">
+                    <mat-chip-option [value]="option" #err class="me-15 mb-18" (selectionChange)="sv($event)">
                         <div class="code-display ">
                             <div class="display" style="font-weight: 500;">{{option.display | titlecase}}</div>
                             <div class="code subtitle-text-color-2">
@@ -77,6 +94,7 @@ margin-right: 12px !important;
                             </span>
 
                         </div>
+                        <!-- {{ccfb.value}}{{'...'}} -->
                         <input matInput type="text" [matAutocomplete]="chuks" #ccfb
                             [formControl]="observationNameChosen" placeholder="Enter new physical exam observation">
 
@@ -86,10 +104,10 @@ margin-right: 12px !important;
                             <mat-option [value]="option">
                                 <div class="ticket-like">
                                     <div class="text">
-                                        {{option | splitHash:1 | titlecase}}
+                                        {{option.display | titlecase}}
                                     </div>
                                     <div class="code">
-                                        {{option | splitHash:0 }}
+                                        {{option.code | titlecase}}
                                     </div>
                                 </div>
                             </mat-option>
@@ -212,25 +230,45 @@ margin-right: 12px !important;
     </mat-card-header>
     <mat-card-content>
         <div class="my-18">
-            <div class="g-just-flex flex-wrap justify-content-start gap-30">
-                @for(exam of examArray.controls; track $index;){
-                @let name = exam.get('name')?.value;
-                @let value = exam.get('value')?.value;
+            @if(physicalExamForm.valid && examArray.controls.length > 0){
+            <form [formGroup]="physicalExamForm" style="max-width: 700px; width: 100%;">
+                <div class="g-just-flex flex-wrap justify-content-start gap-30">
+                    <div class="form-array" formArrayName="examArray" style="    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+">
 
 
-                <div class="aafield" style="width: 280px; max-width: 100%;">
-                    <label for="" style="display: block; margin-bottom: 4px;"> {{name.split('$#$').length > 1 ?
-                        name.split('$#$')[1] : name | titlecase}}</label>
-                    <mat-form-field appearance="fill" style="width: 100%;">
-                        <textarea [attr.rows]="3" value="{{value}}" matInput>
+                        @for(exam of examArray.controls; track $index; let i = $index){
+                        @let name = exam.get('name')?.value;
+                        @let value = exam.get('value')?.value;
 
-                            </textarea>
 
-                    </mat-form-field>
+                        <div class="aafield" style="width: 280px; max-width: 100%; position: relative;"
+                            formGroupName="{{i}}">
+                            <button mat-icon-button color="warn" aria-label="Delete"
+                                style="position:absolute; top:-6px; right:-6px; z-index:5;" (click)="removeExam(i)">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                            <label style="display:block; margin-bottom:4px;">
+                                {{name.display??name | titlecase}}
+                            </label>
+                            <mat-form-field appearance="fill" style="width:100%;">
+                                <textarea [attr.rows]="3" formControlName="value" matInput></textarea>
+                            </mat-form-field>
+                        </div>
+                        }
+                    </div>
+
                 </div>
-                }
-
-            </div>
+                <div class="mt-20" style="text-align: right;">
+                    <button mat-flat-button color="primary" [disabled]="!physicalExamForm.valid"
+                        (click)="onSubmitPhysicalExamForm()">
+                        Save Physical Exam Observations
+                    </button>
+                </div>
+            </form>
+            }
         </div>
     </mat-card-content>
 </mat-card>

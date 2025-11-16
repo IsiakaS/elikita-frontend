@@ -332,9 +332,9 @@ export class DynamicFormsV2Component {
     return codeDisplay;
   }
 
-  displayConceptFieldDisplay(conceptField: string): string {
+  displayConceptFieldDisplay(conceptField: any): string {
     if (conceptField) {
-      return conceptField.split('$#$')[1] || conceptField;
+      return conceptField.display || conceptField.split('$#$')[1] || conceptField;
     }
     return conceptField;
   }

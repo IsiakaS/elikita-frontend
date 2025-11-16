@@ -15,13 +15,17 @@
                 </mat-card-subtitle>
             </div>
             <div class="right gap-10 g-just-flex">
+                @if (canExportObservation) {
                 <a mat-flat-button extended class="secondary-button small-button">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
+                }
+                @if (canAddObservation) {
                 <a mat-flat-button class="" (click)="encounterService.addAnyObservation()">
                     <mat-icon>add</mat-icon>
                     Add Observations
                 </a>
+                }
 
 
             </div>
@@ -36,7 +40,7 @@
         </app-table-header>
         <div class="my-15">
             <div class="rounded-buttons-group">
-                <button (click)="categoryFiltering.setValue('vital-signs')" title="Vital Signs"
+                <button (click)="categoryFiltering.setValue('vital signs')" title="Vital Signs"
                     [ngClass]="{'selected': categoryFiltering.value === 'vital-signs'}">
                     Vital Signs
                 </button>
@@ -52,99 +56,123 @@
         </div>
 
 
-        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+        <div class="table-or-empty">
+            @if((tableDataLevel2 | async)?.length > 0) {
+            <!-- existing table -->
+            <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
 
-            <!--name - coding.code.display-->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
-                    Name
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    <span class="restrict-length">
-                        {{element.code.coding[0].display | titlecase}}
-                    </span>
-                </td>
-            </ng-container>
-            <!---->
-            <!--dateTaken - effectiveDateTime -->
-            <ng-container matColumnDef="dateTaken">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="dateTaken"
-                    sortActionDescription="Sort by Date Taken">
-                    Date Taken
-                </th>
-                <td mat-cell *matCellDef="let element" style="padding-top: 4px; padding-bottom: 4px;">
-                    <span class="restrict-length">{{element.effectiveDateTime | date: 'mediumDate'}}</span>
-                    <br>
-                    <span class="restrict-length subtitle-text-color-2 small-subtitle"> {{element.effectiveDateTime |
-                        date:
-                        'shortTime'}}</span>
-                </td>
-            </ng-container>
-            <!--category - category.coding.display -->
-            <ng-container matColumnDef="category">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
-                    sortActionDescription="Sort by Category">
-                    Category
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    <span class="restrict-length">
-                        {{element.category[0].coding[0].display | titlecase}}
-                    </span>
-                </td>
-            </ng-container>
-            <!--result - valueQuantity.value -->
-            <ng-container matColumnDef="result">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="result" sortActionDescription="Sort by Result">
-                    Result
-                </th>
-                <td mat-cell *matCellDef="let element">{{element.valueQuantity?.value}}{{element.valueQuantity?.unit}}
-                </td>
-            </ng-container>
-            <!--normal referenceRange.low.value+referenceRange.low.unit
-            +" to "+referenceRange.high.value+referenceRange.high.unit -->
-            <ng-container matColumnDef="normal_range">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="normal_range"
-                    sortActionDescription="Sort by Normal Range">
-                    Normal Range
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    {{element.referenceRange?.[0].low.value && element.referenceRange?.[0].low.unit ?
-                    `${element.referenceRange?.[0].low.value} to
-                    ${element.referenceRange?.[0].high.value} (${element.referenceRange?.[0].low.unit})
-                    `: 'N / A'}}
-                </td>
-
-            </ng-container>
-            <!--status - status -->
-            <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="status" sortActionDescription="Sort by Status">
-                    Status
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    <div #sc
-                        [attr.class]="'small-chips'+' '+'status-'+statuStyles[element.status]['color']+' g-just-flex gap-8'">
-
-                        <span> {{element.status}}
-
+                <!--name - coding.code.display-->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
+                        Name
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="restrict-length">
+                            {{element.code | codeableConcept2 | na | titlecase}}
                         </span>
-                        <mat-icon>
-                            {{statuStyles[element.status]['icon']}}
-                        </mat-icon>
+                    </td>
+                </ng-container>
+                <!---->
+                <!--dateTaken - effectiveDateTime -->
+                <ng-container matColumnDef="dateTaken">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="dateTaken"
+                        sortActionDescription="Sort by Date Taken">
+                        Date Taken
+                    </th>
+                    <td mat-cell *matCellDef="let element" style="padding-top: 4px; padding-bottom: 4px;">
+                        <span class="restrict-length">{{element.effectiveDateTime | date: 'mediumDate' | na}}</span>
+                        <br>
+                        <span class="restrict-length subtitle-text-color-2 small-subtitle"> {{element.effectiveDateTime
+                            |
+                            date:
+                            'shortTime' | na}}</span>
+                    </td>
+                </ng-container>
+                <!--category - category.coding.display -->
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="category"
+                        sortActionDescription="Sort by Category">
+                        Category
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="restrict-length">
+                            {{element.category | na | joinedcodeableconcept | titlecase}}
+                        </span>
+                    </td>
+                </ng-container>
+                <!--result - valueQuantity.value -->
+                <ng-container matColumnDef="result">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="result"
+                        sortActionDescription="Sort by Result">
+                        Result
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span [appTruncateWords]="20" maxWidth="360px" [wrap]="true" tooltipPosition="above"
+                            [showIcon]="true">
+                            {{ element.displayValue || (element | valueToString) }}
+                        </span>
+                    </td>
+                </ng-container>
+                <!--normal referenceRange.low.value+referenceRange.low.unit
+                +" to "+referenceRange.high.value+referenceRange.high.unit -->
+                <ng-container matColumnDef="normal_range">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="normal_range"
+                        sortActionDescription="Sort by Normal Range">
+                        Normal Range
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.referenceRange?.[0].low.value && element.referenceRange?.[0].low.unit ?
+                        `${element.referenceRange?.[0].low.value} to
+                        ${element.referenceRange?.[0].high.value} (${element.referenceRange?.[0].low.unit})
+                        `: 'N / A'}}
+                    </td>
 
-                    </div>
-                </td>
-            </ng-container>
-            <!-- practitioner - performer.reference -->
-            <ng-container matColumnDef="practitioner">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header="practitioner"
-                    sortActionDescription="Sort by Practitioner">
-                    Practitioner
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    {{references.get(element.performer[0].reference)['name'][0].given[0]
-                    + ' ' + references.get(element.performer[0].reference)['name'][0].family
-                    }}</td>
-            </ng-container>
+                </ng-container>
+                <!--status - status -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="status"
+                        sortActionDescription="Sort by Status">
+                        Status
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <!-- {{element.status | titlecase}} -->
+                        <div [appChips]="element.status" fontSize="14px"></div>
+                        <!-- <div #sc
+                            [attr.class]="'small-chips'+' '+'status-'+statuStyles[element.status]['color']+' g-just-flex gap-8'">
+
+                            <span> {{element.status}}
+
+                            </span>
+                            <mat-icon>
+                                {{statuStyles[element.status]['icon']}}
+                            </mat-icon>
+
+                        </div> -->
+                    </td>
+                </ng-container>
+                <!-- practitioner - performer.reference -->
+                <ng-container matColumnDef="practitioner">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="practitioner"
+                        sortActionDescription="Sort by Practitioner">
+                        Practitioner
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="top">
+                            <!-- <span [appReferenceDisplay]="element.performer?.[0]?.reference"></span> -->
+                            <span [appReferenceDisplay]="'Practitioner/e60241c9-eb4e-421f-8431-9f42d3bd0105'"
+                                InstantfetchAndRepace="true"></span>
+                        </div>
+                        @if(element.performer && element.performer.length > 1){
+                        <div class="subtitle-text-color-2 small-subtitle">
+                            + {{element.performer.length - 1}} more
+                        </div>
+                        }
+                        <!-- {{references.get(element.performer[0].reference)['name'][0].given[0]
+                        + ' ' + references.get(element.performer[0].reference)['name'][0].family
+                        }} -->
+
+                    </td>
+                </ng-container>
 
 
 
@@ -152,10 +180,18 @@
 
 
 
-            <tr mat-header-row *matHeaderRowDef="patientObservationDisplayedColumns" matHeaderRowDefSticky="true">
-            </tr>
-            <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns:patientObservationDisplayedColumns;"></tr>
-        </table>
+                <tr mat-header-row *matHeaderRowDef="patientObservationDisplayedColumns" matHeaderRowDefSticky="true">
+                </tr>
+                <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns:patientObservationDisplayedColumns;">
+                </tr>
+            </table>
+            } @else {
+            <!-- Empty state -->
+            <div class="g-just-flex flex-column align-items-center py-40" style="text-align:center;">
+                <app-empty-state [icon]="'HOSPITAL'"></app-empty-state>
+            </div>
+            }
+        </div>
 
     </mat-card-content>
 </mat-card>

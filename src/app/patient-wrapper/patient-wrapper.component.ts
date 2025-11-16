@@ -1,5 +1,5 @@
 import { AsyncPipe, TitleCasePipe } from '@angular/common';
-import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, inject, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,6 +32,10 @@ import { BookingsFormComponent } from '../bookings-form/bookings-form.component'
 import { AuthService } from '../shared/auth/auth.service';
 import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
 import { CheckSheetComponent } from '../check-sheet/check-sheet.component';
+import { StateService } from '../shared/state.service';
+import { backendEndPointToken } from '../app.config';
+import { Bundle } from 'fhir/r4';
+import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
@@ -48,6 +52,143 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   styleUrl: './patient-wrapper.component.scss'
 })
 export class PatientWrapperComponent {
+  constructor(@Inject(backendEndPointToken) private backendEndPointToken: string) {
+
+  }
+  stateService = inject(StateService);
+
+  // http = inject(HttpClient);
+  // sn = inject(MatSnackBar);
+  confirmCancelButKeep(status: string) {
+    const dRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cancel Encounter',
+        message: 'Cancel this encounter but keep related resources as-is?',
+        confirmText: 'Yes, cancel only',
+        cancelText: 'No',
+        icon: 'warning'
+      }
+    });
+    dRef.afterClosed().subscribe(ok => {
+      if (ok) this.changeEncounterStatus(status);
+    });
+  }
+
+  confirmCancelAll(status: string) {
+    const dRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cancel Encounter and Related Resources',
+        message: 'Cancel this encounter and set statuses of all related resources accordingly? This cannot be undone.',
+        confirmText: 'Yes, cancel all',
+        cancelText: 'No',
+        icon: 'warning'
+      }
+    });
+    dRef.afterClosed().subscribe(ok => {
+      if (ok) this.changeEncunterStatusToCancelandChangeReferencedResourceStatusToCorrespondingStatus();
+    });
+  }
+
+  changeEncounterStatus(status: string) {
+
+    this.http.put(`${this.backendEndPointToken}/Encounter?_id=${this.stateService.currentEncounter?.getValue()?.['id']}`,
+      {
+        ...this.stateService.currentEncounter?.getValue(), status: status,
+        patientId: null
+
+      }).subscribe({
+        next: (res) => {
+          console.log('Encounter status updated successfully:', res);
+
+          this.sn.openFromComponent(SuccessMessageComponent, {
+            data: {
+              message: `Encounter status changed to "${status}" successfully.`,
+            },
+            duration: 3000,
+          });
+          if (['on-hold', 'finished', 'cancelled'].includes(status)) {
+            this.stateService.setCurrentEncounter(null)
+          }
+        },
+        error: (err) => {
+          console.error('Error updating encounter status:', err);
+          this.errorService.openandCloseError("An errored ocurred and the status was nt changed")
+        }
+      });
+  }
+
+  // Cancel Encounter and set statuses of linked resources to corresponding values.
+  changeEncunterStatusToCancelandChangeReferencedResourceStatusToCorrespondingStatus() {
+    const encounter = this.stateService.currentEncounter?.getValue();
+    const encounterId = encounter?.['id'];
+    if (!encounterId) {
+      this.errorService.openandCloseError('No active encounter to cancel.');
+      return;
+    }
+
+    const pickLinked = (items: Array<{ actualResource: any }>) =>
+      (items || [])
+        .map(x => x.actualResource)
+        .filter(r => r?.id && this.stateService.isResourceForCurrentEncounter(r));
+
+    const obsToUpdate = pickLinked(this.stateService.PatientResources.observations.getValue())
+      .map((r: any) => ({ ...r, status: 'cancelled' }));
+
+    const medReqsToUpdate = pickLinked(this.stateService.PatientResources.medicationRequests.getValue())
+      .map((r: any) => ({ ...r, status: 'cancelled' }));
+
+    const condsToUpdate = pickLinked(this.stateService.PatientResources.condition.getValue())
+      .map((r: any) => ({
+        ...r,
+        verificationStatus: {
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+            code: 'entered-in-error',
+            display: 'Entered in Error'
+          }],
+          text: 'entered-in-error'
+        }
+      }));
+
+    const encounterUpdate$ = this.http.put(
+      `${this.backendEndPointToken}/Encounter?_id=${encounterId}`,
+      { ...encounter, status: 'cancelled', patientId: null }
+    );
+
+    const updateCalls = [
+      encounterUpdate$,
+      ...obsToUpdate.map(r => this.http.put(`${this.backendEndPointToken}/Observation?_id=${r.id}`, r)),
+      ...medReqsToUpdate.map(r => this.http.put(`${this.backendEndPointToken}/MedicationRequest?_id=${r.id}`, r)),
+      ...condsToUpdate.map(r => this.http.put(`${this.backendEndPointToken}/Condition?_id=${r.id}`, r)),
+    ];
+
+    forkJoin(updateCalls).subscribe({
+      next: () => {
+        const bundle: Bundle = {
+          resourceType: 'Bundle',
+          type: 'transaction',
+          entry: [
+            { resource: { ...encounter, resourceType: 'Encounter', status: 'cancelled' } as any },
+            ...obsToUpdate.map(r => ({ resource: r })),
+            ...medReqsToUpdate.map(r => ({ resource: r })),
+            ...condsToUpdate.map(r => ({ resource: r })),
+          ]
+        };
+        this.stateService.processBundleTransaction(bundle as any);
+
+        this.sn.openFromComponent(SuccessMessageComponent, {
+          data: { message: 'Encounter cancelled and related resources updated.' },
+          duration: 3000,
+        });
+        this.stateService.setCurrentEncounter(null);
+      },
+      error: (err) => {
+        console.error('Failed to cancel and update related resources:', err);
+        this.errorService.openandCloseError('Failed to cancel encounter or update related resources.');
+      }
+    });
+  }
+
   auth = inject(AuthService);
 
   route = inject(ActivatedRoute);
@@ -80,17 +221,17 @@ export class PatientWrapperComponent {
     }).subscribe(({ params, data }) => {
       this.patientId = params['id'];
       console.log('Patient ID:', this.patientId);
-      
+
       this.resolvedData = data['patientData'];
       console.log('Resolved patient data:', this.resolvedData);
-      
+
       // Handle case where patient data couldn't be loaded
       if (!this.resolvedData) {
         console.error('No patient data found for ID:', this.patientId);
         // You could show an error message or redirect here
         // For now, we'll continue but components should handle null data
       }
-      
+
       // Initialize encounter state
       this.encounterState = this.ecounterService.getEncounterState(this.patientId);
       console.log('Encounter State:', this.encounterState);
@@ -1045,6 +1186,24 @@ export class PatientWrapperComponent {
         }
       })
     })
+  }
+  confirmAndChangeEncounterStatus(status: string) {
+    if (status !== 'cancelled') {
+      this.changeEncounterStatus(status);
+      return;
+    }
+    const dRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cancel Encounter',
+        message: 'Are you sure you want to cancel this encounter? Related draft data may be cleared.',
+        confirmText: 'Yes, Cancel',
+        cancelText: 'No',
+        icon: 'warning'
+      }
+    });
+    dRef.afterClosed().subscribe(ok => {
+      if (ok) this.changeEncounterStatus(status);
+    });
   }
 }
 

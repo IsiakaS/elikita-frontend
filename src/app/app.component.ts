@@ -55,6 +55,12 @@ export class AppComponent {
       // Already a doctor: navigate directly
       this.router.navigateByUrl(target);
     }
+    // Ensure auth user has practitioner type and a random userId for Observation.performer
+    const u = this.auth.user.getValue();
+    if (u && !u['userType']) {
+      const randomId = crypto.randomUUID ? crypto.randomUUID() : Math.floor(Math.random() * 1e12).toString();
+      this.auth.user.next({ ...u, userType: 'Practitioner', userId: randomId });
+    }
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.loaderService.openLoader();

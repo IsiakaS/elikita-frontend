@@ -1,7 +1,7 @@
 import { AsyncPipe, TitleCasePipe } from '@angular/common';
-import { Component, inject, Injectable } from '@angular/core';
+import { Component, inject, Inject, Injectable } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTab, MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -35,6 +35,9 @@ import { TestingTasksComponent } from '../testing-tasks/testing-tasks.component'
 // import { AddAlllergyComponent } from '../allergy/add-alllergy/add-alllergy.component';
 import { AddAllergyComponent } from '../allergy/add-allergy/add-allergy.component';
 import { UtilityService } from '../shared/utility.service';
+import { AuthService } from '../shared/auth/auth.service';
+import { backendEndPointToken } from '../app.config';
+import { Resource } from 'fhir/r4';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +47,7 @@ export class EncounterServiceService {
   sn = inject(MatSnackBar);
   dialog = inject(MatDialog);
   http = inject(HttpClient);
+  authService = inject(AuthService);
   encounterState: Observable<any> | undefined;
   patientId: string = '';
   links: string[] = ['summary', 'observations', 'conditions', 'medications'];
@@ -57,7 +61,272 @@ export class EncounterServiceService {
     [patientId: string]: BehaviorSubject<'planned' | 'in-progress' | 'on-hold' | 'discharged' | 'completed' | 'cancelled' | 'discontinued' | 'entered-in-error' | 'unknown'>
 
   } = {}
-  constructor() { }
+  constructor(@Inject(backendEndPointToken) private backendEndPoint: string) { }
+  // Configurable list of required vitals that must be filled before proceeding
+  requiredVitals: string[] = ['temperature', 'pulseRate', 'respiratoryRate', 'bloodPressure', 'oxygenSaturation'];
+
+  // Local builder for vitals Observations (used if dialog does not supply pre-built list)
+  private buildVitalsObservations(v: any, patientId: string, encounterId?: string, performerRef?: string, effectiveDateTime?: string): any[] {
+    const subject = { reference: `Patient/${patientId}` };
+    const effective = effectiveDateTime || new Date().toISOString();
+    const vitalCat = [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs', display: 'Vital Signs' }], text: 'Vital Signs' }];
+    const examCat = [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'exam', display: 'Exam' }], text: 'Exam' }];
+    // SNOMED CT mapping for appearance & gait common clinical descriptors
+    const appearanceMap: Record<string, { code: string; display: string }> = {
+      'well': { code: '102876003', display: 'Well' }, // Clinical finding present
+      'unwell': { code: '271838008', display: 'Unwell' },
+      'pale': { code: '271807003', display: 'Pallor' },
+      'flushed': { code: '248196009', display: 'Flushed face' },
+      'icteric': { code: '267036007', display: 'Jaundice' },
+      'lethargic': { code: '248279007', display: 'Lethargic' },
+      'active': { code: '224960004', display: 'Active' },
+      'agitated': { code: '271794005', display: 'Agitated' },
+      'calm': { code: '272151009', display: 'Calm' },
+      'compliant': { code: '105480006', display: 'Cooperative' },
+      'combative': { code: '271795006', display: 'Aggressive behaviour' }
+    };
+    const gaitMap: Record<string, { code: string; display: string }> = {
+      'walks normally': { code: '248263006', display: 'Normal gait' },
+      'walks with support': { code: '282301002', display: 'Gait difficulty' },
+      'walks with limp': { code: '282300003', display: 'Antalgic gait' },
+      'unable to walk': { code: '282310008', display: 'Unable to walk' }
+    };
+    const base = () => ({
+      resourceType: 'Observation',
+      status: 'final',
+      subject,
+      effectiveDateTime: effective,
+      ...(encounterId ? { encounter: { reference: `Encounter/${encounterId}` } } : {}),
+      ...(performerRef ? { performer: [{ reference: performerRef }] } : {})
+    });
+    const obs: any[] = [];
+    if (v?.temperature) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '8310-5', display: 'Body temperature' }], text: 'Body temperature' }, valueQuantity: { value: Number(v.temperature), unit: '°C', system: 'http://unitsofmeasure.org', code: 'Cel' } });
+    if (v?.pulseRate) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }], text: 'Heart rate' }, valueQuantity: { value: Number(v.pulseRate), unit: '/min', system: 'http://unitsofmeasure.org', code: '/min' } });
+    if (v?.respiratoryRate) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '9279-1', display: 'Respiratory rate' }], text: 'Respiratory rate' }, valueQuantity: { value: Number(v.respiratoryRate), unit: '/min', system: 'http://unitsofmeasure.org', code: '/min' } });
+    if (v?.oxygenSaturation) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation in Arterial blood by Pulse oximetry' }], text: 'SpO2' }, valueQuantity: { value: Number(v.oxygenSaturation), unit: '%', system: 'http://unitsofmeasure.org', code: '%' } });
+    if (v?.height) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '8302-2', display: 'Body height' }], text: 'Height' }, valueQuantity: { value: Number(v.height), unit: 'cm', system: 'http://unitsofmeasure.org', code: 'cm' } });
+    if (v?.weight) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '29463-7', display: 'Body weight' }], text: 'Weight' }, valueQuantity: { value: Number(v.weight), unit: 'kg', system: 'http://unitsofmeasure.org', code: 'kg' } });
+    if (v?.bmi) obs.push({ ...base(), category: vitalCat, code: { coding: [{ system: 'http://loinc.org', code: '39156-5', display: 'Body mass index (BMI) [Ratio]' }], text: 'BMI' }, valueQuantity: { value: Number(v.bmi), unit: 'kg/m2', system: 'http://unitsofmeasure.org', code: 'kg/m2' } });
+    if (v?.bloodPressure && /^\d{1,3}\/\d{1,3}$/.test(String(v.bloodPressure))) {
+      const [sys, dia] = String(v.bloodPressure).split('/').map((n: any) => Number(n));
+      obs.push({
+        ...base(),
+        category: vitalCat,
+        code: { coding: [{ system: 'http://loinc.org', code: '85354-9', display: 'Blood pressure panel with all children optional' }], text: 'Blood Pressure' },
+        component: [
+          { code: { coding: [{ system: 'http://loinc.org', code: '8480-6', display: 'Systolic blood pressure' }] }, valueQuantity: { value: sys, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' } },
+          { code: { coding: [{ system: 'http://loinc.org', code: '8462-4', display: 'Diastolic blood pressure' }] }, valueQuantity: { value: dia, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' } }
+        ]
+      });
+    }
+    if (v?.appearance) {
+      const raw = String(v.appearance).trim();
+      const key = raw.toLowerCase();
+      const mapped = appearanceMap[key];
+      obs.push({
+        ...base(),
+        category: examCat,
+        code: { text: 'Appearance' },
+        valueCodeableConcept: mapped
+          ? { coding: [{ system: 'http://snomed.info/sct', code: mapped.code, display: mapped.display }], text: mapped.display }
+          : { text: raw }
+      });
+    }
+    if (v?.gait) {
+      const raw = String(v.gait).trim();
+      const key = raw.toLowerCase();
+      const mapped = gaitMap[key];
+      obs.push({
+        ...base(),
+        category: examCat,
+        code: { text: 'Gait' },
+        valueCodeableConcept: mapped
+          ? { coding: [{ system: 'http://snomed.info/sct', code: mapped.code, display: mapped.display }], text: mapped.display }
+          : { text: raw }
+      });
+    }
+    return obs;
+  }
+
+  // Coerce any heterogeneous value (string | flat object | CodeableConcept) to a CodeableConcept-like object
+  private coerceCodeableConcept(v: any): { coding?: Array<{ system?: string; code?: string; display?: string }>; text?: string } | null {
+    if (!v) return null;
+    // Already a CodeableConcept
+    if (typeof v === 'object' && Array.isArray(v.coding)) return v;
+    // Flat object with code/display/system
+    if (typeof v === 'object' && (v.code || v.display || v.system)) {
+      const code = v.code || '';
+      const display = v.display || v.text || '';
+      const system = v.system || '';
+      return { coding: [{ code, display, system }], text: display || code };
+    }
+    // Encoded string: code$#$display$#$system or free text
+    if (typeof v === 'string') {
+      if (v.includes('$#$')) {
+        const [code = '', display = '', system = ''] = v.split('$#$');
+        return { coding: [{ code, display, system }], text: display || code };
+      }
+      return { text: v };
+    }
+    return null;
+  }
+
+  // Build Encounter resource from dialog values
+  private buildEncounterResource(patientId: string, details: any, actors: any): any {
+    const patientRef = { reference: `Patient/${patientId}` };
+    // Normalize class and priority to CodeableConcept, then derive Coding/CodeableConcept as required
+    const classCC = this.coerceCodeableConcept(details?.class);
+    const priorityCC = this.coerceCodeableConcept(details?.priority);
+    // Encounter.class expects a single Coding
+    const encClass = classCC?.coding && classCC.coding.length ? classCC.coding[0] : undefined;
+    const priority = priorityCC?.coding ? { coding: priorityCC.coding } : (priorityCC ? { text: priorityCC.text } : undefined);
+
+    // participants could be array of references or strings like "Practitioner/123$#$John Doe"
+    const rawParticipants: any[] = actors?.participant || [];
+    // alert(JSON.stringify(rawParticipants));
+    // ["", { "individual": { "reference": "Practitioner/08fc11a0-666d-4f34-b243-a0f70f917971", "display": "Dr. John Doe" } }]
+    const participants = (Array.isArray(rawParticipants) ? rawParticipants : [rawParticipants])
+      .filter((o) => { return !!o; })
+      // .map((p: any) => {
+      //   alert(p);
+      //   const ref = this.parseReference(p);
+      //   return ref ? { individual: ref } : null;
+      // })
+      .filter((p): p is { individual: any } => !!p);
+    // alert(JSON.stringify(participants));
+
+
+    const encounter: any = {
+      resourceType: 'Encounter',
+      status: 'in-progress',
+      subject: patientRef,
+      period: { start: new Date().toISOString() },
+      ...(encClass ? { class: encClass } : {}),
+      ...(priority ? { priority } : {}),
+      ...(participants.length ? { participant: participants } : {})
+    };
+    return encounter;
+  }
+
+  private conditionClinicalCodeMap = new Set(['active', 'recurrence', 'relapse', 'inactive', 'remission', 'resolved']);
+  private conditionVerificationCodeMap = new Set(['unconfirmed', 'provisional', 'differential', 'confirmed', 'refuted', 'entered-in-error']);
+
+  private buildConditionResources(symptomsForm: any, patientId: string, encounterId: string, practitionerRef?: string): any[] {
+    const patientRef = { reference: `Patient/${patientId}` };
+    const encounterRef = { reference: `Encounter/${encounterId}` };
+    const list: any[] = [];
+    const arr = symptomsForm?.symptoms || [];
+    for (const row of arr) {
+      if (!row?.code?.code) continue;
+      const clinical = String(row?.clinicalStatus || '').trim().toLowerCase();
+      const verification = String(row?.verificationStatus || '').trim().toLowerCase();
+      const onset = row?.onsetDateTime ? new Date(row.onsetDateTime).toISOString() : undefined;
+      const base: any = {
+        resourceType: 'Condition',
+        subject: patientRef,
+        encounter: encounterRef,
+        code: {
+          coding: [{ system: row.code.system || 'http://snomed.info/sct', code: row.code.code, display: row.code.display }],
+          text: row.code.display || row.code.code
+        },
+        ...(onset ? { onsetDateTime: onset } : {})
+      };
+      if (this.conditionClinicalCodeMap.has(clinical)) {
+        base.clinicalStatus = { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: clinical, display: clinical.charAt(0).toUpperCase() + clinical.slice(1) }], text: clinical };
+      } else if (clinical) {
+        base.clinicalStatus = { text: row.clinicalStatus };
+      }
+      const verificationCode = this.conditionVerificationCodeMap.has(verification) ? verification : 'provisional';
+      base.verificationStatus = { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status', code: verificationCode, display: verificationCode.charAt(0).toUpperCase() + verificationCode.slice(1) }], text: verificationCode };
+
+      if (row?.severity) {
+        base.severity = { text: String(row.severity) };
+      }
+
+      const isConfirmed = verificationCode === 'confirmed';
+      base.asserter = isConfirmed && practitionerRef ? { reference: practitionerRef } : patientRef;
+
+      list.push(base);
+
+      // Clone rule: if confirmed and asserter practitioner, add a provisional patient-stated clone
+      if (isConfirmed && practitionerRef) {
+        const clone = JSON.parse(JSON.stringify(base));
+        clone.verificationStatus = { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status', code: 'provisional', display: 'Provisional' }], text: 'provisional' };
+        clone.asserter = patientRef;
+        list.push(clone);
+      }
+    }
+    return list;
+  }
+
+  private parseReference(input: any): { reference: string; display?: string; type?: string } | null {
+    if (!input) return null;
+    if (typeof input === 'string') {
+      const parts = input.split('$#$');
+      if (parts.length >= 1) {
+        return { reference: parts[0], display: parts[1], type: parts[2] };
+      }
+      // assume the string is already a FHIR reference
+      return { reference: input };
+    }
+    if (typeof input === 'object' && input.reference) {
+      return input as any;
+    }
+    return null;
+  }
+
+  // Build a FHIR R4 transaction Bundle for Encounter + Conditions + Observations
+  private buildEncounterBundle(encounter: any, conditions: any[], observations: any[]): any {
+    // Assign temporary UUIDs and use urn:uuid references so intra-bundle links resolve
+    const encounterUUID = (crypto.randomUUID ? crypto.randomUUID() : Math.floor(Math.random() * 1e12).toString());
+    const encounterFullUrl = `urn:uuid:${encounterUUID}`;
+    const encounterEntry = {
+      fullUrl: encounterFullUrl,
+      resource: encounter,
+      request: { method: 'POST', url: 'Encounter' }
+    };
+
+    // Ensure all resources reference the bundle Encounter
+    const fixRef = (r: any) => {
+      if (r && r.encounter && r.encounter.reference && r.encounter.reference.startsWith('Encounter/')) {
+        r.encounter.reference = encounterFullUrl;
+      }
+    };
+    const conditionEntries = (conditions || []).map((c) => {
+      fixRef(c);
+      return {
+        fullUrl: `urn:uuid:${crypto.randomUUID ? crypto.randomUUID() : Math.floor(Math.random() * 1e12).toString()}`,
+        resource: c,
+        request: { method: 'POST', url: 'Condition' }
+      };
+    });
+    const observationEntries = (observations || []).map((o) => {
+      fixRef(o);
+      return {
+        fullUrl: `urn:uuid:${crypto.randomUUID ? crypto.randomUUID() : Math.floor(Math.random() * 1e12).toString()}`,
+        resource: o,
+        request: { method: 'POST', url: 'Observation' }
+      };
+    });
+
+    // Also ensure the Encounter.subject is a Patient reference (external), leave as-is
+    // Performer refs remain as external Practitioner/{id}
+
+    return {
+      resourceType: 'Bundle',
+      type: 'transaction',
+      entry: [encounterEntry, ...conditionEntries, ...observationEntries]
+    };
+  }
+
+  // POST the transaction bundle to the FHIR server
+  private postEncounterBundle(bundle: any): Observable<any> {
+    // NOTE: Replace base URL and headers to match your environment
+    const baseUrl = this.backendEndPoint; // e.g., 'https://your-server/fhir'
+    return this.http.post(`${baseUrl}`, bundle, {
+      headers: { 'Content-Type': 'application/fhir+json', 'Accept': 'application/fhir+json' }
+    });
+  }
 
   setEncounterState(patientId: string, encounter: 'planned' | 'in-progress' | 'on-hold' | 'discharged' | 'completed' | 'cancelled' | 'discontinued' | 'entered-in-error' | 'unknown') {
     if (this.globalEncounterState.hasOwnProperty(patientId)) {
@@ -88,7 +357,7 @@ export class EncounterServiceService {
   router = inject(Router)
   stateService = inject(StateService)
   addEncounter(patientId: string) {
-    alert("added here");
+    // alert("added here");
     // alert(patientId);
     // Logic to add an encounter
     console.log('Add Encounter clicked');
@@ -96,9 +365,15 @@ export class EncounterServiceService {
     let currentEncounter: any = null;
     this.stateService.currentEncounter.subscribe(enc => currentEncounter = enc).unsubscribe();
     if (currentEncounter && currentEncounter.status == 'in-progress') {
+      const startText = currentEncounter?.period?.start
+        ? new Date(currentEncounter.period.start).toLocaleString()
+        : null;
+      const msg = startText
+        ? `An encounter is already in progress for this patient (started ${startText}). Use the Tasks button to continue.`
+        : `An encounter is already in progress for this patient. Use the Tasks button to continue.`;
       this.sn.openFromComponent(SuccessMessageComponent, {
-        data: { message: 'Practitioner approved. You can now find them on the Practitioners page.', action: 'View Practitioner' },
-        duration: 3000,
+        data: { message: msg, action: 'Open Tasks' },
+        duration: 4000,
         horizontalPosition: 'center',
         verticalPosition: 'top',
       });
@@ -118,6 +393,7 @@ export class EncounterServiceService {
         autoFocus: false,
         disableClose: true,
         data: {
+          requiredVitals: this.requiredVitals,
 
           formMetaDataToUse: <formMetaData>{
             formName: 'Encounter (Visits)',
@@ -136,7 +412,10 @@ export class EncounterServiceService {
                   fieldLabel: 'Type of Encounter',
                   fieldType: 'CodeableConceptField',
                   isArray: false,
-                  isGroup: false
+                  isGroup: false,
+                  validations: [
+                    { type: 'default', name: 'required' }
+                  ]
                 },
                 data: <codeableConceptDataType>{
                   coding: g.class.concept
@@ -150,7 +429,10 @@ export class EncounterServiceService {
                   fieldLabel: 'Encounter Urgency',
                   fieldType: 'CodeableConceptField',
                   isArray: false,
-                  isGroup: false
+                  isGroup: false,
+                  validations: [
+                    { type: 'default', name: 'required' }
+                  ]
                 },
                 data: <codeableConceptDataType>{
                   coding: g.priority.concept
@@ -207,7 +489,10 @@ export class EncounterServiceService {
                 fieldType: "CodeableConceptFieldFromBackEnd",
                 isArray: false,
                 isGroup: false,
-                allowedOthers: true
+                allowedOthers: true,
+                validations: [
+                  { type: 'default', name: 'required' }
+                ]
               },
               data: ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/condition-code&_format=json'],
             },
@@ -239,12 +524,13 @@ export class EncounterServiceService {
                 fieldApiName: 'verificationStatus',
                 fieldName: "Verification Status",
                 fieldType: 'SingleCodeField',
+                isHidden: true,
                 inputType: 'text',
                 fieldLabel: "Is the Symptom Confirmed",
                 fieldPlaceholder: "Is the Symptom Confirmed",
                 isArray: false,
                 isGroup: false,
-                value: 'Confirmed'
+                value: 'Provisional'
               },
               data: "unconfirmed | provisional | differential | confirmed | refuted | entered-in-error".split('|').map((e: string) => e.trim().slice(0, 1).toUpperCase() + e.trim().slice(1))
             },
@@ -328,28 +614,64 @@ export class EncounterServiceService {
 
       dRef.afterClosed().subscribe((result) => {
         console.log(result);
-        // Only initiate encounter if component signalled completion
         if (result && result.encounterInitiated) {
+          // Simulate encounter creation and get an Encounter ID (would be POST in real impl)
+          const encounterId = crypto.randomUUID ? crypto.randomUUID() : Math.floor(Math.random() * 1e12).toString();
           this.setEncounterState(patientId, 'in-progress');
-          this.sn.openFromComponent(SuccessMessageComponent, {
-            data: {
-              message: 'Encounter initiated successfully',
 
+          // Build performer reference from auth user (Practitioner)
+          const authUser = this.authService.user.getValue();
+          const performerRef = authUser?.['userId'] ? `Practitioner/${authUser['userId']}` : undefined;
+
+          // Build vitals Observations with encounter and performer references using raw vitals
+          const vitalsObservations = this.buildVitalsObservations(result.vitals || {}, patientId, encounterId, performerRef, new Date().toISOString());
+          // alert(result.actors)
+          // Build Encounter resource from details and actors
+          const encounterResource = this.buildEncounterResource(patientId, result.details || {}, result.actors || {});
+          // Build Condition resources from symptoms form with clone rule
+          const conditions = this.buildConditionResources(result.symptomsForm || {}, patientId, encounterId, performerRef);
+
+          // Compose a transaction bundle with urn:uuid linking
+          const bundle = this.buildEncounterBundle(encounterResource, conditions, vitalsObservations);
+          console.log('FHIR Transaction Bundle:', bundle);
+
+          // Submit to FHIR server
+          this.postEncounterBundle(bundle).subscribe({
+            next: (resp) => {
+              // Build a server-aligned bundle with assigned ids and fixed references
+              const mergedBundle = this.materializeTransactionResponse(bundle, resp);
+
+              // Use the real Encounter (with server id) to seed current encounter
+              const encounterResource = this.findResourceInBundle(mergedBundle, 'Encounter');
+              if (encounterResource) {
+                this.stateService.setCurrentEncounter({
+                  patientId,
+                  status: encounterResource.status || 'in-progress',
+                  ...encounterResource
+                });
+              }
+
+              console.log('FHIR Transaction Response:', resp);
+              this.sn.openFromComponent(SuccessMessageComponent, {
+                data: { message: 'Encounter and related records saved' },
+                duration: 3000,
+                horizontalPosition: 'center',
+                verticalPosition: 'top'
+              });
+
+              // Use the merged response (not the pre-post request bundle)
+              this.stateService.processBundleTransaction(mergedBundle);
+
+              this.dialog.closeAll();
             },
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-          })
-          this.dialog.closeAll();
-          //alert(this.encounterState[this])
-
-          // this.router.navigate(["/app/patients/", patientId]);
-
+            error: (err) => {
+              console.error('FHIR Transaction Error:', err);
+              this.errorService.openandCloseError('Failed to save encounter. Please try again.');
+            }
+          });
         } else {
-          this.errorService.openandCloseError("You did not initiate an encounter before closing the encounter form!.")
-
+          this.errorService.openandCloseError('You did not initiate an encounter before closing the encounter form!.');
         }
-
       });
 
       // this.dialog.open(DynamicFormsComponent, {
@@ -663,7 +985,7 @@ export class EncounterServiceService {
 
 
 
-  addObservation(patientId: string, observationCategory: string | null = null) {
+  addObservation(patientId: string, observationCategory: string | null = null, incomingDref: MatDialogRef<any> | null = null, ObsCat: string | null = null) {
     let category = 'category'
     if (observationCategory) {
       switch (observationCategory) {
@@ -697,12 +1019,16 @@ export class EncounterServiceService {
         category: this.formFieldsDataService.getFormFieldSelectData('observation', category),
         code: this.formFieldsDataService.getFormFieldSelectData('observation', 'code'),
       }).subscribe((g: any) => {
-        console.log(g);
-        const dRef = this.dialog.open(AddObservationComponent, {
+
+        // alert(JSON.stringify(g.code));
+
+        const toSpreadObj: any = {
           maxHeight: '90vh',
           maxWidth: '650px',
           autoFocus: false,
           data: {
+            isAnyCategory: false,
+            obsCategory: ObsCat,
             observationformFields: [[
               'category', {
                 formFields:
@@ -720,7 +1046,9 @@ export class EncounterServiceService {
                         isGroup: false
                       },
                       data: <codeableConceptDataType>{
-                        coding: g[category]['concept']
+                        //remove, vital signs, exam for category
+                        coding: g[category]['concept'].filter((c: any) => c.code !== 'vital-signs' && c.code !== 'exam')
+
                       }
                       ,
                     },
@@ -739,15 +1067,13 @@ export class EncounterServiceService {
                         fieldName: 'Name of Observation / Test',
                         fieldHint: "Pick from suggested names or enter your own",
                         fieldLabel: 'Name of Observation / Test',
-
-                        fieldType: 'CodeableConceptField',
+                        allowedOthers: true,
+                        fieldType: 'CodeableConceptFieldFromBackEnd',
                         isArray: false,
                         isGroup: false
                       },
-                      data: <codeableConceptDataType>{
-                        coding: g.code.concept
-                      }
-                      ,
+                      data: g.code
+
                     },
                   ]
 
@@ -890,7 +1216,27 @@ export class EncounterServiceService {
             })
           }
 
-        });
+
+
+        }
+
+        if (incomingDref) {
+          incomingDref.close();
+          incomingDref.afterClosed().subscribe(() => {
+            // alert("i am closed");
+            this.dialog.open(AddObservationComponent, {
+              ...toSpreadObj
+            });
+          });
+        } else {
+
+          this.dialog.open(AddObservationComponent, {
+            ...toSpreadObj
+          });
+        }
+        // alert(toSpreadObj.data.observationformFields.name.)
+
+
       })
     } else {
       this.errorService.openandCloseError("You need to initiate an encounter before an observation can be added for this patient");
@@ -1413,10 +1759,14 @@ export class EncounterServiceService {
 
     // }
   }
-
+  state = inject(StateService);
   encounterStateCheck(patientId: string) {
-    if (this.globalEncounterState.hasOwnProperty(patientId)
-      && this.globalEncounterState[patientId].getValue() == 'in-progress'
+    if (this.state.currentEncounter.getValue()
+      && this.state.currentEncounter.getValue()?.['patientId'] == patientId
+      && (this.state.currentEncounter.getValue()?.status == 'in-progress' ||
+        this.state.currentEncounter.getValue()?.status == 'planned')
+
+
     ) {
       return true;
 
@@ -1425,6 +1775,129 @@ export class EncounterServiceService {
       return false;
     }
   }
+
+  addDiagnosisV2() {
+    forkJoin({
+      code: this.formFieldsDataService.getFormFieldSelectData('condition', 'code'),
+      //ce.getFormFieldSelectData('medication', 'reason'),
+    }).subscribe({
+      next: (g: any) => {
+        const dRef = this.dialog.open(DynamicFormsV2Component, {
+          maxHeight: '90vh',
+          maxWidth: '650px',
+          autoFocus: false,
+          data: {
+
+            formMetaData: <formMetaData>{
+              formName: 'Diagnosis Form',
+              formDescription: "Use this form to enter a diagnosis for the patient. You can request A.I. assistance using the side chat",
+              submitText: 'Confirm Diagnosis',
+            },
+            formFields: <FormFields[]>[
+              // verificationStatus - unconfirmed | provisional | differential | confirmed | refuted | entered-in-error
+              //clinicalStatus - 	active | recurrence | relapse | inactive | remission | resolved | unknown
+              //severity - mild | moderate | severe
+              //code - 
+              //onsetDateTime - 
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'clinicalStatus',
+                  fieldName: "Clinical Status",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+
+                },
+                data: "active | recurrence | relapse | inactive | remission | resolved | unknown".split('|').map((e: string) => e.trim())
+              },
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'verificationStatus',
+                  fieldName: "Verification Status",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: "unconfirmed | provisional | differential | confirmed | refuted | entered-in-error".split('|').map((e: string) => e.trim())
+              },
+              //severity
+              <SingleCodeField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'severity',
+                  fieldName: "Severity",
+                  fieldType: 'SingleCodeField',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: "mild | moderate | severe".split('|').map((e: string) => e.trim())
+              },
+              //code
+              <CodeableConceptFieldFromBackEnd>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'code',
+                  fieldName: "Diagnosis Code & Name",
+                  fieldType: 'CodeableConceptFieldFromBackEnd',
+                  inputType: 'text',
+                  isArray: false,
+                  isGroup: false,
+
+                },
+                data: g.code,
+              },
+
+
+
+              <IndividualField>{
+                generalProperties: <generalFieldsData>{
+                  auth: {
+                    read: 'all',
+                    write: 'doctor, nurse'
+                  },
+                  fieldApiName: 'onsetDateTime',
+                  fieldName: "Onset Date/Time",
+                  fieldType: 'IndividualField',
+                  inputType: 'datetime-local',
+                  isArray: false,
+                  isGroup: false,
+                },
+                data: ""
+              }
+            ]
+          }
+        });
+      },
+      error: (err: any) => {
+        console.error('Error fetching diagnosis data:', err);
+        this.errorService.openandCloseError('Error fetching diagnosis data. Please try again later.');
+
+
+
+
+      }
+    })
+  }
+
+
+
 
 
   formFieldsDataService = inject(FormFieldsSelectDataService);
@@ -1905,6 +2378,80 @@ export class EncounterServiceService {
 
       }
     })
+  }
+
+  // Parse "ResourceType/{id}/_history/1" -> { resourceType, id }
+  private parseLocation(location: string | undefined): { resourceType: string; id: string } | null {
+    if (!location) return null;
+    const parts = location.split('/');
+    if (parts.length >= 2) {
+      return { resourceType: parts[0], id: parts[1] };
+    }
+    return null;
+  }
+
+  // Rewrite all FHIR Reference.reference fields from urn:uuid -> ResourceType/id
+  private rewriteReferences(obj: any, urnMap: Map<string, { resourceType: string; id: string }>): void {
+    if (!obj || typeof obj !== 'object') return;
+    for (const key of Object.keys(obj)) {
+      const val = obj[key];
+      if (key === 'reference' && typeof val === 'string' && urnMap.has(val)) {
+        const mapped = urnMap.get(val)!;
+        obj[key] = `${mapped.resourceType}/${mapped.id}`;
+      } else if (Array.isArray(val)) {
+        for (const v of val) this.rewriteReferences(v, urnMap);
+      } else if (typeof val === 'object') {
+        this.rewriteReferences(val, urnMap);
+      }
+    }
+  }
+
+  // Merge server-assigned ids into request bundle and normalize intra-bundle refs
+  private materializeTransactionResponse(requestBundle: any, responseBundle: any): any {
+    if (!requestBundle || requestBundle.resourceType !== 'Bundle' || !Array.isArray(requestBundle.entry)) return requestBundle;
+    if (!responseBundle || responseBundle.resourceType !== 'Bundle' || !Array.isArray(responseBundle.entry)) return requestBundle;
+
+    const reqEntries = requestBundle.entry;
+    const resEntries = responseBundle.entry;
+    const urnMap = new Map<string, { resourceType: string; id: string }>();
+
+    // Assume response entries align with request order per FHIR spec
+    for (let i = 0; i < reqEntries.length; i++) {
+      const reqE = reqEntries[i];
+      const resE = resEntries[i];
+
+      const locInfo = this.parseLocation(resE?.response?.location);
+      if (locInfo && reqE?.fullUrl && reqE?.resource) {
+        reqE.resource.id = locInfo.id; // set server id
+        urnMap.set(reqE.fullUrl, { resourceType: locInfo.resourceType, id: locInfo.id });
+      }
+
+      // If server returned the full resource, prefer it
+      if (resE?.resource?.resourceType && resE.resource?.id) {
+        reqE.resource = resE.resource;
+      }
+    }
+
+    // Rewrite all urn:uuid references to ResourceType/id
+    for (const reqE of reqEntries) {
+      if (reqE?.resource) this.rewriteReferences(reqE.resource, urnMap);
+    }
+
+    // Keep bundle shape compatible with your local processor
+    return {
+      resourceType: 'Bundle',
+      type: requestBundle.type || 'transaction',
+      entry: reqEntries
+    };
+  }
+
+  private findResourceInBundle(bundle: any, resourceType: string): any | null {
+    const entries = Array.isArray(bundle?.entry) ? bundle.entry : [];
+    for (const e of entries) {
+      const r = e?.resource ?? e;
+      if (r?.resourceType === resourceType) return r;
+    }
+    return null;
   }
 }
 

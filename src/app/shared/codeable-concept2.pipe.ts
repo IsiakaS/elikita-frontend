@@ -6,26 +6,32 @@ import { CodeableConcept } from 'fhir/r5';
 })
 export class CodeableConcept2Pipe implements PipeTransform {
 
-  transform(value: CodeableConcept, whatToExtract: string | null = null, ...args: unknown[]): string {
-    if (!whatToExtract
+  transform(value: CodeableConcept | string | null | undefined, whatToExtract: string | null = null, ...args: unknown[]): string {
+    if (value == null) return '';
+    if (typeof value === 'string') return value; // pass through plain strings
 
-    ) {
-      if (value.hasOwnProperty('text')) {
+    const firstCoding = Array.isArray((value as any).coding) && (value as any).coding.length > 0
+      ? (value as any).coding[0]
+      : undefined;
+
+    if (!whatToExtract) {
+      if (Object.prototype.hasOwnProperty.call(value, 'text') && value.text) {
         return value.text as string;
       } else {
-        console.log(value, value?.coding, (value?.coding?.[0], value?.coding?.[0].display || value?.coding?.[0].code) as string)
-        return (value?.coding?.[0].display || value?.coding?.[0].code) as string;
+        return (firstCoding?.display || firstCoding?.code || '') as string; // safe fallback
       }
-    }
-    else {
-      if (value.hasOwnProperty(whatToExtract)) {
-        return (value as any)[whatToExtract];
-      } else {
-        if (value.coding?.hasOwnProperty(whatToExtract)) {
-          return (value.coding as any)[whatToExtract];
-        } else {
-          return (value.coding?.[0] as any)[whatToExtract];
+    } else {
+      if (Object.prototype.hasOwnProperty.call(value, whatToExtract)) {
+        return ((value as any)[whatToExtract] || '') as string;
+      } else if (Array.isArray((value as any).coding)) {
+        // try direct property on coding array object, then first coding element
+        const codingObj: any = (value as any).coding;
+        if (Object.prototype.hasOwnProperty.call(codingObj, whatToExtract)) {
+          return (codingObj[whatToExtract] || '') as string;
         }
+        return (codingObj[0]?.[whatToExtract] || '') as string;
+      } else {
+        return '';
       }
     }
   }

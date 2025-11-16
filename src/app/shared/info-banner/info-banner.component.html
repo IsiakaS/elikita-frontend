@@ -1,0 +1,22 @@
+<div class="banner" [ngClass]="type" [attr.role]="ariaRole" aria-live="polite" aria-atomic="true">
+    <div class="icon" *ngIf="icon !== null">
+        <span class="default-icon" *ngIf="icon === undefined" aria-hidden="true">
+            {{ type === 'success' ? '✓' : type === 'warning' ? '!' : type === 'error' ? '⛔' : 'ℹ' }}
+        </span>
+        <span class="custom-icon" *ngIf="icon">{{ icon }}</span>
+    </div>
+
+    <div class="content">
+        <div class="title" *ngIf="title">{{ title }}</div>
+        <div class="message">
+            <ng-content></ng-content>
+        </div>
+        <div class="actions" *ngIf="actions?.length">
+            <button type="button" *ngFor="let a of actions; trackBy: trackAction" (click)="onAction(a)">
+                {{ a.label }}
+            </button>
+        </div>
+    </div>
+
+    <button *ngIf="dismissible" type="button" class="close" (click)="onClose()" aria-label="Close">&times;</button>
+</div>

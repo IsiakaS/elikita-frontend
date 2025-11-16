@@ -60,3 +60,18 @@
     color: light-dark(#c62828, #ffcdd2);
 
 }
+
+table th,
+table td:not(.status) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    white-space: nowrap;
+    // position: relative;
+
+}
+
+
+table td:hover {
+    // background-color: transparent !important;
+}

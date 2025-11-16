@@ -46,7 +46,7 @@ export class FormFieldsSelectDataService {
 
     'encounter': {
       'class': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActEncounterCode&_format=json',
-      'priority': 'https://tx.fhir.org/r4/ValueSet?url=http://terminology.hl7.org/ValueSet/v3-ActPriority&_format=json',
+      'priority': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActPriority&_format=json',
       'participant': 'https://elikita-server.daalitech.com/Practitioner?_format=json',
       'reason': "/dummy.json",
       'reason_use': 'https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason-use&_format=json'
@@ -115,7 +115,7 @@ export class FormFieldsSelectDataService {
     'observation': {
       practitioner: "/encounter/encounter_participant.json",
       category: "/observation/observation_category.json",
-      code: "/observation/observation_code.json",
+      code: "/dummy.json",
       category2: "/observation/observation_category.json",
       category3: "/observation/observation_category.json",
       category4: "/observation/observation_category.json",
@@ -434,21 +434,22 @@ export class FormFieldsSelectDataService {
         },
       code:
         (all: any) => {
-          if (all.hasOwnProperty('system') && all.hasOwnProperty('property')) {
-            all = {
-              ...all, concept: all.concept.map((e: any) => {
+          // if (all.hasOwnProperty('system') && all.hasOwnProperty('property')) {
+          //   all = {
+          //     ...all, concept: all.concept.map((e: any) => {
 
-                const system = all.system;
-                return { ...e, system }
+          //       const system = all.system;
+          //       return { ...e, system }
 
 
-              })
-            }
-          } else {
-            all = all
-          }
+          //     })
+          //   }
+          // } else {
+          //   all = all
+          // }
 
-          return all;
+          // return all;
+          return ["https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/observation-codes&_format=json"]
         },
 
       category2:
@@ -596,7 +597,7 @@ export class FormFieldsSelectDataService {
         return this.practitionerBundleToReferenceData(value);
       },
       reason: (_value: any) => {
-        alert('encounter reason called');
+        // alert('encounter reason called');
         return ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason&_format=json'];
       },
       reason_use: (_value: any) => {

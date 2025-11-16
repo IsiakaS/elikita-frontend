@@ -100,11 +100,19 @@ body {
 :root {
   @include mat.table-overrides((header-headline-size: 1rem,
       row-item-label-text-size: 15px));
+}
+
+table:not(.mat-calendar-table) {
 
   /* Table header sizing variables */
-  --table-th-min-width: 120px;
+  // --table-th-min-width: 120px;
+  th {
+    min-width: 120px;
+    max-width: 120px;
+  }
+
   /* prevent overly narrow headers */
-  --table-th-max-width: 260px;
+  // --table-th-max-width: 260px;
   /* clip long headers and ellipsize */
 }
 
@@ -668,68 +676,79 @@ table tr {
   color: light-dark(#000000a9, #bbb);
 }
 
-.status-green mat-icon {
+.status-green mat-icon,
+.status-green .material-icons {
   color: green;
   background-color: #e0f2e9;
   border: 1px solid #a5d6a7;
 }
 
-.status-orange mat-icon {
+.status-orange mat-icon,
+.status-orange .material-icons {
   color: orange;
   background-color: #fff8e1;
   border: 1px solid #ffcc80;
 }
 
-.status-purple mat-icon {
+.status-purple mat-icon,
+.status-purple .material-icons {
   color: #6A1B9A;
   background-color: #f3e5f5;
   border: 1px solid #ce93d8;
 }
 
-.status-red mat-icon {
+.status-red mat-icon,
+.status-red .material-icons {
   color: red;
   background-color: #ffebee;
   border: 1px solid #ef9a9a;
 }
 
-.status-dark-green mat-icon {
+.status-dark-green mat-icon,
+.status-dark-green .material-icons {
   color: #2E7D32;
   background-color: #e8f5e9;
   border: 1px solid #a5d6a7;
 }
 
-.status-deep-red mat-icon {
+.status-deep-red mat-icon,
+.status-deep-red .material-icons {
   color: #B71C1C;
   background-color: #ffebee;
   border: 1px solid #ef9a9a;
 }
 
-.status-warning-red mat-icon {
+.status-warning-red mat-icon,
+.status-warning-red .material-icons {
   color: #E53935;
   background-color: #fdecea;
   border: 1px solid #ef9a9a;
 }
 
-.status-gray mat-icon {
+.status-gray mat-icon,
+.status-gray .material-icons {
   color: gray;
   background-color: #f5f5f5;
   border: 1px solid #ccc;
 }
 
 //blue
-.status-blue mat-icon {
+.status-blue mat-icon,
+.status-blue .material-icons {
   color: #1E88E5;
   background-color: #e3f2fd;
   border: 1px solid #90caf9;
 }
 
-.status-muted-gray mat-icon {
+.status-muted-gray mat-icon,
+.status-muted-gray .material-icons {
   color: #757575;
   background-color: #eeeeee;
   border: 1px dashed #bdbdbd;
 }
 
-.status-deep-purple mat-icon {
+.status-deep-purple mat-icon,
+.status-deep-purple .material-icons {
   color: #6A1B9A;
   background-color: #f3e5f5;
   border: 1px solid #ce93d8;
@@ -1012,6 +1031,9 @@ table:not(.mat-calendar-table) {
 
   color: var(--mat-sys-on-background);
 
+  &.no-border {
+    border: none !important;
+  }
 
   mat-icon {
     font-size: 16px;

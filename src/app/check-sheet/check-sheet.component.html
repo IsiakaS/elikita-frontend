@@ -218,7 +218,62 @@
                     </mat-panel-title>
 
                 </mat-expansion-panel-header>
-                <app-add-vitals [dummySamples]="true"></app-add-vitals>
+
+                <!-- Vitals table and actions -->
+                <div class="vitals-table-wrapper">
+                    @if(vitalRows.length > 0){
+                    <table mat-table [dataSource]="vitalTableDataSource" class="mat-elevation-z1 w-100">
+
+                        <ng-container matColumnDef="display">
+                            <th mat-header-cell *matHeaderCellDef> Vital </th>
+                            <td mat-cell *matCellDef="let v">{{ v.display }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="value">
+                            <th mat-header-cell *matHeaderCellDef> Value </th>
+                            <td mat-cell *matCellDef="let v">{{ v.value }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef> Status </th>
+                            <td mat-cell *matCellDef="let v">
+                                <div appChips="{{v.status}}" [fontSize]="'14px'"></div>
+                                <!-- {{ v.status | titlecase }} -->
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef> Action </th>
+                            <td mat-cell *matCellDef="let v">
+                                @if(!passedEncounter){
+                                <button mat-button color="primary" [matMenuTriggerFor]="menu">Change Status</button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item (click)="changeVitalStatus(v, 'entered-in-error')">
+                                        Entered in error
+                                    </button>
+                                    <button mat-menu-item (click)="changeVitalStatus(v, 'cancelled')">
+                                        Cancelled
+                                    </button>
+                                </mat-menu>
+                                }
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+
+                    <div class="vitals-actions g-just-flex gap-12 mt-12">
+                        <button mat-stroked-button color="primary" (click)="addMoreVitals()">Add More</button>
+                    </div>
+                    } @else {
+                    <div class="subtitle-text-color-2 mb-10">No vitals available for this encounter.</div>
+                    <button mat-stroked-button color="primary" (click)="addMoreVitals()">Add Vitals</button>
+                    }
+
+                    <!-- Add Vitals Form -->
+                    <!-- <app-add-vitals *ngIf="showAddVitals" [initialValues]="vitalsPrefill"></app-add-vitals> -->
+                </div>
             </mat-expansion-panel>
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
@@ -227,7 +282,66 @@
                     </mat-panel-title>
 
                 </mat-expansion-panel-header>
-                <app-obs-res></app-obs-res>
+
+                <!-- Added reusable exam table -->
+                <div class="exam-table-wrapper mb-16">
+                    @if(examRows.length > 0){
+                    <table mat-table [dataSource]="examTableDataSource" class="mat-elevation-z1 w-100">
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef> Exam </th>
+                            <td mat-cell *matCellDef="let r">{{ r.name }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="value">
+                            <th mat-header-cell *matHeaderCellDef> Value </th>
+                            <td mat-cell *matCellDef="let r" style="max-width: 300px;">
+                                <div style="white-space: wrap; max-width: 400px;">
+                                    {{ r.value }}</div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef> Status </th>
+                            <td mat-cell *matCellDef="let r">
+                                <div appChips="{{r.status}}" [fontSize]="'14px'"></div>
+                                <!-- {{ r.status | titlecase }} -->
+
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef> Action </th>
+                            <td mat-cell *matCellDef="let r">
+                                @if(!passedEncounter){
+                                <button mat-button color="primary" [matMenuTriggerFor]="examMenu">Change Status</button>
+                                <mat-menu #examMenu="matMenu">
+                                    <button mat-menu-item (click)="changeExamStatus(r, 'entered-in-error')">Entered in
+                                        error</button>
+                                    <button mat-menu-item (click)="changeExamStatus(r, 'cancelled')">Cancelled</button>
+                                </mat-menu>
+                                }
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="examDisplayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: examDisplayedColumns;"></tr>
+                    </table>
+                    <!--ADD more physical exam-->
+                    <div class="exam-actions g-just-flex gap-12 mt-12 " style="">
+                        <button mat-stroked-button color="primary" (click)="addMoreExam()">Add More Exam
+                            Findings</button>
+                    </div>
+                    } @else {
+
+                    <div class="subtitle-text-color-2 mb-10">No examination findings for this encounter.</div>
+                    <div class="exam-actions g-just-flex gap-12 mt-12 " style="justify-content: flex-end;">
+                        <button mat-stroked-button color="primary" (click)="addMoreExam()">Add More Exam
+                            Findings</button>
+                    </div>
+                    }
+                </div>
+
+                <!-- <app-obs-res [initialExam]="examPrefill"></app-obs-res> -->
             </mat-expansion-panel>
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
@@ -236,7 +350,56 @@
                     </mat-panel-title>
 
                 </mat-expansion-panel-header>
-                <app-pat-symp [forClerkingSheet]="true"></app-pat-symp>
+
+                <!-- Complaints table -->
+                <div class="complaints-table-wrapper mb-16">
+                    @if(complaintRows.length > 0){
+                    <table mat-table [dataSource]="complaintTableDataSource" class="mat-elevation-z1 w-100">
+                        <ng-container matColumnDef="symptom">
+                            <th mat-header-cell *matHeaderCellDef> Symptom </th>
+                            <td mat-cell *matCellDef="let r">{{ r.symptom }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="severity">
+                            <th mat-header-cell *matHeaderCellDef> Severity </th>
+                            <td mat-cell *matCellDef="let r">{{ r.severity }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="verification">
+                            <th mat-header-cell *matHeaderCellDef> Verification </th>
+                            <td mat-cell *matCellDef="let r">{{ r.verification | titlecase }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="onset">
+                            <th mat-header-cell *matHeaderCellDef> Onset </th>
+                            <td mat-cell *matCellDef="let r">{{ r.onset }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef> Action </th>
+                            <td mat-cell *matCellDef="let r">
+                                <button mat-button color="primary" [matMenuTriggerFor]="complaintMenu">Change
+                                    Status</button>
+                                <mat-menu #complaintMenu="matMenu">
+                                    <button mat-menu-item (click)="changeComplaintStatus(r, 'entered-in-error')">
+                                        Entered in error
+                                    </button>
+                                    <button mat-menu-item (click)="changeComplaintStatus(r, 'refuted')">
+                                        Refuted
+                                    </button>
+                                </mat-menu>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="complaintDisplayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: complaintDisplayedColumns;"></tr>
+                    </table>
+                    } @else {
+                    <div class="subtitle-text-color-2 mb-10">No chief complaints for this encounter.</div>
+                    }
+                </div>
+
+                <app-pat-symp [initialSymptoms]="symptomsPrefill"></app-pat-symp>
             </mat-expansion-panel>
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
@@ -324,7 +487,6 @@
                     <mat-panel-title>
                         Treatment Plan
                     </mat-panel-title>
-
                 </mat-expansion-panel-header>
                 <mat-expansion-panel>
                     <mat-expansion-panel-header>

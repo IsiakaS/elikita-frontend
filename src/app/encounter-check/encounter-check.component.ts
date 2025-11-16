@@ -1,21 +1,23 @@
-import { Component, Inject, inject, Optional } from '@angular/core';
+import { Component, Inject, inject, Optional, ViewChild } from '@angular/core';
 import { commonImports } from '../shared/table-interface';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { formMetaData } from '../shared/dynamic-forms.interface2';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-forms-v2.component';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CodeableConceptField, CodeField, codingDataType, GroupField, IndividualField, IndividualReferenceField, ReferenceFieldArray, SingleCodeField } from '../shared/dynamic-forms.interface2';
 import { CommonModule, JsonPipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SplitHashPipe } from '../shared/split-hash.pipe';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
 import { AddVitalsComponent } from '../patient-observation/add-vitals/add-vitals.component';
+// (already imported above) DynamicFormsV2Component
 import { MatSelectModule } from '@angular/material/select';
-import { FormArray, FormBuilder, FormGroup, FormsModule, FormControl } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, FormControl, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { map, Observable, of, startWith } from 'rxjs';
+import { AuthService } from '../shared/auth/auth.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
@@ -32,6 +34,13 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
 })
 export class EncounterCheckComponent {
   fb = inject(FormBuilder);
+  authService = inject(AuthService);
+  @ViewChild(AddVitalsComponent) addVitalsComp?: AddVitalsComponent;
+  @ViewChild('detailsDF') detailsDF?: DynamicFormsV2Component;
+  @ViewChild('notesDF') notesDF?: DynamicFormsV2Component;
+  @ViewChild('actorsDF') actorsDF?: DynamicFormsV2Component;
+  @ViewChild('reasonDF') reasonDF?: DynamicFormsV2Component; // patient reported symptom entry form
+  vitalsLatest: any;
   // Optional dialogRef indicates we're running inside a MatDialog
   dialogRef = inject(MatDialogRef<EncounterCheckComponent>, { optional: true });
   // Use inject() for dialog data to avoid constructor param decorators issues
@@ -40,30 +49,31 @@ export class EncounterCheckComponent {
     if (this.data) {
       console.log(this.data);
     }
+    // Initialize required vitals from dialog data or defaults
+    this.requiredVitals = Array.isArray(this.data?.requiredVitals) && this.data.requiredVitals.length
+      ? this.data.requiredVitals
+      : ['temperature', 'pulseRate', 'respiratoryRate', 'bloodPressure', 'oxygenSaturation'];
     this.encounterReasonForm = this.fb.group({
-      symptoms: this.fb.array([
-        this.fb.group({
-          severity: [''],
-          clinicalStatus: [''],
-          verificationStatus: [''],
-          onsetDateTime: [''],
-          code: this.fb.group({
-            code: [''],
-            system: [''],
-            display: ['']
-          })
-        })
-      ])
+      symptoms: this.fb.array([]
+
+      )
 
     })
   }
   // Checklist values tracking
   checkListControls: FormArray<FormControl<boolean>> = this.fb.array<FormControl<boolean>>([]);
+  firstStepGroup!: FormGroup;
   ngOnInit() {
     // initialize checklist controls to match items length
     this.encounterCheckList.forEach(() => this.checkListControls.push(this.fb.control(false) as FormControl<boolean>));
+    // group to drive linear stepper validity
+    this.firstStepGroup = this.fb.group({
+      checklist: this.checkListControls
+    }, { validators: [this.allTrueArrayValidator('checklist')] });
   }
   matAutocompletei = { clinicalStatus: <Observable<any>[]>[], verificationStatus: <Observable<any>[]>[], severity: <Observable<any>[]>[], };
+
+
 
   get symptoms() {
     return this.encounterReasonForm.get(['symptoms']) as FormArray;
@@ -80,20 +90,50 @@ export class EncounterCheckComponent {
     }
     [key: string]: any
   }) {
-    console.log(!this.symptoms.controls[0].get('code.display')?.value)
-    if (!this.symptoms.controls[0].get('code.display')?.value) { } else {
-      this.symptoms.push(this.fb.group({
-        severity: [''],
-        clinicalStatus: [''],
-        onsetDateTime: [''],
-        verificationStatus: [''],
-        code: this.fb.group({
-          code: [''],
-          system: [''],
-          display: ['']
+
+    this.symptoms.push(this.fb.group({
+      severity: [''],
+      clinicalStatus: [''],
+      onsetDateTime: [''],
+      verificationStatus: [''],
+      code: this.fb.group({
+        code: [''],
+        system: [''],
+        display: ['']
+      })
+    }))
+
+    let index = this.symptoms.controls.length - 1;
+    // this.symptoms.controls[index].get(['clinicalStatus'])!.valueChanges.subscribe(e => alert(e));
+    this.matAutocompletei['clinicalStatus'][index] = this.symptoms.controls[index].get(['clinicalStatus'])!.valueChanges.pipe(
+      startWith(""),
+      map((e: any) => {
+        // alert(e + "");
+        return this.symptomClinicalStatusSelectData.filter((f: any) => {
+          return String(f)?.toLowerCase().includes(String(e)?.toLowerCase());
         })
-      }))
-    }
+      })
+    );
+
+    this.matAutocompletei['verificationStatus'][index] = this.symptoms.controls[index]!.get(['verificationStatus'])!.valueChanges.pipe(
+      startWith(""),
+      map((e: any) => {
+        return this.symptomVerificationStatusSelectData.filter((f: any) => {
+          return String(f)?.toLowerCase().includes(String(e)?.toLowerCase());
+        })
+      })
+    );
+
+    this.matAutocompletei['severity'][index] = this.symptoms.controls[index]!.get(['severity'])!.valueChanges.pipe(
+      startWith(""),
+      map((e: any) => {
+        return this.symptomSeveritySelectData.filter((f: any) => {
+          return String(f)?.toLowerCase().includes(String(e)?.toLowerCase());
+        })
+      })
+    );
+
+
     this.symptoms.controls[this.symptoms.controls.length - 1].patchValue({
       clinicalStatus: e.clinicalStatus,
       verificationStatus: e.verificationStatus,
@@ -102,30 +142,7 @@ export class EncounterCheckComponent {
 
     });
 
-    this.matAutocompletei['clinicalStatus'][this.symptoms.controls.length - 1] = this.symptoms.controls[this.symptoms.controls.length - 1].get(['clinicalStatus'])!.valueChanges.pipe(
-      startWith(""),
-      map((e: any) => {
-        return this.symptomClinicalStatusSelectData.filter((f: any) => {
-          return this.symptomClinicalStatusSelectData.includes(e);
-        })
-      })
-    )
-    this.matAutocompletei['verificationStatus'][this.symptoms.controls.length - 1] = this.symptoms.controls[this.symptoms.controls.length - 1]!.get(['verificationStatus'])!.valueChanges.pipe(
-      startWith(""),
-      map((e: any) => {
-        return this.symptomVerificationStatusSelectData.filter((f: any) => {
-          return this.symptomVerificationStatusSelectData.includes(e);
-        })
-      })
-    )
-    this.matAutocompletei['severity'][this.symptoms.controls.length - 1] = this.symptoms.controls[this.symptoms.controls.length - 1]!.get(['severity'])!.valueChanges.pipe(
-      startWith(""),
-      map((e: any) => {
-        return this.symptomSeveritySelectData.filter((f: any) => {
-          return this.symptomSeveritySelectData.includes(e);
-        })
-      })
-    )
+
 
     this.symptoms.controls[this.symptoms.controls.length - 1]?.get(['clinicalStatus'])?.setValue(e.clinicalStatus)
     this.symptoms.controls[this.symptoms.controls.length - 1].get(['code'])?.patchValue({
@@ -154,16 +171,55 @@ export class EncounterCheckComponent {
 
   encounterCheckList = [
     'I washed my hands',
-    'I greeted the patient by name',
-    'I verified the patient’s identity',
-    'I have asked the patient to sit/lie down comfortably',
-    'I observed the patient\'s gait',
-    'I asked about any pain',
-    'Female chaperone present (if applicable)',
-    'I checked the patient\'s visit history'
+    // 'I greeted the patient by name',
+    // 'I verified the patient’s identity',
+    // 'I have asked the patient to sit/lie down comfortably',
+    // 'I observed the patient\'s gait',
+    // 'I asked about any pain',
+    // 'Female chaperone present (if applicable)',
+    // 'I checked the patient\'s visit history'
   ]
   encounterVitals = {
 
+  }
+  // Configurable list of vitals that must be present before proceeding from Patient Details step
+  requiredVitals: string[] = [];
+
+  // Return list of missing required vitals based on latest values from AddVitalsComponent
+  getMissingRequiredVitals(): string[] {
+    const v = this.vitalsLatest || {};
+    return (this.requiredVitals || []).filter((k) => {
+      const val = v?.[k];
+      // consider non-empty string/number and truthy values as filled; allow 0 for numeric
+      if (val === 0) return false;
+      return val === undefined || val === null || String(val).trim() === '';
+    });
+  }
+
+  hasRequiredVitals(): boolean {
+    return this.getMissingRequiredVitals().length === 0;
+  }
+
+  // Determine if user typed a symptom but never clicked the Add button
+  private hasUnaddedSymptomDraft(): boolean {
+    const reasonForm = this.reasonDF?.aForm?.value || {};
+    const rawReason = reasonForm?.reason;
+    // If there's a non-empty reason field but nothing captured in patientPresentedSymptoms
+    return !!rawReason && String(rawReason).trim() !== '' && (this.patientPresentedSymptoms.length === 0);
+  }
+
+  // Ensure at least one symptom with a code/display exists in the symptoms FormArray
+  public hasAtLeastOneSymptomSelected(): boolean {
+    // Prefer the maintained list if present
+    if (this.patientPresentedSymptoms && this.patientPresentedSymptoms.length > 0) return true;
+    const fa = this.encounterReasonForm?.get('symptoms');
+    if (!fa || typeof (fa as any).controls === 'undefined') return false;
+    const arr = (fa as any).controls as any[];
+    return arr.some(ctrl => {
+      const codeGroup = ctrl?.get ? ctrl.get('code') : null;
+      const codeVal = codeGroup?.get('code')?.value || codeGroup?.get('display')?.value;
+      return !!(codeVal && String(codeVal).trim() !== '');
+    });
   }
   patientPresentedSymptoms: {
 
@@ -223,7 +279,7 @@ export class EncounterCheckComponent {
 
 
       this.addToSymptomsArray(pSymp);
-
+      this.data!.formFieldsToUse.reason = [...this.data!.formFieldsToUse.reason];
 
     }
 
@@ -241,6 +297,10 @@ export class EncounterCheckComponent {
     })
     if (symptomIndex > -1) {
       this.patientPresentedSymptoms.splice(symptomIndex, 1);
+      // keep FormArray in sync with displayed list
+      if (this.symptoms && this.symptoms.length > symptomIndex) {
+        this.symptoms.removeAt(symptomIndex);
+      }
     }
     // if (this.patientPresentedSymptoms.includes(symptom)) {
     //   const index = this.patientPresentedSymptoms.indexOf(symptom);
@@ -543,14 +603,123 @@ export class EncounterCheckComponent {
     //   // You can surface a message here if strict completion is required
     // }
 
+    // Guard: enforce required vitals
+    // if (!this.hasRequiredVitals()) {
+    //   const missing = this.getMissingRequiredVitals();
+    //   this.encounterService.errorService.openandCloseError(`Please complete required vitals: ${missing.join(', ')}`);
+    //   return;
+    // }
+
+    // Guard: ensure vitals format is valid (e.g., blood pressure 120/80)
+    // if (this.addVitalsComp?.vitalsFormGroup?.invalid) {
+    //   const bpCtrl = this.addVitalsComp?.vitalsFormGroup?.get('bloodPressure');
+    //   const hasBpFormatError = !!bpCtrl?.errors?.['bloodPressureFormat'];
+    //   const msg = hasBpFormatError
+    //     ? 'Blood Pressure must be in the format systolic/diastolic (e.g., 120/80).'
+    //     : 'Please correct the vitals form before proceeding.';
+    //   this.encounterService.errorService.openandCloseError(msg);
+    //   return;
+    // }
+
+    // Guard: enforce encounter details required fields via dynamic form validity
+    if (this.detailsDF?.aForm?.invalid) {
+      this.encounterService.errorService.openandCloseError('Please complete Encounter Type and Urgency.');
+      return;
+    }
+
+    // Guard: ensure user clicked "Add" for entered symptom
+    if (this.hasUnaddedSymptomDraft()) {
+      this.encounterService.errorService.openandCloseError('You entered a symptom but did not press the Add button. Please press "Add" to include it or clear the field.');
+      // return;
+    }
+
+    // Guard: ensure at least one symptom is present
+    if (!this.hasAtLeastOneSymptomSelected()) {
+      this.encounterService.errorService.openandCloseError('Please add at least one patient symptom before submitting.');
+      return;
+    }
+
     // Close dialog and signal to caller that encounter was initiated
-    this.dialogRef?.close({ encounterInitiated: true, checklist: this.checkListControls.getRawValue() });
+    const details = this.detailsDF?.aForm?.value || {};
+    // alert(JSON.stringify(details) || details || 'no details')
+    const notes = this.notesDF?.aForm?.value || {};
+    const actors = this.actorsDF?.aForm?.value || {};
+    // Ensure the logged-in user is included as a participant (format: { ref, display })
+    try {
+      const authUser: any = this.authService?.user?.getValue?.();
+      const userId: string | undefined = authUser?.['userId'] || authUser?.['id'];
+      const userDisplay: string | undefined = authUser?.['display'] || authUser?.['fullName'] || authUser?.['name'] || authUser?.['email'];
+      const userRef = userId ? `Practitioner/${userId}` : undefined;
+      alert(userRef);
+      if (userRef) {
+
+        const participantsRaw = (actors as any)?.participant;
+        // alert(participantsRaw);
+        let participants: any[] = Array.isArray(participantsRaw)
+          ? participantsRaw
+          : (participantsRaw ? [participantsRaw] : []);
+
+        const alreadyPresent = participants.some((q: any) => {
+          let p = q.individual
+          const ref = (p && (p.ref || p.reference)) || (typeof p === 'string' ? p.split('$#$')[0] : undefined);
+          // ignore fragment
+          // alert(ref);
+          return ref === userRef;
+        });
+
+        if (!alreadyPresent) {
+          participants.push({ reference: userRef, display: userDisplay });
+
+        }
+        const participantsKey = ['reference', 'display'];
+        participants = participants.map((p: any) => {
+          const toObj = (v: any) => {
+            if (!v) return {};
+            if (typeof v === 'string') {
+              const [reference, display] = String(v).split('$#$');
+              return { reference, display };
+            }
+            return {
+              reference: v.reference ?? v.ref ?? (typeof v === 'string' ? String(v).split('$#$')[0] : undefined),
+              display: v.display ?? v.name ?? v.text ?? (typeof v === 'string' ? String(v).split('$#$')[1] : undefined),
+            };
+          };
+          const src = p?.individual !== undefined ? p.individual : p;
+          return { individual: toObj(src) };
+        });
+        (actors as any).participant = participants;
+      }
+    } catch { /* non-blocking */ }
+
+
+
+
+    this.dialogRef?.close({
+      encounterInitiated: true,
+      checklist: this.checkListControls.getRawValue(),
+      vitals: this.vitalsLatest,
+      details,
+      notes,
+      actors,
+      symptomsForm: this.encounterReasonForm.getRawValue(),
+      presentedSymptoms: this.patientPresentedSymptoms
+    });
 
   }
 
   // Compute: are all checklist items toggled on?
   areAllChecklistTrue(): boolean {
     return this.checkListControls?.controls?.every((c: any) => !!c.value) ?? false;
+  }
+
+  // Validator: ensure all items in the given FormArray are true
+  private allTrueArrayValidator(arrayKey: string): ValidatorFn {
+    return (group: AbstractControl) => {
+      const arr = (group.get(arrayKey) as FormArray<FormControl<boolean>>);
+      if (!arr) return null;
+      const allTrue = arr.controls.every(c => !!c.value);
+      return allTrue ? null : { notAllTrue: true };
+    };
   }
 
   // Determine if there are unsaved changes

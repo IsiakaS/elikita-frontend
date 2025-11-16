@@ -16,9 +16,7 @@
 
 
                     <textarea #scsc name="abdominalTenderness" id="abdominalTenderness" matInput [attr.rows]="4"
-                        [placeholder]="data.placeholder??'Enter A Value'">
-
-                    </textarea>
+                        [placeholder]="data.placeholder??'Enter A Value'"></textarea>
 
                 </mat-form-field>
             </div>
@@ -31,7 +29,7 @@
                 Cancel
             </button>
             <button mat-flat-button color="primary" (click)="scsc.value ? addAndClose(scsc.value) : addAndClose('')">
-                Save Observation
+                Add To Observations
             </button>
         </mat-card-actions>
 

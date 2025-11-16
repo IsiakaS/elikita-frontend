@@ -33,10 +33,33 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
 })
 export class PatSympComponent {
   @Input() forClerkingSheet = false;
+  @Input() initialSymptoms?: Array<{
+    clinicalStatus?: string,
+    verificationStatus?: string,
+    severity?: string,
+    onsetDateTime?: string,
+    symptom?: { code?: string, system?: string, display?: string }
+  }>;
   fb = inject(FormBuilder);
   sampleDummyEncounterReasonFormWithValues: any[];
   ngOnInit() {
-    if (this.forClerkingSheet) {
+    if (this.initialSymptoms && this.initialSymptoms.length) {
+      for (const s of this.initialSymptoms) {
+        const p = {
+          clinicalStatus: s.clinicalStatus || '',
+          verificationStatus: s.verificationStatus || '',
+          onsetDateTime: s.onsetDateTime || '',
+          severity: s.severity || '',
+          symptom: {
+            code: s.symptom?.code || '',
+            display: s.symptom?.display || '',
+            system: s.symptom?.system || ''
+          }
+        } as any;
+        this.patientPresentedSymptoms.push(p);
+        this.addToSymptomsArray(p);
+      }
+    } else if (this.forClerkingSheet) {
       for (const pSymp of this.sampleDummyEncounterReasonFormWithValues) {
         this.patientPresentedSymptoms.push(pSymp);
         this.addToSymptomsArray(pSymp);

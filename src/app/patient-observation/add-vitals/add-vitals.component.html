@@ -64,12 +64,36 @@
                     <input type="number" matInput #height formControlName="height">
                     <mat-icon matIconPrefix>height</mat-icon>
                     <span class="unit" matTextSuffix>cm</span>
+                    @let hCtrl = vitalsFormGroup.get(['height']);
+                    @if(hCtrl?.touched && hCtrl?.errors){
+                    @let errs = hCtrl?.errors;
+                    <mat-error class="small-subtitle">
+                        @if(errs?.['requirePair']){
+                        <div>Height is required when weight is provided.</div>
+                        }
+                        @if(errs?.['heightInvalid']){
+                        <div>Enter a valid height in cm (greater than 0).</div>
+                        }
+                    </mat-error>
+                    }
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
                     <mat-label>Patient Weight</mat-label>
                     <input type="number" matInput #weight formControlName="weight">
                     <mat-icon matIconPrefix>monitor_weight</mat-icon>
                     <span class="unit" matTextSuffix>kg</span>
+                    @let wCtrl = vitalsFormGroup.get(['weight']);
+                    @if(wCtrl?.touched && wCtrl?.errors){
+                    @let errs = wCtrl?.errors;
+                    <mat-error class="small-subtitle">
+                        @if(errs?.['requirePair']){
+                        <div>Weight is required when height is provided.</div>
+                        }
+                        @if(errs?.['weightInvalid']){
+                        <div>Enter a valid weight in kg (greater than 0).</div>
+                        }
+                    </mat-error>
+                    }
                 </mat-form-field>
             </div>
             @if(height && weight && height.value && weight.value &&
@@ -117,19 +141,26 @@
                 <input type="text" matInput #bloodPressure formControlName="bloodPressure">
                 <mat-icon matIconPrefix>monitor_heart</mat-icon>
                 <span class="unit" matTextSuffix>mmHg</span>
-
             </mat-form-field>
-            @if(vitalsFormGroup.get(['bloodPressure'])?.touched &&
-
-            vitalsFormGroup.get(['bloodPressure'])?.value &&
-            !isBloodPressureValid(vitalsFormGroup.get(['bloodPressure'])?.value)
-            ){
-            <mat-error class="small-subtitle" style=" margin-top: -20px;">
-                <span>
-                    Please enter a valid blood pressure value in the format "systolic/diastolic" (e.g., 120/80).
-                </span>
+            @let bpCtrl = vitalsFormGroup.get(['bloodPressure']);
+            @if(bpCtrl?.touched && bpCtrl?.errors){
+            @let errs = bpCtrl?.errors || {};
+            <mat-error class="small-subtitle">
+                @if(errs['bloodPressureFormat']){
+                <div>
+                    Please enter blood pressure in the format "systolic/diastolic" (e.g., 120/80).
+                </div>
+                }
+                @if(errs['bloodPressureRange']){
+                <div>
+                    Value out of plausible range. Systolic {{bpRangeEffective.sys.min}}–{{bpRangeEffective.sys.max}}
+                    and
+                    Diastolic {{bpRangeEffective.dia.min}}–{{bpRangeEffective.dia.max}} mmHg allowed.
+                </div>
+                }
             </mat-error>
             }
+
             @if(
             vitalsFormGroup.get(['bloodPressure'])?.value &&
             isBloodPressureValid(vitalsFormGroup.get(['bloodPressure'])?.value) &&
@@ -137,7 +168,6 @@
             ){
 
             <div class="justify-content-start gap-12 g-just-flex indicator-text">
-
                 <mat-icon
                     [style.color]="patientBloodPressureCategory.color">{{patientBloodPressureCategory.icon}}</mat-icon>
                 {{vitalsFormGroup.get(['bloodPressure'])?.value + ' mmHg'}}
@@ -145,9 +175,9 @@
                     <!--patient-->
                     {{patientBloodPressureCategory.category}}
                 </span>
-
             </div>
             }
+
         </div>
         }
         <!--temperature-->
@@ -205,5 +235,10 @@
             </mat-form-field>
         </div>
         }
+        <div class="mt-20" style="text-align:right;">
+            <button mat-flat-button color="primary" (click)="submitVitals()" [disabled]="isSubmitDisabled">
+                Submit Vitals
+            </button>
+        </div>
     </form>
 </div>

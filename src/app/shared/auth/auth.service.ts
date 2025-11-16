@@ -227,7 +227,16 @@ export const capacityObject = {
     viewSelf: ['patient']
   },
 
-
+  // NEW: Observation resource standard permissions
+  observation: {
+    add: ['doctor', 'nurse', 'lab'],
+    viewAll: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    viewSelf: ['patient', 'doctor', 'nurse', 'lab', 'admin', 'receptionist'],
+    update: ['doctor', 'nurse', 'lab'],
+    delete: ['admin'],
+    changeStatus: ['doctor', 'nurse', 'lab'], // e.g., preliminary -> final, cancel, entered-in-error
+    enterResult: ['lab'] // lab technologists entering measured values
+  }
 }
 
 
