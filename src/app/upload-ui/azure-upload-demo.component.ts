@@ -10,19 +10,19 @@ import { AzureConfigService } from './azure-config.service';
 import { UploadUiComponent } from './upload-ui.component';
 
 @Component({
-    selector: 'app-azure-upload-demo',
-    standalone: true,
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatInputModule,
-        MatFormFieldModule,
-        MatIconModule,
-        MatCardModule,
-        FormsModule,
-        UploadUiComponent
-    ],
-    template: `
+  selector: 'app-azure-upload-demo',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatCardModule,
+    FormsModule,
+    UploadUiComponent
+  ],
+  template: `
     <div class="demo-container">
       <mat-card>
         <mat-card-header>
@@ -97,9 +97,9 @@ import { UploadUiComponent } from './upload-ui.component';
               [allowedFilesCategoryLabel]="'Images, PDFs, Office docs, and text files'"
               [maxFileSize]="10485760"
               [maxFiles]="5"
-              [azureStorageAccountName]="currentConfig?.storageAccountName"
-              [azureContainerName]="currentConfig?.containerName"
-              [azureSasToken]="currentConfig?.sasToken">
+              [azureStorageAccountName]="currentConfig!.storageAccountName"
+              [azureContainerName]="currentConfig!.containerName"
+              [azureSasToken]="currentConfig!.sasToken">
             </app-upload-ui>
           </div>
           
@@ -126,7 +126,7 @@ import { UploadUiComponent } from './upload-ui.component';
       </mat-card>
     </div>
   `,
-    styles: [`
+  styles: [`
     .demo-container {
       max-width: 800px;
       margin: 20px auto;
@@ -186,65 +186,65 @@ import { UploadUiComponent } from './upload-ui.component';
   `]
 })
 export class AzureUploadDemoComponent implements OnInit {
-    private azureConfigService = inject(AzureConfigService);
+  private azureConfigService = inject(AzureConfigService);
 
-    // File upload configuration
-    allowedFileTypes = /\.(jpg|jpeg|png|gif|pdf|docx|xlsx|txt)$/i;
+  // File upload configuration
+  allowedFileTypes = /\.(jpg|jpeg|png|gif|pdf|docx|xlsx|txt)$/i;
 
-    // Configuration form fields
-    storageAccountName = '';
-    containerName = 'uploads';
-    sasToken = '';
+  // Configuration form fields
+  storageAccountName = '';
+  containerName = 'uploads';
+  sasToken = '';
 
-    // Status properties
-    isConfigured = false;
-    currentConfig = this.azureConfigService.getConfig();
-    tokenExpiryText = '';
-    isTokenExpired = false; ngOnInit() {
-        this.updateStatus();
+  // Status properties
+  isConfigured = false;
+  currentConfig = this.azureConfigService.getConfig();
+  tokenExpiryText = '';
+  isTokenExpired = false; ngOnInit() {
+    this.updateStatus();
+  }
+
+  saveConfiguration() {
+    this.azureConfigService.setConfig({
+      storageAccountName: this.storageAccountName,
+      containerName: this.containerName,
+      sasToken: this.sasToken
+    });
+
+    this.updateStatus();
+  }
+
+  editConfiguration() {
+    const config = this.azureConfigService.getConfig();
+    if (config) {
+      this.storageAccountName = config.storageAccountName;
+      this.containerName = config.containerName;
+      this.sasToken = config.sasToken;
     }
+    this.isConfigured = false;
+  }
 
-    saveConfiguration() {
-        this.azureConfigService.setConfig({
-            storageAccountName: this.storageAccountName,
-            containerName: this.containerName,
-            sasToken: this.sasToken
-        });
+  clearConfiguration() {
+    this.azureConfigService.clearConfig();
+    this.storageAccountName = '';
+    this.containerName = 'uploads';
+    this.sasToken = '';
+    this.updateStatus();
+  }
 
-        this.updateStatus();
+  loadSampleConfig() {
+    this.storageAccountName = 'mystorageaccount';
+    this.containerName = 'uploads';
+    this.sasToken = 'sv=2020-08-04&ss=b&srt=sco&sp=rwdlacx&se=2026-01-01T00:00:00Z&st=2025-11-06T00:00:00Z&spr=https&sig=REPLACE_WITH_YOUR_SIGNATURE';
+  }
+
+  private updateStatus() {
+    this.currentConfig = this.azureConfigService.getConfig();
+    this.isConfigured = !!this.currentConfig;
+
+    if (this.currentConfig) {
+      this.tokenExpiryText = this.azureConfigService.getTimeUntilExpiry();
+      this.isTokenExpired = this.azureConfigService.isTokenExpired();
     }
-
-    editConfiguration() {
-        const config = this.azureConfigService.getConfig();
-        if (config) {
-            this.storageAccountName = config.storageAccountName;
-            this.containerName = config.containerName;
-            this.sasToken = config.sasToken;
-        }
-        this.isConfigured = false;
-    }
-
-    clearConfiguration() {
-        this.azureConfigService.clearConfig();
-        this.storageAccountName = '';
-        this.containerName = 'uploads';
-        this.sasToken = '';
-        this.updateStatus();
-    }
-
-    loadSampleConfig() {
-        this.storageAccountName = 'mystorageaccount';
-        this.containerName = 'uploads';
-        this.sasToken = 'sv=2020-08-04&ss=b&srt=sco&sp=rwdlacx&se=2026-01-01T00:00:00Z&st=2025-11-06T00:00:00Z&spr=https&sig=REPLACE_WITH_YOUR_SIGNATURE';
-    }
-
-    private updateStatus() {
-        this.currentConfig = this.azureConfigService.getConfig();
-        this.isConfigured = !!this.currentConfig;
-
-        if (this.currentConfig) {
-            this.tokenExpiryText = this.azureConfigService.getTimeUntilExpiry();
-            this.isTokenExpired = this.azureConfigService.isTokenExpired();
-        }
-    }
+  }
 }
