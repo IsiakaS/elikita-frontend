@@ -114,7 +114,7 @@ export class FormFieldsSelectDataService {
     },
     'observation': {
       practitioner: "/encounter/encounter_participant.json",
-      category: "/observation/observation_category.json",
+      category: "https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/observation-category&_format=json",
       code: "/dummy.json",
       category2: "/observation/observation_category.json",
       category3: "/observation/observation_category.json",
@@ -175,7 +175,7 @@ export class FormFieldsSelectDataService {
   }
 
   baseFunctionToRetrieveValueset(value: any) {
-    //   console.log(value);
+    console.log(value);
     return value.expansion.contains.map((item: any) => {
 
       return `${item.code}$#$${item.display}$#$${item.system}`;
@@ -414,24 +414,25 @@ export class FormFieldsSelectDataService {
 
           return all;
         },
-      category:
-        (all: any) => {
-          if (all.hasOwnProperty('system') && all.hasOwnProperty('property')) {
-            all = {
-              ...all, concept: all.concept.map((e: any) => {
+      category: this.baseFunctionToRetrieveValueset,
+      // (all: any) => {
 
-                const system = all.system;
-                return { ...e, system }
+      //   if (all.hasOwnProperty('system') && all.hasOwnProperty('property')) {
+      //     all = {
+      //       ...all, concept: all.concept.map((e: any) => {
+
+      //         const system = all.system;
+      //         return { ...e, system }
 
 
-              })
-            }
-          } else {
-            all = all
-          }
-
-          return all;
-        },
+      //       })
+      //     }
+      //   } else {
+      //     all = this.baseFunctionToRetrieveValueset;
+      //   }
+      //   // alert(JSON.stringify(all));
+      //   return all;
+      // },
       code:
         (all: any) => {
           // if (all.hasOwnProperty('system') && all.hasOwnProperty('property')) {

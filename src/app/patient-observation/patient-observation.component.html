@@ -48,9 +48,9 @@
                     [ngClass]="{'selected': categoryFiltering.value === 'exam'}">
                     Physical Examination
                 </button>
-                <button (click)="categoryFiltering.setValue('laboratory')" title="Laboratory"
-                    [ngClass]="{'selected': categoryFiltering.value === 'laboratory'}">
-                    Laboratory
+                <button (click)="categoryFiltering.setValue('others')" title="Others"
+                    [ngClass]="{'selected': categoryFiltering.value === 'others'}">
+                    Others
                 </button>
             </div>
         </div>
@@ -96,7 +96,7 @@
                     </th>
                     <td mat-cell *matCellDef="let element">
                         <span class="restrict-length">
-                            {{element.category | na | joinedcodeableconcept | titlecase}}
+                            {{element.category | joinedcodeableconcept | titlecase | na}}
                         </span>
                     </td>
                 </ng-container>
@@ -106,10 +106,12 @@
                         sortActionDescription="Sort by Result">
                         Result
                     </th>
-                    <td mat-cell *matCellDef="let element">
-                        <span [appTruncateWords]="20" maxWidth="360px" [wrap]="true" tooltipPosition="above"
+                    <td mat-cell *matCellDef="let element" style="padding-top: 10px;
+                    padding-bottom: 10px;
+                    ">
+                        <span [appTruncateWords]="10" maxWidth="360px" [wrap]="true" tooltipPosition="above"
                             [showIcon]="true">
-                            {{ element.displayValue || (element | valueToString) }}
+                            {{ element.displayValue || (element | valueToString) || 'N / A' }}
                         </span>
                     </td>
                 </ng-container>

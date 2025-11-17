@@ -14,20 +14,37 @@ import { AzureUploadService, AzureUploadConfig } from './azure-upload.service';
   styleUrl: './upload-ui.component.scss'
 })
 export class UploadUiComponent {
-  @Input() allowedFiles?: RegExp;
+
+  // File upload restrictions
+  photoAllowedFiles = /\.(jpg|jpeg|png|gif|pdf|docx|xlsx|txt)$/i;
+  photoMaxFileSize = 52428800; // 50MB
+  photoMaxFiles = 5;
+
+  // Azure Storage configuration for file uploads (from azure-upload-demo)
+  azureStorageAccountNamie = 'elikita2026kraiyxw7s2ywg'; // Replace with your actual Azure Storage account name
+  azureContainerNamie = 'profile'; // Container name for uploads
+  azureSasTokeni = 'sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupiyx&se=2030-11-29T00:08:41Z&st=2025-11-08T15:53:41Z&spr=https&sig=ifQ%2B6AN5bXQ5PMs8lfAMpcsS60KwGjivOyjw4mbo14k%3D'; // Replace with your actual SAS token
+
+
+
+
+  @Input() allowedFiles: RegExp = this.photoAllowedFiles;
   @Input() allowedFilesCategoryLabel?: string
-  @Input() maxFileSize?: number; // in bytes
-  @Input() maxFiles?: number;
+  @Input() maxFileSize: number = this.photoMaxFileSize; // in bytes
+  @Input() maxFiles: number = this.photoMaxFiles;
   @Input() uploadFieldName: string = 'file';
   @Input() existingFiles?: any[]
-  @Input() azureStorageAccountName?: string;
-  @Input() azureContainerName?: string = 'uploads';
-  @Input() azureSasToken?: string;
+  @Input() azureStorageAccountName: string = this.azureStorageAccountNamie;
+  @Input() azureContainerName: string = 'profile';
+  @Input() azureSasToken?: string = this.azureSasTokeni;
 
   @Output() filesChanged = new EventEmitter<any[]>();
 
   allUploadingFiles: any[] = [];
   allUploadedFiles: any[] = [];
+
+
+
 
   private http = inject(HttpClient);
   private azureUploadService = inject(AzureUploadService);

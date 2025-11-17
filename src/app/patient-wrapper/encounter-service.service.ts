@@ -1021,7 +1021,7 @@ export class EncounterServiceService {
       }).subscribe((g: any) => {
 
         // alert(JSON.stringify(g.code));
-
+        console.log(g.category);
         const toSpreadObj: any = {
           maxHeight: '90vh',
           maxWidth: '650px',
@@ -1029,43 +1029,63 @@ export class EncounterServiceService {
           data: {
             isAnyCategory: false,
             obsCategory: ObsCat,
-            observationformFields: [[
-              'category', {
+            observationformFields: [
+
+              ['category', {
                 formFields:
                   <FormFields[]>[
                     {
-
                       generalProperties: {
-
                         fieldApiName: 'category',
                         fieldName: 'Observation / Test Category',
                         fieldLabel: 'Observation / Test Category',
-
                         fieldType: 'CodeableConceptField',
                         isArray: false,
                         isGroup: false
                       },
                       data: <codeableConceptDataType>{
-                        //remove, vital signs, exam for category
-                        coding: g[category]['concept'].filter((c: any) => c.code !== 'vital-signs' && c.code !== 'exam')
+                        coding: g[category].filter((c: any) => {
+                          if (typeof c === 'string' && c.split('$#$').length >= 3) {
+                            const code = c.split('$#$')[0];
+                            return code !== 'vital-signs' && code !== 'exam'
 
-                      }
-                      ,
+                          } else {
+                            if (typeof c === 'object' && c.code) {
+                              return c.code !== 'vital-signs' && c.code !== 'exam'
+                            } else {
+                              return true;
+                            }
+                          }
+                        })
+                      },
                     },
-
                   ]
               }],
-            ['name',
-              {
+              ['status', {
+                formFields: [
+                  <SingleCodeField>{
+                    generalProperties: {
+                      fieldApiName: 'status',
+                      fieldName: 'Observation Status',
+                      fieldLabel: 'Observation Status',
+                      fieldType: 'SingleCodeField',
+                      isArray: false,
+                      isGroup: false,
+                      value: 'final',
+                      validations: [{ type: 'default', name: 'required' }]
+                    },
+                    data: ['preliminary', 'final']
+                  }
+                ] as FormFields[]
+              }],
+              ['name', {
                 formFields:
                   <FormFields[]>[
                     {
-
                       generalProperties: {
-
                         fieldApiName: 'name',
                         fieldName: 'Name of Observation / Test',
-                        fieldHint: "Pick from suggested names or enter your own",
+                        fieldHint: 'Pick from suggested names or enter your own',
                         fieldLabel: 'Name of Observation / Test',
                         allowedOthers: true,
                         fieldType: 'CodeableConceptFieldFromBackEnd',
@@ -1073,147 +1093,145 @@ export class EncounterServiceService {
                         isGroup: false
                       },
                       data: g.code
-
                     },
                   ]
-
               }],
-            ['value', {
-              formFields: [
-                <GroupField>{
-
-
-                  groupFields: {
-                    'result_type': <SingleCodeField>{
-
-                      generalProperties: {
-
-                        fieldApiName: 'result_type',
-                        fieldName: 'Type of Result',
-                        fieldLabel: 'Type of Result',
-                        // value: category === "category3" ? 'Text' : '',
-                        controllingField: [{
-                          isAControlField: true,
-                          dependentFieldVisibilityTriggerValue: 'Text',
-                          controlledFieldDependencyId: "result_type.text"
-
-                        },
-                        {
-                          isAControlField: true,
-                          dependentFieldVisibilityTriggerValue: 'Number',
-                          controlledFieldDependencyId: "result_type.number2"
-
-                        },
-
-                        {
-                          isAControlField: true,
-                          controlledFieldDependencyId: "result_type.number",
-                          dependentFieldVisibilityTriggerValue: 'Number'
-                        }],
-                        fieldType: 'SingleCodeField',
-                        isArray: false,
-                        isGroup: false
-                      },
-                      data: ['Number', 'Text']
-
-                    },
-                    'result_value': <IndividualField>{
-                      generalProperties: {
-
-                        fieldApiName: 'result_value',
-                        fieldName: 'Result Value',
-                        fieldLabel: 'Result Value',
-                        inputType: 'number',
-                        dependence_id: 'result_type.number',
-                        fieldType: 'IndividualField',
-                        isArray: false,
-                        isGroup: false
-                      },
-
-
-                    },
-
-                    'result_value_text': <IndividualField>{
-                      generalProperties: {
-
-                        fieldApiName: 'result_value',
-                        fieldName: 'Result ',
-                        fieldLabel: 'Result ',
-                        inputType: 'textarea',
-                        dependence_id: 'result_type.text',
-                        fieldType: 'IndividualField',
-                        isArray: false,
-                        isGroup: false
-                      },
-
-
-                    },
-
-                    'result_unit': <IndividualField>{
-
-                      generalProperties: {
-
-                        fieldApiName: 'result_unit',
-                        fieldName: 'Unit',
-                        fieldLabel: 'Unit',
-                        fieldHint: 'Pick from suggested units or enter your own',
-                        dependence_id: 'result_type.number2',
-                        fieldType: 'SingleCodeField',
-                        isArray: false,
-                        isGroup: false
-                      },
-                      data: this.observation_units
-
-                    },
-
-
-                  },
-                  keys: [
-                    ''
-                  ],
-                  generalProperties: {
-
-                    fieldApiName: 'value',
-                    fieldName: category === "category3" ? 'Observation Results' : 'Observation / Test Results',
-                    fieldLabel: category === "category3" ? 'Observation Results' : 'Observation / Test Results',
-                    fieldType: 'SingleCodeField',
-                    isArray: false,
-                    isGroup: true
-                  },
-
-
-                },
-              ]
-            }],
-
-            [
-              'attachment', {
+              ['value', {
                 formFields: [
-                  <IndividualField>{
+                  <GroupField>{
+
+
+                    groupFields: {
+                      'result_type': <SingleCodeField>{
+
+                        generalProperties: {
+
+                          fieldApiName: 'result_type',
+                          fieldName: 'Type of Result',
+                          fieldLabel: 'Type of Result',
+                          // value: category === "category3" ? 'Text' : '',
+                          controllingField: [{
+                            isAControlField: true,
+                            dependentFieldVisibilityTriggerValue: 'Text',
+                            controlledFieldDependencyId: "result_type.text"
+
+                          },
+                          {
+                            isAControlField: true,
+                            dependentFieldVisibilityTriggerValue: 'Number',
+                            controlledFieldDependencyId: "result_type.number2"
+
+                          },
+
+                          {
+                            isAControlField: true,
+                            controlledFieldDependencyId: "result_type.number",
+                            dependentFieldVisibilityTriggerValue: 'Number'
+                          }],
+                          fieldType: 'SingleCodeField',
+                          isArray: false,
+                          isGroup: false
+                        },
+                        data: ['Number', 'Text']
+
+                      },
+                      'result_value': <IndividualField>{
+                        generalProperties: {
+
+                          fieldApiName: 'result_value',
+                          fieldName: 'Result Value',
+                          fieldLabel: 'Result Value',
+                          inputType: 'number',
+                          dependence_id: 'result_type.number',
+                          fieldType: 'IndividualField',
+                          isArray: false,
+                          isGroup: false
+                        },
+
+
+                      },
+
+                      'result_value_text': <IndividualField>{
+                        generalProperties: {
+
+                          fieldApiName: 'result_value',
+                          fieldName: 'Result ',
+                          fieldLabel: 'Result ',
+                          inputType: 'textarea',
+                          dependence_id: 'result_type.text',
+                          fieldType: 'IndividualField',
+                          isArray: false,
+                          isGroup: false
+                        },
+
+
+                      },
+
+                      'result_unit': <IndividualField>{
+
+                        generalProperties: {
+
+                          fieldApiName: 'result_unit',
+                          fieldName: 'Unit',
+                          fieldLabel: 'Unit',
+                          fieldHint: 'Pick from suggested units or enter your own',
+                          dependence_id: 'result_type.number2',
+                          fieldType: 'SingleCodeField',
+                          isArray: false,
+                          isGroup: false
+                        },
+                        data: this.observation_units
+
+                      },
+
+
+                    },
+                    keys: [
+                      ''
+                    ],
                     generalProperties: {
 
-                      fieldApiName: 'attachment',
-                      fieldName: 'Add an Attachment',
-                      fieldLabel: 'Add an Attachment',
-                      fieldType: 'IndividualField',
+                      fieldApiName: 'value',
+                      fieldName: category === "category3" ? 'Observation Results' : 'Observation / Test Results',
+                      fieldLabel: category === "category3" ? 'Observation Results' : 'Observation / Test Results',
+                      fieldType: 'SingleCodeField',
                       isArray: false,
-                      isGroup: false,
-                      inputType: 'photo_upload'
+                      isGroup: true
                     },
-                    data: ''
+
+
                   },
-
                 ]
-              }
-            ]
-            ].filter((ff: any) => {
-              if (category !== 'category' && ff[0] === 'category') {
-                return false;
-              }
+              }],
+
+              [
+                'attachment', {
+                  formFields: [
+                    <IndividualField>{
+                      generalProperties: {
+
+                        fieldApiName: 'attachment',
+                        fieldName: 'Add an Attachment',
+                        fieldLabel: 'Add an Attachment',
+                        fieldType: 'IndividualField',
+                        isArray: false,
+                        isGroup: false,
+                        inputType: 'photo_upload'
+                      },
+                      data: ''
+                    },
+
+                  ]
+                }
+              ]]
+              .filter((ff: any) => {
+                if (category !== 'category' && ff[0] === 'category') {
+                  return false;
+                }
 
 
-              return true;
-            })
+                return true;
+              })
           }
 
 

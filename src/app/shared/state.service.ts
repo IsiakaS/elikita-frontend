@@ -208,7 +208,7 @@ export class StateService {
       ? list.findIndex(x => x.referenceId === item.referenceId)
       : -1;
     if (idx > -1) list[idx] = item;
-    else list.push(item);
+    else list.unshift(item);
     subject.next(list);
   }
 
@@ -257,6 +257,16 @@ export class StateService {
     }
   }
 
+  // Decide if we should also add a current-encounter resource into PatientResources.
+  // This ensures the resource belongs to the same patient as the current PatientResources.currentPatient.
+  private maybeAddToPatientResources(resource: Resource, savedStatus: 'saved' | 'unsaved') {
+    const encPatientId = this.currentEncounter.value?.patientId ?? null;
+    const currentPatientId = this.PatientResources.currentPatient.value?.actualResource?.id ?? null;
+    if (encPatientId && currentPatientId && encPatientId === currentPatientId) {
+      this.addResourceToPatientResources(resource, savedStatus);
+    }
+  }
+
   private addResourceToCurrentEncounterResources(resource: Resource, savedStatus: 'saved' | 'unsaved' = 'unsaved') {
     const referenceId = this.toRefId(resource);
     switch (resource.resourceType) {
@@ -267,6 +277,8 @@ export class StateService {
           savedStatus,
           actualResource: resource as Observation
         });
+        // Also reflect into patient resources if the encounter's patient matches the current patient
+        this.maybeAddToPatientResources(resource, savedStatus);
         break;
       }
       case 'Condition': {
@@ -275,6 +287,8 @@ export class StateService {
           savedStatus,
           actualResource: resource as Condition
         });
+        // Also reflect into patient resources if the encounter's patient matches the current patient
+        this.maybeAddToPatientResources(resource, savedStatus);
         break;
       }
       case 'MedicationRequest': {
@@ -283,12 +297,120 @@ export class StateService {
           savedStatus,
           actualResource: resource as MedicationRequest
         });
+        // Also reflect into patient resources if the encounter's patient matches the current patient
+        this.maybeAddToPatientResources(resource, savedStatus);
         break;
       }
       default:
         // Non-encounter-list resources are ignored here (e.g., Encounter itself).
         break;
     }
+  }
+
+  private isEncounterActive(): boolean {
+    const enc = this.currentEncounter.value;
+    return !!enc && ['in-progress', 'planned'].includes(enc.status);
+  }
+
+  public persistLocalResource(resource: Resource, savedStatus: 'saved' | 'unsaved') {
+    if (this.isResourceForCurrentEncounter(resource)) {
+      this.addResourceToCurrentEncounterResources(resource, savedStatus);
+    } else {
+      this.addResourceToPatientResources(resource, savedStatus);
+
+    }
+  }
+
+  private buildCodeableConcept(raw: any): any {
+    if (!raw) return null;
+    if (typeof raw === 'string') {
+      if (raw.includes('$#$')) {
+        const [code = '', display = '', system = ''] = raw.split('$#$');
+        return {
+          coding: [{ code, display, system }],
+          text: display || code
+        };
+      }
+      return { text: raw };
+    }
+    if (raw.coding) return raw;
+    return { text: String(raw) };
+  }
+
+  private buildObservationValue(values: any): { valueQuantity?: any; valueString?: string } {
+    const rt = values?.value?.result_type;
+    if (rt === 'Number') {
+      const num = Number(values?.value?.result_value);
+      if (!isNaN(num)) {
+        return {
+          valueQuantity: {
+            value: num,
+            unit: values?.value?.result_unit || undefined,
+            system: 'http://unitsofmeasure.org',
+            code: values?.value?.result_unit || undefined
+          }
+        };
+      }
+    }
+    if (rt === 'Text') {
+      const txt = values?.value?.result_value_text || values?.value?.result_value;
+      if (txt) return { valueString: String(txt) };
+    }
+    return {};
+  }
+
+  /**
+   * Build and persist an Observation from form values.
+   * Expects keys: status, category, name, value (group), attachment(optional).
+   * Returns { success, resource?, error? }.
+   */
+  public postObservation(values: any): { success: boolean; resource?: Observation; error?: string } {
+    if (!this.isEncounterActive()) {
+      return { success: false, error: 'No active encounter.' };
+    }
+    const patient = this.PatientResources.currentPatient.value?.actualResource;
+    if (!patient?.id) {
+      return { success: false, error: 'No current patient selected.' };
+    }
+    const encounterId = this.getCurrentEncounterId();
+    if (!encounterId) {
+      return { success: false, error: 'Encounter ID missing.' };
+    }
+
+    const status = (values?.status || 'preliminary').toLowerCase();
+    const categoryCC = this.buildCodeableConcept(values?.category);
+    const codeCC = this.buildCodeableConcept(values?.name);
+    const valuePart = this.buildObservationValue(values);
+    const nowIso = new Date().toISOString();
+
+    const obs: Observation = {
+      resourceType: 'Observation',
+      status,
+      subject: { reference: `Patient/${patient.id}` },
+      encounter: { reference: `Encounter/${encounterId}` },
+      effectiveDateTime: nowIso,
+      // ...(categoryCC ? { category: [categoryCC] } : {}),
+      category: categoryCC || { text: 'Uncategorized' },
+      // ...(codeCC ? { code: codeCC } : {}),
+      ...valuePart,
+      code: codeCC || { text: 'Unnamed Observation' }
+    };
+
+    // Simple attachment handling -> valueAttachment if single
+    if (values?.attachment && Array.isArray(values.attachment) && values.attachment.length) {
+      const first = values.attachment[0];
+      if (first?.data) {
+        (obs as any).valueAttachment = {
+          contentType: first.type || first.contentType || 'application/octet-stream',
+          data: first.data,
+          title: first.name || first.title
+        };
+      }
+    }
+
+    // Persist
+    this.addResourceToCurrentEncounterResources(obs, 'unsaved');
+    return { success: true, resource: obs };
   }
 
 }

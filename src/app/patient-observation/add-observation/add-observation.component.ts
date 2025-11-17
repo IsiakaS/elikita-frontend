@@ -23,10 +23,15 @@ import { StateService } from '../../shared/state.service';
 import { backendEndPointToken } from '../../app.config';
 import { ErrorService } from '../../shared/error.service';
 import { AuthService } from '../../shared/auth/auth.service';
+import { FhirResourceService } from '../../shared/fhir-resource.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SuccessMessageComponent } from '../../shared/success-message/success-message.component';
+import { CommonModule } from '@angular/common';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-observation',
-  imports: [DynamicFormsV2Component,
+  imports: [DynamicFormsV2Component, JsonPipe,
     MatInputModule, MatFormFieldModule, MatAutocompleteModule,
     AsyncPipe, TitleCasePipe, MatIconModule, MatButtonModule, ReactiveFormsModule,
     MatChipsModule, MatCardModule, AddVitalsComponent, SplitHashPipe],
@@ -277,26 +282,26 @@ export class AddObservationComponent {
     //   "display": "Laboratory"
     // },
     {
-      "code": "imaging",
-      "display": "Imaging"
+      "code": "others",
+      "display": "Others"
     },
-    {
-      "code": "survey",
-      "display": "Survey"
-    },
+    // {
+    //   "code": "survey",
+    //   "display": "Survey"
+    // },
 
-    {
-      "code": "therapy",
-      "display": "Therapy"
-    },
-    {
-      "code": "activity",
-      "display": "Activity"
-    },
-    {
-      "code": "social-history",
-      "display": "Social History"
-    }
+    // {
+    //   "code": "therapy",
+    //   "display": "Therapy"
+    // },
+    // {
+    //   "code": "activity",
+    //   "display": "Activity"
+    // },
+    // {
+    //   "code": "social-history",
+    //   "display": "Social History"
+    // }
   ]
 
 
@@ -357,7 +362,7 @@ export class AddObservationComponent {
       console.log(this.toPassIntoDynamicForms);
     }
   }
-
+  sn = inject(MatSnackBar);
   setObsCat(event: any) {
     if (event && event.value) {
       this.observationCategory.setValue(event.value)
@@ -384,6 +389,57 @@ export class AddObservationComponent {
     closeDialogOnSubmit: false,
 
   };
+
+  logger: {
+    [key: string]: any
+  } = {}
+  frs = inject(FhirResourceService);
+  postToBackend(event: any) {
+    // Validate patient and encounter (encounter optional unless required by your flow)
+    const patientId = this.stateService.PatientResources.currentPatient.value.actualResource?.id;
+    if (!patientId) {
+      this.errorService.openandCloseError('No current patient selected.');
+      return;
+    }
+
+    // Basic validation: require name/code and status
+    const nameOk = !!event?.name;
+
+    const statusOk = !!event?.status;
+    const valueObj = event?.value || {};
+    if (!nameOk || !statusOk) {
+      this.errorService.openandCloseError('Please provide Observation name and status.');
+      return;
+    }
+
+    // Build Observation resource from form payload
+    const observation = this.buildObservationFromForm(event);
+
+    // POST to backend; prefer full representation back
+    this.http.post(`${this.backendEndPoint}/Observation`, observation, {
+      headers: { 'Content-Type': 'application/fhir+json', 'Accept': 'application/fhir+json', 'Prefer': 'return=representation' }
+    }).subscribe({
+      next: (resp: any) => {
+        const saved = resp?.resourceType === 'OperationOutcome' ? observation : (resp || observation);
+        // Persist in state as saved if id present, else unsaved
+        this.stateService.persistLocalResource(saved, saved?.id ? 'saved' : 'unsaved');
+
+        // success snackbar
+        this.sn.openFromComponent(SuccessMessageComponent, {
+          data: 'Observation saved successfully!',
+          duration: 3000,
+        });
+        this.dref?.close(saved);
+      },
+      error: (err) => {
+        console.error('Failed to post observation:', err);
+        // Persist locally as unsaved
+        this.stateService.persistLocalResource(observation, 'unsaved');
+        this.errorService.openandCloseError('Failed to post observation. Stored locally.');
+      }
+    });
+  }
+
   addLab(display: string, unit: string) {
     this.labFormMetaData.formName = `Add Laboratory Result For  ${display}`;
     forkJoin({
@@ -596,6 +652,110 @@ export class AddObservationComponent {
     this.dref?.close();
   }
 
+  // Convert "code$#$display$#$system" or plain string/object to CodeableConcept
+  private toCodeableConcept(input: any): any | null {
+    if (!input) return null;
+    if (typeof input === 'string') {
+      const s = input.trim();
+      if (!s) return null;
+      if (s.includes('$#$')) {
+        const [code = '', display = '', system = ''] = s.split('$#$');
+        return {
+          coding: [{ code: code.trim(), display: display.trim(), system: system.trim() }],
+          text: display || code
+        };
+      }
+      return { text: s };
+    }
+    if (Array.isArray(input)) {
+      const coding = input.flatMap((v: any) => {
+        if (typeof v === 'string' && v.includes('$#$')) {
+          const [code = '', display = '', system = ''] = v.split('$#$');
+          return [{ code: code.trim(), display: display.trim(), system: system.trim() }];
+        }
+        if (v && typeof v === 'object' && (v.code || v.display)) {
+          return [{ code: v.code || '', display: v.display || v.text || '', system: v.system || '' }];
+        }
+        return [];
+      });
+      return coding.length ? { coding, text: coding[0].display || coding[0].code } : null;
+    }
+    if (typeof input === 'object') {
+      if (Array.isArray(input.coding)) return input;
+      if (input.code || input.display) {
+        return { coding: [{ code: input.code || '', display: input.display || input.text || '', system: input.system || '' }], text: input.display || input.code };
+      }
+    }
+    return null;
+  }
+
+  // Build Observation resource from form event payload
+  private buildObservationFromForm(evt: any): any {
+    const nowIso = new Date().toISOString();
+    const status = (evt?.status || 'preliminary').toString().trim().toLowerCase();
+    const categoryCC = this.toCodeableConcept(evt?.category);
+    const codeCC = this.toCodeableConcept(evt?.name);
+
+    const obs: any = {
+      resourceType: 'Observation',
+      status,
+      effectiveDateTime: nowIso
+    };
+
+    if (categoryCC) obs.category = [categoryCC];
+    if (codeCC) obs.code = codeCC;
+
+    // Map value group -> valueQuantity or valueString
+    const v = evt?.value || {};
+    const rType = (v?.result_type || '').toString().trim();
+    const rVal = v?.result_value;
+    const rUnit = v?.result_unit;
+
+    const hasNumber = rVal !== undefined && rVal !== null && rVal !== '' && !isNaN(Number(rVal));
+    if (rType === 'Number' && hasNumber) {
+      obs.valueQuantity = {
+        value: Number(rVal),
+        unit: rUnit || undefined,
+        system: 'http://unitsofmeasure.org',
+        code: rUnit || undefined
+      };
+    } else if (rVal !== undefined && rVal !== null && String(rVal).trim() !== '') {
+      obs.valueString = String(rVal).trim();
+    }
+
+    // Optional valueAttachment from 'attachment' control (first item)
+    const att = evt?.attachment;
+    const first = Array.isArray(att) ? att[0] : att;
+    if (first && (first.data || first.url)) {
+      obs.valueAttachment = {
+        contentType: first.type || first.contentType || 'application/octet-stream',
+        data: first.data, // base64
+        url: first.url,
+        title: first.name || first.title
+      };
+    }
+
+    // Subject, encounter, performer from state/auth
+    const patientRef = this.stateService.getPatientReference();
+    const encounterRef = this.stateService.getCurrentEncounterReference();
+    const performerRef = this.stateService.getPractitionerReference(this.auth.user?.getValue()?.['userId']);
+
+    if (patientRef) obs.subject = patientRef;
+    if (encounterRef) obs.encounter = encounterRef;
+    if (performerRef) obs.performer = [performerRef];
+
+    return obs;
+  }
+
+  // Open a reusable dialog to show object details as key/value
+  openRowDetails(row: any, title: string = 'Details') {
+    this.dialog.open(RowDetailsDialogComponent, {
+      width: '720px',
+      maxHeight: '90vh',
+      data: { title, row }
+    });
+  }
+
 }
 
 @Component({
@@ -621,29 +781,48 @@ export class ExamValueFormComponent {
     this.dRef.close(value);
   }
 
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@Component({
+  selector: 'app-row-details-dialog',
+  standalone: true,
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  template: `
+    <h2 mat-dialog-title>{{ data?.title || 'Details' }}</h2>
+    <div mat-dialog-content>
+      <table class="kv">
+        <tbody>
+          <tr *ngFor="let kv of entries">
+            <th>{{ kv.key }}</th>
+            <td>
+              <ng-container [ngSwitch]="kv.type">
+                <span *ngSwitchCase="'primitive'">{{ kv.value }}</span>
+                <pre *ngSwitchDefault>{{ kv.value | json }}</pre>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Close</button>
+    </div>
+  `,
+  styles: [`
+    .kv { width: 100%; border-collapse: collapse; }
+    .kv th { text-align: left; padding: 6px 8px; color: var(--mat-sys-on-surface-variant); width: 30%; vertical-align: top; }
+    .kv td { padding: 6px 8px; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+  `]
+})
+export class RowDetailsDialogComponent {
+  entries: Array<{ key: string; value: any; type: 'primitive' | 'object' }> = [];
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { title?: string; row: any }) {
+    const obj = data?.row || {};
+    this.entries = Object.keys(obj).map(k => {
+      const v = obj[k];
+      const isPrimitive = v === null || ['string', 'number', 'boolean'].includes(typeof v);
+      return { key: k, value: isPrimitive ? v : v, type: isPrimitive ? 'primitive' : 'object' };
+    });
+  }
 }

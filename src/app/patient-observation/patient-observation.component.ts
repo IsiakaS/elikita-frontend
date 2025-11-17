@@ -33,10 +33,14 @@ import { ReferenceDisplayDirective } from '../shared/reference-display.directive
 import { TruncateWordsDirective } from '../shared/truncate-words.directive';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
 import { AuthService } from '../shared/auth/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { RowDetailsDialogComponent } from './add-observation/add-observation.component';
+
 
 @Component({
   selector: 'app-patient-observation',
   imports: [MatCardModule, MatButtonModule, CodeableConcept2Pipe, NaPipe,
+    TruncateWordsDirective,
     JoinedCodeableConceptPipe, ValueToStringPipe, ChipsDirective,
     CodeableRef2Pipe, TruncateWordsDirective, EmptyStateComponent,
     MatFormField, MatDividerModule, DatePipe, RouterLink, CommonModule,
@@ -75,7 +79,7 @@ export class PatientObservationComponent {
   patientName!: Observable<string>;
   patientId!: string;
   patientOpenAndClose = inject(PatientDetailsKeyService);
-  patientObservationDisplayedColumns = ['dateTaken', 'name', 'status',
+  patientObservationDisplayedColumns = ['dateTaken', 'category', 'name', 'status',
     'result', 'practitioner',
   ]
   // ['basedOn', 'category', 'code', 'subject', 'performer', 'referenceRange', 'value[x]', 'status', 'effective[x]', 'component', 'issued'];
@@ -126,8 +130,14 @@ export class PatientObservationComponent {
     this.categoryFiltering.valueChanges.pipe(startWith('vital signs')).subscribe((value) => {
       console.log(value);
       this.tableDataLevel2.next(this.patientObservationData.filter((obs: any) => {
-        console.log(value, obs.category[0].coding[0].display)
-        return obs.category[0].coding[0].display.trim().toLowerCase() === value?.trim().toLowerCase();
+        // console.log(value, obs.category[0].coding[0].display)
+
+        if (!obs.category?.[0]?.coding) { console.log('No category found for observation', obs); }
+        return value?.trim().toLowerCase() !== 'others' ? (obs.category?.[0]?.coding?.[0]?.code?.trim().toLowerCase() ||
+          obs.category?.[0]?.text?.trim().toLowerCase())
+          === value?.trim().toLowerCase().replace(' ', '-') : !['vital-signs', 'exam'].includes(obs.category?.[0]?.coding?.[0]?.code?.trim().toLowerCase() ||
+            obs.category?.[0]?.text?.trim().toLowerCase())
+
       })
 
 
@@ -142,10 +152,17 @@ export class PatientObservationComponent {
   setCategoryFilter(value: string) {
     this.categoryFiltering.setValue(value);
   }
-
-  showRow(row: any) {
+  dialog = inject(MatDialog);
+  showRow(row: any, title: string = 'Details') {
     console.log(row);
+
+    this.dialog.open(RowDetailsDialogComponent, {
+      width: '720px',
+      maxHeight: '90vh',
+      data: { title, row }
+    });
   }
+
 
   private isBloodPressure(obs: any): boolean {
     const codeable = obs?.code;

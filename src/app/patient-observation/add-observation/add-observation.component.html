@@ -211,7 +211,8 @@ margin-right: 12px !important;
     }
 
     @if(toPassIntoDynamicForms){
-    <app-dynamic-forms-v2 [formFields]="toPassIntoDynamicForms" [formMetaData]="formMetaData">
+    <app-dynamic-forms-v2 [formFields]="toPassIntoDynamicForms" (formSubmitted)="postToBackend($event)"
+        [formMetaData]="formMetaData">
 
     </app-dynamic-forms-v2>
     }
@@ -274,3 +275,5 @@ margin-right: 12px !important;
 </mat-card>
 
 }
+
+<!-- <pre>{{logger | json}}</pre> -->

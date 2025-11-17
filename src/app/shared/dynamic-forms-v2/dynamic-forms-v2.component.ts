@@ -652,7 +652,15 @@ export class DynamicFormsV2Component {
 
     })
   }
-
+  onPhotosUploaded(files: any[], fieldApiName: string) {
+    console.log('Photos uploaded for field', fieldApiName, files);
+    const control = this.aForm.get(fieldApiName) as FormControl;
+    if (control) {
+      const existingValues = control.value ?? [];
+      const newValues = files;
+      control.setValue([...existingValues, ...newValues]);
+    }
+  }
 }
 
 

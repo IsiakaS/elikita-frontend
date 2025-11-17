@@ -231,9 +231,12 @@
                     }@else if (field.generalProperties.inputType && field.generalProperties.inputType ==
                     'photo_upload'){
                     <div class="photo-wrapper" stretch>
-                        <app-upload-ui></app-upload-ui>
+                        <!-- [azureContainerName]="'medicals'" -->
+                        <app-upload-ui
+                            (filesChanged)="onPhotosUploaded($event, field.generalProperties.fieldApiName)"></app-upload-ui>
                     </div>
-                    <input type="text" hidden="true" name="" matInput>
+                    <input type="text" hidden="true" name="" matInput
+                        [formControlName]="field.generalProperties.fieldApiName">
                     }
                     <!-- // number fields -->
                     @else if (field.generalProperties.inputType && field.generalProperties.inputType == 'number') {

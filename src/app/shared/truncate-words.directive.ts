@@ -21,6 +21,7 @@ export class TruncateWordsDirective implements OnChanges {
 
     private originalText: string | null = null;
     private moreEl: HTMLElement | null = null;
+    private deferTimer: any = null;
 
     ngOnChanges(_: SimpleChanges): void {
         // Prepare styles
@@ -35,9 +36,30 @@ export class TruncateWordsDirective implements OnChanges {
         // Use programmatic property 'position' (alias in template is 'matTooltipPosition')
         this.tooltip.position = this.tooltipPosition;
 
-        // Read full text from content if not cached
-        if (!this.originalText) {
-            this.originalText = (host.textContent || '').trim();
+        this.recompute();
+    }
+
+    private recompute() {
+        const host = this.el.nativeElement;
+
+        // Read full text from content if not cached OR was cached empty
+        if (!this.originalText || this.originalText.length === 0) {
+            const current = (host.textContent || '').trim();
+            if (!current) {
+                // Likely called too early; defer to next tick
+                if (!this.deferTimer) {
+                    this.deferTimer = setTimeout(() => {
+                        this.deferTimer = null;
+                        this.recompute();
+                    }, 0);
+                }
+                // Nothing to do yet
+                this.clearMore();
+                this.tooltip.message = '';
+                this.r2.removeAttribute(host, 'title');
+                return;
+            }
+            this.originalText = current;
         }
 
         // If no content or content does not look like text, skip
@@ -52,14 +74,15 @@ export class TruncateWordsDirective implements OnChanges {
         const words = this.originalText.split(/\s+/).filter(Boolean);
         if (words.length <= this.maxWords) {
             // Not truncated; show original and clear tooltip
-            this.setHostText(this.originalText);
             this.clearMore();
+            this.setHostText(this.originalText);
             this.tooltip.message = '';
             this.r2.removeAttribute(host, 'title');
             return;
         }
 
         const truncated = words.slice(0, this.maxWords).join(' ') + '…';
+        this.clearMore();
         this.setHostText(truncated);
 
         // Tooltip shows full text

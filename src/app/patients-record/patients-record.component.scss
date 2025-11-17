@@ -62,7 +62,8 @@
 }
 
 table th,
-table td:not(.status) {
+table td:not(.status),
+table td .top {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 160px;
