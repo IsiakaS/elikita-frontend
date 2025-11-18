@@ -236,6 +236,14 @@ export const capacityObject = {
     delete: ['admin'],
     changeStatus: ['doctor', 'nurse', 'lab'], // e.g., preliminary -> final, cancel, entered-in-error
     enterResult: ['lab'] // lab technologists entering measured values
+  },
+  condition: {
+    add: ['doctor', 'nurse'],
+    viewAll: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    viewSelf: ['patient', 'doctor', 'nurse', 'lab', 'admin', 'receptionist'],
+    update: ['doctor', 'nurse'],
+    delete: ['admin'],
+    export: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy']
   }
 }
 

@@ -128,11 +128,15 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
   ]).pipe(map(([patient, encounters, conditions, observations]) => {
 
     stateService.PatientResources.condition.next(
-      (conditions || []).map((condition: any) => ({
-        referenceId: condition.id ? `Condition/${condition.id}` : null,
-        savedStatus: 'saved',
-        actualResource: condition
-      }))
+      (conditions || []).reverse().map((condition: any) => {
+        // alert(JSON.stringify(condition));
+        return ({
+
+          referenceId: condition.id ? `Condition/${condition.id}` : null,
+          savedStatus: 'saved',
+          actualResource: condition
+        })
+      })
     )
     stateService.PatientResources.observations.next(
       (observations || []).map((observation: any) => ({

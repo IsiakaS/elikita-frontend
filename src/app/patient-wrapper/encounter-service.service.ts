@@ -38,6 +38,7 @@ import { UtilityService } from '../shared/utility.service';
 import { AuthService } from '../shared/auth/auth.service';
 import { backendEndPointToken } from '../app.config';
 import { Resource } from 'fhir/r4';
+import { assert } from 'fhirclient/lib/lib';
 
 @Injectable({
   providedIn: 'root'
@@ -215,7 +216,7 @@ export class EncounterServiceService {
     const patientRef = { reference: `Patient/${patientId}` };
     const encounterRef = { reference: `Encounter/${encounterId}` };
     const list: any[] = [];
-    const arr = symptomsForm?.symptoms || [];
+    const arr = symptomsForm?.symptoms || symptomsForm
     for (const row of arr) {
       if (!row?.code?.code) continue;
       const clinical = String(row?.clinicalStatus || '').trim().toLowerCase();
@@ -674,55 +675,7 @@ export class EncounterServiceService {
         }
       });
 
-      // this.dialog.open(DynamicFormsComponent, {
-      //   maxWidth: '560px',
-      //   maxHeight: '90%',
-      //   autoFocus: false,
-      //   data: {
-      //     formMetaData: <formMetaData>{
-      //       formName: 'Encounter (Visits)',
-      //       formDescription: "Record your encounter with patient",
-      //       submitText: 'Initiate Encounter',
-      //     },
-      //     formFields: <formFields[]>[{
-      //       fieldApiName: 'class',
-      //       fieldName: 'Type of Encounter',
-      //       fieldLabel: 'Type of Encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.class.concept,
-      //       codingSystems: g.class.system
 
-      //     },
-
-      //     {
-      //       fieldApiName: 'priority',
-      //       fieldName: 'Encounter Urgency',
-      //       fieldLabel: 'Urgency of the encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.priority.concept,
-      //       codingSystems: g.priority.system
-
-      //     }, {
-      //       fieldApiName: 'participant',
-      //       fieldName: 'Participant',
-      //       fieldLabel: 'People Providing Service',
-      //       dataType: 'Reference',
-      //       BackboneElement_Array: true,
-      //       Reference: g.participant,
-
-      //     }, {
-      //       fieldApiName: 'reason',
-      //       fieldName: 'Reaon for Encounter',
-      //       fieldLabel: 'Reason for Encounter',
-      //       dataType: 'CodeableConcept',
-      //       codingConcept: g.reason.concept,
-      //       codingSystems: g.reason.system,
-      //       BackboneElement_Array: true,
-
-
-      //     }]
-      //   }
-      // })
     })
     // You can implement the logic to open a dialog or navigate to a form here
   }
@@ -1613,7 +1566,7 @@ export class EncounterServiceService {
     });
 
   }
-  addServiceRequest(patientId: string | null) {
+  addServiceRequest(patientId: string | null, typeOfService: string | null = null) {
     // if (!patientId) {
     //   this.errorService.openandCloseError(`Patient ID is required to add a service request, 
     //     please start from the patient page to choose a patient and then visit the lab requests tab`);
@@ -1639,10 +1592,10 @@ export class EncounterServiceService {
           maxWidth: '650px',
           autoFocus: false,
           data: {
-
+            typeOfService: typeOfService,
             formMetaData: <formMetaData>{
-              formName: 'Service Request (Lab Tests, e.t.c.)',
-              formDescription: "Use this form to order a lab test or any other medical services from your or other department",
+              formName: typeOfService ? `${typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
+              formDescription: "Use this form to order a " + (typeOfService ? typeOfService : "lab test") + " or any other medical services from your department or others",
               submitText: 'Submit Request',
             },
             formFields: <FormFields[]>[
@@ -1795,11 +1748,26 @@ export class EncounterServiceService {
   }
 
   addDiagnosisV2() {
+    //is there an encounter in progress for the patient?
+    if (this.state.isEncounterActive() == false) {
+      this.errorService.openandCloseError("You need to initiate an encounter before adding a diagnosis for this patient");
+      return;
+    }
+
+    const patientId = this.state.currentEncounter.getValue()?.patientId;
+    if (!patientId) {
+      this.errorService.openandCloseError("Patient ID is missing in the current encounter. Please re-initiate the encounter.");
+      return;
+    }
+
+
     forkJoin({
       code: this.formFieldsDataService.getFormFieldSelectData('condition', 'code'),
       //ce.getFormFieldSelectData('medication', 'reason'),
     }).subscribe({
       next: (g: any) => {
+        const authUser = this.authService.user.getValue();
+        const performerRef = authUser?.['userId'] ? `Practitioner/${authUser['userId']}` : undefined;
         const dRef = this.dialog.open(DynamicFormsV2Component, {
           maxHeight: '90vh',
           maxWidth: '650px',
@@ -1810,6 +1778,7 @@ export class EncounterServiceService {
               formName: 'Diagnosis Form',
               formDescription: "Use this form to enter a diagnosis for the patient. You can request A.I. assistance using the side chat",
               submitText: 'Confirm Diagnosis',
+              closeDialogOnSubmit: true,
             },
             formFields: <FormFields[]>[
               // verificationStatus - unconfirmed | provisional | differential | confirmed | refuted | entered-in-error
@@ -1843,6 +1812,8 @@ export class EncounterServiceService {
                   fieldName: "Verification Status",
                   fieldType: 'SingleCodeField',
                   inputType: 'text',
+                  value: 'confirmed',
+                  isHidden: true,
                   isArray: false,
                   isGroup: false,
                 },
@@ -1877,6 +1848,7 @@ export class EncounterServiceService {
                   inputType: 'text',
                   isArray: false,
                   isGroup: false,
+                  allowedOthers: true,
 
                 },
                 data: g.code,
@@ -1901,6 +1873,124 @@ export class EncounterServiceService {
               }
             ]
           }
+        });
+
+        dRef.afterClosed().subscribe((e) => {
+          let result = e.values;
+          // alert(JSON.stringify(result));
+          const requiredValues = ['code'];
+          if (Object.keys(result || {}).length == 0 ||
+            requiredValues.some(rv => !result.hasOwnProperty(rv) || !result[rv] || (Array.isArray(result[rv]) && result[rv].length == 0))
+          ) {
+            this.errorService.openandCloseError("Diagnosis Code & Name is required to add a diagnosis. Diagnosis was not added.");
+            return;
+          }
+          // turn result.code into codeable concept if it's a string
+          const turnToCodeableConcept = (code: any) => {
+            alert(JSON.stringify(result[code]));
+            if (result && result[code] && typeof result[code] === 'string') {
+              // spilt`
+              const codeParts = result[code].split('$#$');
+              if (codeParts.length >= 3) {
+                result[code] = {
+                  coding: [
+                    {
+                      system: codeParts[2],
+                      code: codeParts[0],
+                      display: codeParts[1]
+                    }
+                  ],
+                  text: codeParts[1]
+                };
+              } else {
+                result[code] = {
+
+                  text: result[code]
+                };
+              }
+            } else {
+              //dis, code and system are present
+              if (result && result[code] && result[code].display && result[code].code
+                && result[code].system
+              ) {
+                result[code] = {
+                  coding: [
+                    {
+                      system: result[code].system,
+                      code: result[code].code,
+                      display: result[code].display
+                    }
+                  ],
+                  text: result[code].display
+                };
+              }
+
+            }
+          }
+          // Build Condition resources from symptoms form with clone rule
+          result['verificationStatus'] = result['verificationStatus'] ?? "confirmed";
+          turnToCodeableConcept('verificationStatus');
+          turnToCodeableConcept('severity');
+          turnToCodeableConcept('code');
+          turnToCodeableConcept('clinicalStatus');
+          const conditions = {
+            resourceType: 'Condition',
+            ...result,
+
+            onsetDateTime: result['onsetDateTime'],
+            recordedDate: new Date().toISOString(),
+            subject: {
+              reference: `Patient/${patientId}`
+            },
+            encounter: {
+              reference: `Encounter/${this.state.currentEncounter?.getValue()?.['id']}`
+            },
+            recorder: performerRef ? {
+              reference: performerRef
+            } : undefined,
+            asserter: performerRef ? {
+              reference: performerRef
+            } : undefined,
+          }
+
+
+
+
+          //this.buildConditionResources(result ? [result] : [], patientId, this.state.currentEncounter?.getValue()?.['id'], performerRef);
+
+          //this.dialog.open(AddDiagnosisComponent, {});
+
+
+          // alert(JSON.stringify(conditions));
+
+
+          // POST to backend; prefer full representation back
+          this.http.post(`${this.backendEndPoint}/Condition`, conditions, {
+            headers: { 'Content-Type': 'application/fhir+json', 'Accept': 'application/fhir+json', 'Prefer': 'return=representation' }
+          }).subscribe({
+            next: (resp: any) => {
+              const saved = resp?.resourceType === 'OperationOutcome' ? conditions : (resp || conditions);
+              // Persist in state as saved if id present, else unsaved
+              this.stateService.persistLocalResource(saved, saved?.id ? 'saved' : 'unsaved');
+
+              // success snackbar
+              this.sn.openFromComponent(SuccessMessageComponent, {
+                data: { message: 'Diagnosis saved successfully!' },
+                duration: 3000,
+              });
+              // this.dref?.close(saved);
+            },
+            error: (err) => {
+              console.error('Failed to post diagnosis:', err);
+              // Persist locally as unsaved
+              // this.stateService.persistLocalResource(observation, 'unsaved');
+              this.errorService.openandCloseError('Failed to post diagnosis');
+
+              // Stored locally.');
+            }
+          });
+
+
         });
       },
       error: (err: any) => {

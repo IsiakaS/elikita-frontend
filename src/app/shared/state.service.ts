@@ -307,7 +307,7 @@ export class StateService {
     }
   }
 
-  private isEncounterActive(): boolean {
+  public isEncounterActive(): boolean {
     const enc = this.currentEncounter.value;
     return !!enc && ['in-progress', 'planned'].includes(enc.status);
   }

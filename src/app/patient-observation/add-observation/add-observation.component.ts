@@ -434,8 +434,10 @@ export class AddObservationComponent {
       error: (err) => {
         console.error('Failed to post observation:', err);
         // Persist locally as unsaved
-        this.stateService.persistLocalResource(observation, 'unsaved');
-        this.errorService.openandCloseError('Failed to post observation. Stored locally.');
+        // this.stateService.persistLocalResource(observation, 'unsaved');
+        this.errorService.openandCloseError('Failed to post observation');
+
+        // Stored locally.');
       }
     });
   }

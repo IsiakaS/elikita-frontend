@@ -12,7 +12,21 @@ import { finalize } from 'rxjs/operators';
 })
 export class ReferenceDisplayDirective implements OnChanges {
     @Input('appReferenceDisplay') ref: string | null | undefined;
-    @Input() maxWidth: string = '180px';
+    // @Input() maxWidth: string = '180px';?
+    private _maxWidth: string = '180px';
+    @Input() set maxWidth(v: string | number | null | undefined) { this._maxWidth = this.normalizeMaxWidth(v); }
+    @Input('appReferenceDisplayMaxWidth') set appReferenceDisplayMaxWidth(v: string | number | null | undefined) {
+        alert("maxWidth input called with " + v);
+        this._maxWidth = this.normalizeMaxWidth(v);
+    }
+    get maxWidth(): string { return this._maxWidth; }
+
+    private normalizeMaxWidth(v: string | number | null | undefined): string {
+        if (v == null || v === '') return '180px';
+        if (typeof v === 'number') return `${v}px`;
+        const s = String(v).trim();
+        return /^\d+$/.test(s) ? `${s}px` : s; // allow '30' or '30px'
+    }
     @Input() tooltipPosition: 'above' | 'below' | 'left' | 'right' = 'above';
     @Input() showRawRef: boolean = true;
     // Instant fetch/replace option (primary and compatibility alias as requested)
@@ -26,15 +40,20 @@ export class ReferenceDisplayDirective implements OnChanges {
 
     private loaderEl: HTMLElement | null = null;
     private static spinnerStyleInjected = false;
-
+    ngOnInit() {
+        // alert("init called");
+        // alert("maxWidth is " + this.maxWidth);
+    }
     ngOnChanges(_: SimpleChanges): void {
+        // alert(JSON.stringify(_));
         this.applyEllipsisStyles();
         this.tooltip.position = this.tooltipPosition;
 
         // If host has no text and showRawRef, put the ref as content
         const hostText = (this.el.nativeElement.textContent || '').trim();
         if (this.showRawRef && (!hostText || hostText.length === 0) && this.ref) {
-            this.r2.setProperty(this.el.nativeElement, 'textContent', this.ref);
+            //show text with a visible icon at the beginning
+            this.r2.setProperty(this.el.nativeElement, 'textContent', "👁 " + this.ref);
         }
 
         // Instant fetch & replace (no hover)
@@ -85,6 +104,7 @@ export class ReferenceDisplayDirective implements OnChanges {
         const el = this.el.nativeElement;
         this.r2.setStyle(el, 'display', 'inline-block');
         this.r2.setStyle(el, 'max-width', this.maxWidth);
+
         this.r2.setStyle(el, 'overflow', 'hidden');
         this.r2.setStyle(el, 'text-overflow', 'ellipsis');
         this.r2.setStyle(el, 'white-space', 'nowrap');
@@ -177,6 +197,7 @@ export class ReferenceDisplayDirective implements OnChanges {
 
     @HostListener('mouseenter')
     onMouseEnter() {
+        // alert("mouseenter called");
         // Don't do anything for non-reference strings
         const trimmed = (this.ref || '').trim();
         if (!this.isLikelyReference(trimmed)) return;
@@ -192,6 +213,7 @@ export class ReferenceDisplayDirective implements OnChanges {
         // Show tooltip immediately; refresh after resolve
         this.tooltip.message = 'Resolving...';
         this.tooltip.show();
+        // this.tooltip.hide(3000);
 
         // show tiny loader beneath the host while resolving
         this.showMiniLoader();

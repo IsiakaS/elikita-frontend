@@ -56,7 +56,7 @@ export class FormFieldsSelectDataService {
       'intent': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-intent&_format=json",
       'priority': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-priority&_format=json",
       'code': "/dummy.json",
-      'performerType': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/participant-role&_format=json",
+      'performerType': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/practitioner-role&_format=json",
 
     },
     'medication': {

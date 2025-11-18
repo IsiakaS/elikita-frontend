@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DynamicFormsV2Component } from '../dynamic-forms-v2/dynamic-forms-v2.component';
+import { MatDividerModule } from '@angular/material/divider';
+import { SplitHashPipe } from "../split-hash.pipe";
 
 /**
  * Generic resource data review component.
@@ -14,7 +16,9 @@ import { DynamicFormsV2Component } from '../dynamic-forms-v2/dynamic-forms-v2.co
 @Component({
     selector: 'app-resource-data-review',
     standalone: true,
-    imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatDialogModule],
+    imports: [CommonModule, MatCardModule,
+        MatDividerModule,
+        MatButtonModule, MatIconModule, MatDialogModule, SplitHashPipe],
     templateUrl: './resource-data-review.component.html',
     styleUrls: ['./resource-data-review.component.scss']
 })

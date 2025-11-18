@@ -13,11 +13,14 @@
             </mat-card-header>
             <mat-card-content>
                 <div class="fields-list">
-                    @for (sf of simpleFields; track sf.fieldApiName) {
+                    @for (sf of simpleFields; track sf.fieldApiName; let last = $last) {
                     <div class="field-row">
-                        <span class="field-label">{{ sf.fieldLabel }}</span>
-                        <span class="field-value">{{ sf.data }}</span>
+                        <span class="field-label subtitle-text-color-2">{{ sf.fieldLabel }}</span>
+                        <span class="field-value">{{ sf.data | splitHash:1 | titlecase }}</span>
                     </div>
+                    @if(!$last){
+                    <mat-divider></mat-divider>
+                    }
                     }
                 </div>
             </mat-card-content>

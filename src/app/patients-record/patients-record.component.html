@@ -261,7 +261,7 @@
                                         Date
                                     </th>
                                     <td mat-cell *matCellDef="let element">{{element.period.start |
-                                        date: 'medium'}}</td>
+                                        date: 'shortDate'}}</td>
                                 </ng-container>
 
                                 <!--Status Column-->
@@ -304,7 +304,15 @@
                                         Diagnosis
                                     </th>
                                     <td mat-cell *matCellDef="let element">
-                                        {{ ((element?.diagnosis ?? '').trim() || 'N / A') }}
+                                        @if(element.diagnosis){
+                                        @for(elem of element.diagnosis.split(","); track $index){
+                                        @if(elem.trim()){
+                                        <div class="top mb-4">{{elem.trim()}}</div>
+                                        }
+                                        }
+                                        }@else{
+                                        N / A
+                                        }
                                     </td>
                                 </ng-container>
                                 <ng-container matColumnDef="doctor">
@@ -371,7 +379,7 @@
                             <mat-divider></mat-divider>
 
                             <table mat-table matSort [dataSource]="filteredConditionDataSource"
-                                class="mat-elevation-z8 demo-table">
+                                class="mat-elevation-z8 demo-table" style="width: 100%;">
 
                                 <ng-container matColumnDef="status">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header="status"
@@ -379,7 +387,8 @@
                                         Status
                                     </th>
                                     <td mat-cell *matCellDef="let element" class="status" s>
-                                        <div [appChips]="element.status">
+                                        <div [appChips]="element.verificationStatus | codeableConcept2"
+                                            [fontSize]="'14px'">
 
                                         </div>
 
@@ -402,10 +411,10 @@
                                 <ng-container matColumnDef="recordedDate">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header="recordedDate"
                                         sortActionDescription="Sort by Date Recorded">
-                                        Date Recorded
+                                        Date
                                     </th>
                                     <td mat-cell *matCellDef="let element">{{element.recordedDate?(element.recordedDate
-                                        | date: 'medium'): 'N / A'}}
+                                        | date: 'shortDate'): 'N / A'}}
                                     </td>
                                 </ng-container>
 
@@ -425,8 +434,11 @@
                                         sortActionDescription="Sort by Asserter">
                                         Asserter
                                     </th>
-                                    <td mat-cell *matCellDef="let element">
-                                        {{ element.asserter?(element.asserter | codeableRef2 | titlecase):' N / A'}}
+                                    <td mat-cell *matCellDef="let element" style="">
+                                        <div appReferenceDisplay="{{element.asserter?.reference || ''}}"
+                                            [maxWidth]="'70px'">
+
+                                        </div>
                                     </td>
                                 </ng-container>
                                 <ng-container matColumnDef="severity">
@@ -518,7 +530,7 @@
                     </mat-card>
                 </div>
                 <div class="thirty-five g-just-flex gap-30 flex-column"
-                    style="flex: 1 1 250px; max-width: 100%; align-items: flex-start;">
+                    style="flex: 1 1 230px; max-width: 100%; align-items: flex-start;">
                     <mat-card style="width: 100%; max-width: 100%;">
                         <div class="bottom  g-just-flex gap-12 justify-content-start p-15" style="
                                 flex-direction: column;

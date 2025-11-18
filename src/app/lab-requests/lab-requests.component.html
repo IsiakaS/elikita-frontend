@@ -17,7 +17,7 @@
 
                 @if(user && capacityObject['labRequest']['request'].includes(user.role) && patientId !== null
                 ) {
-                <a mat-flat-button class="" (click)="encounterService.addServiceRequest(patientId)">
+                <a mat-flat-button class="" (click)="encounterService.addServiceRequest(patientId, 'Laboratory')">
                     <mat-icon>add</mat-icon>
                     Add Lab Request
                 </a>

@@ -64,7 +64,7 @@ export class DynamicFormsV2Component {
   backendOptions: { [key: string]: BehaviorSubject<any[]> } = {};
   aForm!: FormGroup;
   minutes: any[] = [];
-  @Output() formSubmitted = new EventEmitter<any>();
+  @Output() formSubmitted = new EventEmitter<any>(); // Emits full form value when closeAndReturn() is called
 
   // Inject dialog dependencies
   data = inject(MAT_DIALOG_DATA, { optional: true });

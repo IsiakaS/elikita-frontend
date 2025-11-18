@@ -17,7 +17,9 @@
 
         @if(isChosenOption && formFields && formMetaData){
         @for(form of medicineForms; track $index; ){
-        <app-dynamic-forms-v2 [formFields]="formFields" [formMetaData]="formMetaData"></app-dynamic-forms-v2>
+        <app-dynamic-forms-v2 [formFields]="formFields" [formMetaData]="formMetaData"
+            (formSubmitted)="processValues($event)">
+        </app-dynamic-forms-v2>
         }
         }
         @if(isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData){
@@ -36,9 +38,23 @@
             </button>
         </div>
 
-
+        <!--form group here-->
+        <form [formGroup]="requestForm" class="mt-30">
+            <div formArrayName="items">
+                @for(group of items.controls; track $index) {
+                <div [formGroupName]="$index" class="one-request mb-30">
+                    <app-resource-data-review [resource]="group.value" [formFields]="formFields"
+                        [submittedData]="group.value" (fieldEdited)="onFieldEdited($index, $event)"
+                        (resourceUpdated)="onResourceUpdated($index, $event)" [showEditButtons]="true">
+                    </app-resource-data-review>
+                </div>
+                }
+            </div>
+        </form>
 
         }@else{ }
+
+
     </div>
 
 </div>

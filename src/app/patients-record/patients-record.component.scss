@@ -76,3 +76,8 @@ table td .top {
 table td:hover {
     // background-color: transparent !important;
 }
+
+tr td {
+    z-index: 9999999;
+    position: relative;
+}

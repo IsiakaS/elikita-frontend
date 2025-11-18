@@ -126,6 +126,7 @@ export class PatientObservationComponent {
         return obsWrapper.actualResource
       });
       this.tableDataLevel2.next(this.patientObservationData);
+      this.categoryFiltering.setValue('vital-signs');
     });
     this.categoryFiltering.valueChanges.pipe(startWith('vital signs')).subscribe((value) => {
       console.log(value);

@@ -18,6 +18,15 @@ import { AgePipe } from '../age.pipe';
 import { TableHeaderComponent } from '../table-header/table-header.component';
 import { HttpClient } from '@angular/common/http';
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
+import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
+import { AuthService } from '../shared/auth/auth.service';
+import { StateService } from '../shared/state.service';
+import { ErrorService } from '../shared/error.service';
+import { CodeableConcept2Pipe } from "../shared/codeable-concept2.pipe";
+import { NaPipe } from "../shared/na.pipe";
+import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
+import { ChipsDirective } from '../chips.directive';
+import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
 
 
 
@@ -41,15 +50,15 @@ import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details
 // },
 @Component({
   selector: 'app-patient-condition',
-  imports: [MatCardModule, MatButtonModule,
-    MatFormField, MatDividerModule, DatePipe, RouterLink,
-    RouterLinkActive,
+  imports: [MatCardModule, MatButtonModule, EmptyStateComponent,
+    MatFormField, MatDividerModule, DatePipe, RouterLink, ChipsDirective,
+    RouterLinkActive, ReferenceDisplayDirective,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
     MatChipsModule,
     MatInputModule,
     MatMenuModule, AgePipe, TableHeaderComponent,
-    MatTableModule, MatIconModule, ReactiveFormsModule],
+    MatTableModule, MatIconModule, ReactiveFormsModule, CodeableConcept2Pipe, NaPipe],
   templateUrl: './patient-condition.component.html',
   styleUrl: './patient-condition.component.scss'
 })
@@ -76,25 +85,27 @@ export class PatientConditionComponent {
   patientObservationFiltersFormControlObject: any = {};
   patientName!: Observable<string>;
   patientId!: string;
-  patientConditionDisplayedColumns = ['recordedDate', 'code', 'verificationStatus', 'clinicalStatus', 'category',
-    'severity', 'onsetDateTime', 'abatementDateTime',
+  patientConditionDisplayedColumns = ['recordedDate', 'code', 'verificationStatus', 'clinicalStatus',
+    'severity',
     'asserter'
   ]
-
+  authService = inject(AuthService);
   http = inject(HttpClient);
   patientOpenAndClose = inject(PatientDetailsKeyService);
+  encounterService = inject(EncounterServiceService);
   constructor(private router: Router) {
   }
+  canAddDiagnosis = this.authService.user.pipe(map(user => {
+    return this.authService.can('condition', 'add');
+  }));
+  canExportDiagnosis = this.authService.user.pipe(map(user => {
+    return this.authService.can('condition', 'viewAll');
+  }));
+
+
   ngOnInit() {
     this.patientId = this.route.parent?.snapshot.params['id'] || '';
     console.log(this.patientId);
-    this.patientName = this.http.get("sample_fhir_patients.json").pipe(map((allArray: any) => {
-      return allArray.find((element: any) => {
-        return element.identifier[0].value === this.route.parent?.snapshot.params['id']
-      })
-    }), map((patient: any) => {
-      return patient.name[0].given.join(' ') + ' ' + patient.name[0].family;
-    }));
 
     this.tableDataSource.connect = () => {
       return this.tableDataLevel2;
@@ -107,15 +118,40 @@ export class PatientConditionComponent {
       }
     }
 
-    this.route.data.subscribe((allData) => {
-      this.patientConditionData = allData['patCond']['observations'];
-      this.references = new Map(allData['patCond']['references']);
-      console.log(this.references);
-      console.log(this.patientConditionData);
-      this.tableDataLevel2.next(this.patientConditionData);
+    // this.route.data.subscribe((allData) => {
+    this.patientConditionData = this.stateService.PatientResources.condition.subscribe({
+      next:
+        (data: any) => {
+          this.tableDataLevel2.next(data.map((condWrapper: any) => {
+            return condWrapper.actualResource
+          }).filter((cond: any) => {
+            return cond.asserter?.reference?.startsWith('Practitioner/') &&
+              cond.verificationStatus?.coding?.[0]?.code !== 'provisional' &&
+              cond.verificationStatus?.text !== 'provisional';
+          }));
+          // alert(JSON.stringify(this.tableDataLevel2.value));
 
-    });
+        }
+
+      ,
+      error: (err) => {
+        console.log(err);
+        this.errorService.openandCloseError("Failed to load patient condition data");
+      }
+
+    }
+    );
+
+    // allData['patCond']['observations'];
+    // this.references = new Map(allData['patCond']['references']);
+    // console.log(this.references);
+    // console.log(this.patientConditionData);
+
+
+    // });
   }
+  stateService = inject(StateService);
+  errorService = inject(ErrorService);
 
   showRow(row: any) {
     console.log(row);

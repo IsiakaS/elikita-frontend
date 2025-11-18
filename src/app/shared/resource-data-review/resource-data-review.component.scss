@@ -9,7 +9,7 @@
 }
 
 .section-card {
-    background: var(--section-bg, #fff);
+    // background: var(--section-bg, #fff);
 }
 
 .fields-list {
@@ -21,6 +21,13 @@
     display: flex;
     justify-content: space-between;
     gap: 16px;
+    padding: 4px 0;
+    // border-bottom: 1px solid var(--mat-sys-outline);
+
+    .field-label {
+        font-weight: 600;
+        // color: var(--mat-sys-on-surface-variant);
+    }
 }
 
 .array-item {

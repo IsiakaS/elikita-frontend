@@ -31,13 +31,14 @@ import { CodeableConcept2Pipe } from '../shared/codeable-concept2.pipe';
 import { CodeableRef2Pipe } from '../shared/codeable-ref2.pipe';
 import { StateService } from '../shared/state.service';
 import { Condition } from 'fhir/r4';
+import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 
 @Component({
   selector: 'app-patients-record',
   imports: [MatCardModule, MatButtonModule, CommonModule,
     MatDividerModule, RouterLink, ChipsDirective, CodeableConcept2Pipe, CodeableRef2Pipe,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe, MatTooltipModule,
-    MatTabsModule,
+    MatTabsModule, ReferenceDisplayDirective,
     MatTableModule,
     MatChipsModule,
     MatInputModule, DatePipe,
@@ -141,7 +142,7 @@ export class PatientsRecordComponent {
       displayedColumns:
         ['recordedDate', 'status', 'code',
           'severity',
-          'asserter'
+          // 'asserter'
         ]
     }
 
@@ -169,7 +170,9 @@ export class PatientsRecordComponent {
               return !['entered-in-error', 'refuted'].includes((f.verificationStatus?.coding?.[0]?.code?.toLowerCase() || "")
                 || (f.verificationStatus?.text?.toLowerCase() || "")
               ) &&
-                f.asserter && f.asserter.reference && !f.asserter.reference.toLowerCase().startsWith('patient/');
+                f.asserter && f.asserter.reference && !f.asserter.reference.toLowerCase().startsWith('patient/') &&
+                f.encounter?.reference?.endsWith(e.e.id!)
+                ;
             }).
             map((condition: any) => condition.code?.text || condition.code?.coding?.[0]?.display || '').join(', ');
         return { ...e.e, presentedSymptoms, presentedSeverity, diagnosis: diagnosisForEncounter };
