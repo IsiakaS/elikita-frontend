@@ -1,20 +1,34 @@
 import { Component, inject } from '@angular/core';
-import { fieldType } from '../shared/dynamic-forms.interface2';
 import { Bundle } from 'fhir/r5';
 import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
+import { AuthService } from '../shared/auth/auth.service';
+import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
+import { fieldType } from '../shared/dynamic-forms.interface2';
 import { TabledOptionComponent } from '../tabled-option/tabled-option.component';
-import { JsonPipe } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { StateService } from '../shared/state.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { AddSpecimenComponent } from '../specimen/add-specimen/add-specimen.component';
 
 @Component({
   selector: 'app-specimens',
-  imports: [TabledOptionComponent, JsonPipe, MatCardModule, MatDividerModule],
+  imports: [TabledOptionComponent, 
+    MatButtonModule,
+    JsonPipe, AsyncPipe, MatCardModule, MatDividerModule, MatIconModule],
   templateUrl: './specimens.component.html',
-  styleUrl: './specimens.component.scss'
+  styleUrls: ['../medicine-requests/medicine-requests.component.scss','./specimens.component.scss']
 })
 export class SpecimensComponent {
   http = inject(HttpClient);
+  private auth = inject(AuthService);
+  private encounterService = inject(EncounterServiceService);
+  canAddSpecimen$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('specimen', 'add')));
+  canExportSpecimen$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('specimen', 'viewAll')));
   testingTabeledOption = {
     headerFilter: new Map<string, string[]>([
 
@@ -64,5 +78,22 @@ export class SpecimensComponent {
 
     })
   }
+stateService = inject(StateService);
+dialog = inject(MatDialog);
+  onAddSpecimen(): void {
+this.dialog.open(AddSpecimenComponent, {
+  maxHeight: '93vh',
+  maxWidth: '650px',
 
+
+})
+
+
+    //  this.encounterService.addSpecimen();
+    
+  }
+
+  onExportSpecimens(): void {
+    console.warn('Export specimens not implemented yet.');
+  }
 }

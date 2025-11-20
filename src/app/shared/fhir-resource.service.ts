@@ -51,12 +51,12 @@ export class FhirResourceService {
                 this.state.processBundleTransaction(resp);
                 return { saved: true, bundle: resp };
             }),
-            catchError(err => {
-                console.error('POST bundle failed:', err);
-                // Fallback: process original bundle locally as unsaved
-                this.state.processBundleTransaction(bundle);
-                return of({ saved: false, bundle });
-            })
+            // catchError(err => {
+            //     console.error('POST bundle failed:', err);
+            //     // Fallback: process original bundle locally as unsaved
+            //     this.state.processBundleTransaction(bundle);
+            //     return of({ saved: false, bundle });
+            // })
         );
     }
 }

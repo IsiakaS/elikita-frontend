@@ -16,7 +16,7 @@ export interface FhirCodeableConcept {
     text?: string;
 }
 
-type PropertyKind =
+export type PropertyKind =
     'CodeableConcept' |
     'Reference' |
     'CodeableConcept[]' |
@@ -26,7 +26,7 @@ type PropertyKind =
     'primitive';
 
 // Minimal mapping (extend as needed)
-const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind>> = {
+export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind>> = {
     Patient: {
         gender: 'string',
         maritalStatus: 'CodeableConcept',
@@ -69,7 +69,9 @@ const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind>> = {
         medicationReference: 'Reference',
         subject: 'Reference',
         reasonCode: 'CodeableConcept[]',
-        performerType: 'CodeableConcept'
+        reasonReference: 'Reference[]',
+        performerType: 'CodeableConcept',
+        requester: 'Reference'
     },
     AllergyIntolerance: {
         clinicalStatus: 'CodeableConcept',
@@ -168,7 +170,18 @@ export class FhirResourceTransformService {
         return result;
     }
 
-    private inferKind(value: any): PropertyKind {
+    transformResource(
+        resource: { resourceType?: string } & Record<string, any>,
+        passthrough: string[] = []
+    ): Record<string, Record<string, any>> {
+        if (!resource?.resourceType) return {};
+        const { resourceType, ...payload } = resource;
+        return {
+            [resourceType]: this.transformValues(resourceType, payload, passthrough)
+        };
+    }
+
+    public inferKind(value: any): PropertyKind {
         if (Array.isArray(value)) return 'string[]';
         if (typeof value === 'string') return 'string';
         return 'primitive';
@@ -186,15 +199,34 @@ export class FhirResourceTransformService {
         }
     }
 
-    private ensureArray(v: any): any[] {
+    public ensureArray(v: any): any[] {
         return Array.isArray(v) ? v : (v == null ? [] : [v]);
     }
 
-    private toCodeableConcept(raw: any): FhirCodeableConcept | any {
+    public toCodeableConcept(raw: any): FhirCodeableConcept | any {
         if (!raw) return raw;
-        if (typeof raw === 'object' && (raw.coding || raw.text)) return raw;
-        if (typeof raw !== 'string') return { text: String(raw) };
-        const parts = raw.split('$#$').map(p => p.trim());
+        if (typeof raw === 'object' && (raw.display || raw.code || raw.text)) {
+            if(!raw.code && !raw.display && raw.text){
+            return {text: raw.text}
+            }
+            if(raw.code || raw.display){
+return {
+    text: raw.text || raw.display || raw.code,
+    coding: [
+        {
+            code: raw.code || raw.display,
+            display: raw.display || raw.code,
+            system: raw.system || 'https://elikita-server.daalitech.com'
+
+
+        }
+    ]
+}
+            
+        }}
+    
+        // if (typeof raw !== 'string') return { text: String(raw) };
+        const parts = raw.split('$#$').map((p:any) => p.trim());
         if (parts.length === 3 && this.allPartsHaveValue(parts)) {
             const [code, display, system] = parts;
             return { coding: [{ code, display, system }], text: display };
@@ -206,7 +238,7 @@ export class FhirResourceTransformService {
         return { text: raw };
     }
 
-    private toReference(raw: any): FhirReference | any {
+    public toReference(raw: any): FhirReference | any {
         if (!raw) return raw;
         if (typeof raw === 'object' && raw.reference) return raw;
         if (typeof raw !== 'string') return raw;

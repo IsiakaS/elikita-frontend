@@ -1,4 +1,9 @@
 tr td {
     z-index: 9999999;
     position: relative;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
 }

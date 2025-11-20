@@ -34,7 +34,7 @@ import { AddObservationComponent } from '../patient-observation/add-observation/
 import { CheckSheetComponent } from '../check-sheet/check-sheet.component';
 import { StateService } from '../shared/state.service';
 import { backendEndPointToken } from '../app.config';
-import { Bundle } from 'fhir/r4';
+import { Bundle, Encounter } from 'fhir/r4';
 import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
@@ -108,6 +108,11 @@ export class PatientWrapperComponent {
           });
           if (['on-hold', 'finished', 'cancelled'].includes(status)) {
             this.stateService.setCurrentEncounter(null)
+          }else{
+            this.stateService.setCurrentEncounter({
+              ...this.stateService.currentEncounter?.getValue(),
+              status: (status as Encounter['status']),
+            });
           }
         },
         error: (err) => {

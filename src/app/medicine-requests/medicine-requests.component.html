@@ -33,6 +33,7 @@
 
     <mat-card-content class="my-12 ">
         <mat-divider></mat-divider>
+        @if((tableDataLevel2 | async)?.length > 0) {
         <app-table-header [patientsTableFilterArray]="  tableFilter"
             [patientsFiltersFormControlObject]=" tableFilterFormControlObject">
 
@@ -380,5 +381,12 @@
             <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: tableColumns" (click)="showRow(row)">
             </tr>
         </table>
+    }@else {
+        <app-empty-state
+        [title]="'No Medication Requests Found'"
+        [subtitle]="'No medication requests have been made for this patient yet.'"
+        [icon]="'PILLS'"
+        ></app-empty-state>
+    }
     </mat-card-content>
 </mat-card>

@@ -54,6 +54,7 @@
 
     <mat-card-content class="my-12">
         <mat-divider></mat-divider>
+        @if((this.tableDataLevel2 | async) && (this.tableDataLevel2 | async)?.length > 0) {
         <app-table-header [patientsTableFilterArray]="  labRequestsTableFilterArray"
             [patientsFiltersFormControlObject]=" labRequestsFiltersFormControlObject">
 
@@ -74,6 +75,7 @@
                     }@else {
                     <span class="subtitle-text-color-2">N/A</span>
                     }
+                    <!-- {{element | json}} -->
                 </td>
 
             </ng-container>
@@ -83,10 +85,12 @@
                     Status
                 </th>
                 <td mat-cell *matCellDef="let element">
+                    <div [appChips]="element.status" [fontSize]="'14px'">
 
-                    {{
-                    element.status
-                    }} </td>
+
+                    </div>
+
+                    </td>
             </ng-container>
 
 
@@ -179,13 +183,18 @@
                         <div class="g-just-flex gap-5 link-group-words" style="
                             
                             justify-content: flex-start; align-items: flex-start; flex-direction: column;">
-                            <div class="top">
-                                {{element.subject | references2}}
+                            <div class="top"
+                            [appReferenceDisplay]="element.subject"
+                            [InstantfetchAndRepace]="true"
+
+                            >
+                                <!-- {{element.subject | references2 | na}} -->
 
 
                             </div>
                             @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
                             !element.subject.display))) {
+                                @if(false){
                             <div class="bottom subtitle-text-color-2">
                                 @if((element.subject | fetchFromReference : 'name': 0 : 'family' )| async){
                                 {{element.subject | fetchFromReference : 'name': 0 : 'family' | async}}
@@ -195,16 +204,18 @@
 
                                     </mat-progress-spinner>
                                 </div>
-                                pop
+                                
                                 }
 
 
                             </div>
+                        }
                             }
                         </div>
                         <div>
                             @if(isLinkObj['subject'].get(i) && ((element.subject.reference &&
                             !element.subject.display))) {
+                                @if(false){
                             <div (click)="alltds(td)" class="link-group-icon">
 
 
@@ -224,6 +235,7 @@
                                     </ng-template>
                                 </mat-expansion-panel>
                             </div>
+                        }
                             }
                         </div>
                     </div>
@@ -250,7 +262,7 @@
                     @let priority = element.priority?.display || element.priority;
                     <span
                         [ngClass]="{'grey': true, 'round': true, 'yellowbg':priority === 'ASAP', 'redbg':priority=== 'emergency'}">
-                        {{priority | titlecase}}
+                        {{priority | titlecase | na}}
                     </span>
                 </td>
             </ng-container>
@@ -261,18 +273,19 @@
                     Test
                 </th>
                 <td mat-cell *matCellDef="let element; let i=index;" #td class="restrict-width">
-                    @if(element.code.concept || element.code.reference ){
+                    @if(element.code?.concept || element.code?.reference ){
 
                     <div class="g-just-flex gap-0 my-12 link-group"
                         style="justify-content: flex-start; align-items: center;">
                         <div class="g-just-flex gap-5 link-group-words"
                             style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
                             <div class="top">
-                                {{element.code | codeableRef2}}
+                                {{element.code | codeableConcept2 | na}}
 
 
                             </div>
                             @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                                @if(false){
                             <div class="bottom subtitle-text-color-2 link-group-icon">
                                 @if((element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display'
                                 )| async){
@@ -290,10 +303,13 @@
 
 
                             </div>
+                        }
                             }
                         </div>
                         <div>
+                            @if(false){
                             @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
+                                
                             <div (click)="alltds(td)">
 
 
@@ -314,16 +330,17 @@
                                 </mat-expansion-panel>
                             </div>
                             }
+                        }
                         </div>
                     </div>
 
-                    }@else if(element.code.coding && element.code.coding.length > 0) {
+                    }@else if(element.code?.coding && element.code?.coding?.length > 0) {
                     <div class="g-just-flex gap-0 my-12 link-group"
                         style="justify-content: flex-start; align-items: center;">
                         <div class="g-just-flex gap-5 link-group-words"
                             style="justify-content: flex-start; align-items: flex-start; flex-direction: column;">
                             <div class="top">
-                                {{element.code | codeableConcept2}}
+                                {{element.code | codeableConcept2 | na}}
 
 
                             </div>
@@ -371,6 +388,9 @@
                             } -->
                         </div>
                     </div>
+                    }@else if(element.code?.text){
+                    {{element.code.text}}
+
                     }@else {
                     <span class="subtitle-text-color-2">N/A</span>}
 
@@ -429,6 +449,15 @@
             <tr mat-header-row *matHeaderRowDef="labRequestsDisplayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns:labRequestsDisplayedColumns; let dataIndex = dataIndex;"></tr>
         </table>
+    }@else {
+        <app-empty-state
+        [icon]="'MEDICAL_SERVICES'"
+        [title]="'Lab Requests Not Available'"
+        [subtitle]="'No lab requests have been made for this patient yet.'"
+        >
+
+        </app-empty-state>
+    }
     </mat-card-content>
 </mat-card>
 

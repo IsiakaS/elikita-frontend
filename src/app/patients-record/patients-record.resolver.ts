@@ -9,9 +9,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
   const http = inject(HttpClient);
   const patientId = route.parent?.params['id'] || route.params['id'];
+
   const stateService = inject(StateService);
   const snackBar = inject(MatSnackBar);
   stateService.setCurrentEncounter(null);
+  stateService.currentPatientIdFromResolver.next(patientId);
 
   console.log('Resolving patient data for ID:', patientId);
 
@@ -121,11 +123,16 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
         return allergies.entry?.map((a: BundleEntry<any>) => a.resource) || [];
       })),
 
-    //
+    //fetch patient labRequests - service Requests filtered to laboratory type
+    http.get<Bundle<any>>(`${baseUrl}/ServiceRequest?patient=${patientId}&_count=199`).pipe(
+      map((labRequests: Bundle<any>) => {
+        console.log('Successfully fetched lab requests from FHIR server:', labRequests);
+        return labRequests.entry?.map((lr: BundleEntry<any>) => lr.resource) || [];
+      }))
 
 
 
-  ]).pipe(map(([patient, encounters, conditions, observations]) => {
+  ]).pipe(map(([patient, encounters, conditions, observations, MedicationRequest, AllergyIntolerance, serviceRequests]) => {
 
     stateService.PatientResources.condition.next(
       (conditions || []).reverse().map((condition: any) => {
@@ -159,6 +166,22 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
       savedStatus: 'saved',
       actualResource: patient
     });
+
+    stateService.PatientResources.serviceRequests.next(
+      (serviceRequests || []).map((serviceRequest: any) => ({
+        referenceId: serviceRequest.id ? `ServiceRequest/${serviceRequest.id}` : null,
+        savedStatus: 'saved',
+        actualResource: serviceRequest
+      }))
+    );
+//medicationRequest
+    stateService.PatientResources.medicationRequests.next(
+      (MedicationRequest || []).reverse().map((medRequest: any) => ({
+        referenceId: medRequest.id ? `MedicationRequest/${medRequest.id}` : null,
+        savedStatus: 'saved',
+        actualResource: medRequest
+      }))
+    );
 
     // Preserve direct access to patient name/gender/etc while adding arrays
     return {

@@ -108,19 +108,37 @@
                     <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
                         [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
                         [matAutocomplete]="auto">
-                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayConceptFieldDisplay">
+                    <mat-autocomplete #auto="matAutocomplete"
+                    [class]="'more-raised'"
+                    [displayWith]="displayConceptFieldDisplay"
+
+                    >
                         <!-- @for(option of field.Reference; track $index){ -->
                         @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
                         $index){
-                        <mat-option [value]="option">
+                        <mat-option [value]="option"  
+                                   >
 
                             <div class="ticket-like">
                                 <div class="text">
                                     {{(option.display || (option | splitHash:1))| titlecase}}
                                 </div>
-                                <div class="code">
+                                <div class="code" #cdRef>
                                     {{(option.reference || (option | splitHash: 0))}}
+                                   
+                             
+
+             
                                 </div>
+                                 <span
+                                   #sp="matMenuTrigger"
+                                   [matMenuTriggerFor]="mm"
+                                   (mouseover)="triggerForMatMenu(sp, option.reference)"
+                                  (mouseleave)="closeMenu(sp)"
+                                   >
+                                    <mat-icon>info</mat-icon>
+                                 </span>
+
                             </div>
 
                         </mat-option>
@@ -836,7 +854,7 @@
                                 | async;
                                 track
                                 $index){
-                                <mat-option [value]="option.display || option" class="mb-8">
+                                <mat-option [value]="option" class="mb-8">
                                     <div class="ticket-like">
                                         <div class="text">
                                             {{(option.display || (option | splitHash:1))| titlecase}}
@@ -933,5 +951,16 @@
     </mat-card>
 </div>
 }
+           <mat-menu
+             #mm="matMenu"
+             class="info-menu-panel"
+             (mouseenter)="cancelPendingMenuClose()"
+             (mouseleave)="closeMenu(lastHoveredTrigger)">
+                                           <app-detail-base [url]="toUseUrl" [exclude]="['meta', 'id', 'resourceType','requisition']"
+                                           
+                                           
+                                           ></app-detail-base>
+                                           
+                                        </mat-menu>
 
 <!-- {{aForm.value|json}} -->

@@ -1255,3 +1255,15 @@ html[color-scheme='light'] {
     }
   }
 }
+.info-menu-panel{
+    position: fixed !important;
+    z-index: 100 !important;
+    top: 0px !important;
+    left: 0px !important;
+    max-width: 300px !important;
+}
+.more-raised{
+  z-index: 9999999999999 !important;
+  // position: fixed !important;
+  background-color: #B71C1C;
+}

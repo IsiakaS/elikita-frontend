@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Optional, Inject } from '@angular/core';
+import { Component, inject, Optional, Inject, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, FormBuilder, FormArray, FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -91,10 +91,32 @@ export class AddLabRequestsComponent {
   ]
 
   ngOnInit() {
+      this.formMetaData = <formMetaData>{
+          // formName: 'Service Request (Lab Tests, e.t.c.)',
+          // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
+          // submitText: 'Submit Request',
+
+          formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
+          formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
+          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+            ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
+
+        };
     this.isMultiple.valueChanges.subscribe((e: boolean | null) => {
       if (e !== null) {
         this.isChosenOption = true;
       }
+        this.formMetaData = <formMetaData>{
+          // formName: 'Service Request (Lab Tests, e.t.c.)',
+          // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
+          // submitText: 'Submit Request',
+
+          formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
+          formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
+          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+            ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
+
+        }
     })
 
 
@@ -113,17 +135,7 @@ export class AddLabRequestsComponent {
 
 
 
-        this.formMetaData = <formMetaData>{
-          // formName: 'Service Request (Lab Tests, e.t.c.)',
-          // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
-          // submitText: 'Submit Request',
-
-          formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
-          formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
-          submitText: ` ${this.isMultiple.value && this.isMultipleVa
-            ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
-
-        }
+      
 
         this.formFields = [
           {
@@ -225,7 +237,7 @@ export class AddLabRequestsComponent {
 
             generalProperties: {
 
-              fieldApiName: 'orderDetailParameterValueString',
+              fieldApiName: 'note',
               fieldName: 'Additional Details',
               fieldLabel: 'Additional Details',
               fieldType: 'IndividualField',
@@ -240,11 +252,12 @@ export class AddLabRequestsComponent {
             },
             data: g.priority
           },
+          //category
 
 
 
         ]
-        this.medicineForms.push({ formMetaData: this.formMetaData, formFields: [...this.formFields] });
+        // this.medicineForms.push({ formMetaData: this.formMetaData, formFields: [...this.formFields] });
 
         // Build the initial item in the FormArray once fields are available
         // this.items.push(this.buildItemGroup());
@@ -266,13 +279,35 @@ export class AddLabRequestsComponent {
     }
   }
 
+@ViewChild('cref') dynamicFormComponent!: DynamicFormsV2Component;
   processValues(values: any) {
     if (!values) return;
-    if (!this.isMultiple.value) {
+
+    if(!values.code || values.code == '' ||
+      values.intent == '' || !values.intent ||
+      values.status == '' || !values.status
+
+    ){
+      this.errorService.openandCloseError('Status, Intent and Service Requested fields are required.');
+    
+      return;
+    }
+
+
+    if (!this.isMultiple.value || this.isMultiple.value == 'Single') {
       if (this.dialogRef) {
         this.dialogRef.close({ values: values });
       }
     }
+    //vallidationbefore `pushing
+    
     this.items.push(this.buildItemGroup(values));
+  }
+
+  submitAllRequests() {
+    const allValues = this.items.value;
+    if (this.dialogRef) {
+      this.dialogRef.close({ values: allValues });
+    }
   }
 }

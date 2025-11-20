@@ -204,20 +204,40 @@ export const capacityObject = {
 
   },
   specimen: {
-    'add': ['lab'],
-    'edit': ['lab'],
-    'viewAll': ['lab', 'doctor'],
-    'viewSelf': ['patient', 'lab', 'doctor'],
+    add: ['lab'],
+    edit: ['lab'],
+    viewAll: ['lab', 'doctor'],
+    viewSelf: ['patient', 'lab', 'doctor']
   },
   labRequest: {
-    request: ['doctor'],
-    enter_result: ['lab',],
-    diagnosticReport: ['lab', 'doctor'],
-    view_specimen: ['lab', 'doctor', 'patient'],
-    revoke: ['doctor'],
-    viewAll: ['doctor', 'lab'],
-    viewSelf: ['patient'],
-    order: ['lab', 'doctor', 'cashier'],
+    request: ['doctor', 'nurse'], // doctors and nurses can order lab tests
+    approve: ['doctor'], // doctors approve requests if needed
+    revoke: ['doctor'], // doctors can cancel/revoke lab requests
+    cancel: ['doctor', 'lab'], // lab can cancel if specimen issues, doctor for clinical reasons
+    viewAll: ['admin', 'doctor', 'nurse', 'lab'], // clinical staff view all requests
+    viewSelf: ['patient'], // patients view their own lab requests
+    update: ['doctor', 'lab'], // update request details or status
+    enterResult: ['lab'], // lab technicians enter test results
+    reviewResult: ['lab', 'doctor'], // lab staff and doctors review results
+    releaseResult: ['lab', 'doctor'], // authorize result release to patient
+    collectSpecimen: ['nurse', 'lab'], // nurses and lab can mark specimen collection
+    receiveSpecimen: ['lab'], // lab receives and processes specimens
+    viewSpecimen: ['lab', 'doctor', 'nurse'], // clinical staff view specimen details
+    billable: ['cashier', 'admin'], // cashier processes payment/billing
+  },
+  serviceRequest: {
+    request: ['doctor', 'nurse'], // order services: imaging, procedures, consults, therapy
+    approve: ['doctor', 'consultant'], // senior staff approve high-cost or complex services
+    revoke: ['doctor'], // ordering provider can cancel
+    cancel: ['doctor', 'admin'], // cancel service orders
+    viewAll: ['admin', 'doctor', 'nurse', 'receptionist'], // administrative and clinical staff
+    viewSelf: ['patient'], // patients see their own service orders
+    update: ['doctor', 'nurse', 'admin'], // modify service request details
+    fulfill: ['doctor', 'nurse', 'lab', 'consultant'], // various specialists fulfill services
+    schedule: ['receptionist', 'nurse', 'admin'], // schedule service appointments
+    complete: ['doctor', 'nurse', 'lab', 'consultant'], // mark service as completed
+    billable: ['cashier', 'admin'], // billing and payment processing
+    assign: ['admin', 'receptionist'], // assign service to specific provider/department
   },
   diagnosticReport: {
     request: ['doctor'],

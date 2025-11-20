@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Encounter, Observation, Resource } from 'fhir/r4';
+import { Encounter, Observation, Resource, ServiceRequest } from 'fhir/r4';
 import { Condition, Medication, MedicationRequest, Patient } from 'fhir/r4';
 import { BehaviorSubject, mergeMapTo, Observable } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
@@ -33,7 +33,7 @@ export class StateService {
       savedStatus: 'saved' | 'unsaved',
       actualResource: Condition
     }>>([]),
-    medications: new BehaviorSubject<Array<{
+    medicationRequests: new BehaviorSubject<Array<{
       referenceId: string | null,
       savedStatus: 'saved' | 'unsaved',
       actualResource: MedicationRequest
@@ -76,6 +76,11 @@ export class StateService {
       savedStatus: 'unsaved',
       actualResource: {} as Patient
     }),
+    serviceRequests: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Resource
+    }>>([]),
 
   }
 
@@ -251,6 +256,23 @@ export class StateService {
         });
         break;
       }
+      // case 'ServiceRequest': {
+      //   this.upsertToSubject(this.PatientResources.serviceRequests, {
+      //     referenceId,
+      //     savedStatus,
+      //     actualResource: resource as ServiceRequest
+      //   });
+      //   break;
+        
+      // }
+      case 'ServiceRequest': {
+        this.upsertToSubject(this.PatientResources.serviceRequests, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as ServiceRequest
+        });
+        break;
+      }
       default:
         // Unsupported resource types can be handled here if needed.
         break;
@@ -292,7 +314,7 @@ export class StateService {
         break;
       }
       case 'MedicationRequest': {
-        this.upsertToSubject(this.currentEncounterResources.medications, {
+        this.upsertToSubject(this.currentEncounterResources.medicationRequests, {
           referenceId,
           savedStatus,
           actualResource: resource as MedicationRequest
@@ -306,7 +328,7 @@ export class StateService {
         break;
     }
   }
-
+currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
   public isEncounterActive(): boolean {
     const enc = this.currentEncounter.value;
     return !!enc && ['in-progress', 'planned'].includes(enc.status);

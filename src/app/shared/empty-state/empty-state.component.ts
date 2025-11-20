@@ -66,6 +66,7 @@ export class EmptyStateComponent {
     WARNING: 'warning',
     ERROR: 'error',
     PEOPLE: 'people',
+    PILLS: 'local_pharmacy',
     // Data related
     NO_DATA: 'database',
     EMPTY: 'folder_open',

@@ -466,5 +466,155 @@ export class UtilityService {
       }))
       .filter(a => a.data || a.url);
   }
+
+  /**
+   * Generate a requisition identifier for FHIR resources.
+   * Requisitions are used to track orders/requests in healthcare settings (lab tests, imaging, procedures).
+   * 
+   * @param opts Configuration options
+   * @param opts.prefix Prefix for the requisition number (default: 'REQ')
+   * @param opts.resourceType Type of resource: 'lab', 'service', 'imaging', 'specimen' (default: 'lab')
+   * @param opts.facilityCode Short facility/department code (default: 'FAC')
+   * @param opts.system System URL for the identifier (default: hospital system URL)
+   * @param opts.includeTimestamp Whether to include timestamp in the requisition (default: true)
+   * @returns FHIR Identifier object with requisition number
+   * 
+   * @example
+   * // Generates: { system: '...', value: 'REQ-LAB-FAC-20251118-001234' }
+   * generateRequisition({ resourceType: 'lab', facilityCode: 'LAB' })
+   * 
+   * @example
+   * // Generates: { system: '...', value: 'SRV-IMG-RAD-20251118-001234' }
+   * generateRequisition({ prefix: 'SRV', resourceType: 'imaging', facilityCode: 'RAD' })
+   */
+  generateRequisition(opts?: {
+    prefix?: string;
+    resourceType?: 'lab' | 'service' | 'medReq' | 'imaging' | 'specimen' | 'procedure' | 'consultation';
+    facilityCode?: string;
+    system?: string;
+    includeTimestamp?: boolean;
+  }): { system: string; value: string; type?: any } {
+    const prefix = opts?.prefix || 'REQ';
+    const facilityCode = opts?.facilityCode || 'FAC';
+    const includeTimestamp = opts?.includeTimestamp !== false;
+    const system = opts?.system || 'http://hospital.example.org/requisition';
+
+    // Resource type codes for clarity
+    const typeCodeMap = {
+      lab: 'LAB',
+      medReq: 'MEDREQ',
+      service: 'SRV',
+      imaging: 'IMG',
+      specimen: 'SPM',
+      procedure: 'PRO',
+      consultation: 'CON'
+    };
+    const typeCode = opts?.resourceType ? typeCodeMap[opts.resourceType] : 'GEN';
+
+    // Generate timestamp component (YYYYMMDD format)
+    const now = new Date();
+    const dateStr = includeTimestamp
+      ? now.toISOString().slice(0, 10).replace(/-/g, '') // YYYYMMDD
+      : '';
+
+    // Generate unique sequence number (6 digits)
+    // In production, this should come from a database sequence or atomic counter
+    const sequence = this.generateSequenceNumber(6);
+
+    // Build requisition number: PREFIX-TYPE-FACILITY-DATE-SEQUENCE
+    const parts = [prefix, typeCode, facilityCode];
+    if (dateStr) parts.push(dateStr);
+    parts.push(sequence);
+
+    const requisitionValue = parts.join('-');
+
+    return {
+      system,
+      value: requisitionValue,
+      type: {
+        coding: [{
+          system: 'http://terminology.hl7.org/CodeSystem/v2-0203',
+          code: 'PLAC',
+          display: 'Placer Identifier'
+        }],
+        text: 'Requisition Number'
+      }
+    };
+  }
+
+  /**
+   * Generate a pseudo-random sequence number for requisitions.
+   * In production, replace this with a database sequence or distributed ID generator.
+   * 
+   * @param length Number of digits in the sequence (default: 6)
+   * @returns Zero-padded sequence number as string
+   */
+  private generateSequenceNumber(length: number = 6): string {
+    // Use timestamp + random for uniqueness
+    // In production: fetch from backend sequence generator
+    const timestamp = Date.now() % (10 ** length);
+    const random = Math.floor(Math.random() * 1000);
+    const combined = (timestamp + random) % (10 ** length);
+    return String(combined).padStart(length, '0');
+  }
+
+  /**
+   * Generate requisition identifier and add it to a FHIR resource.
+   * 
+   * @param resource The FHIR resource to add requisition to
+   * @param opts Requisition generation options
+   * @returns The resource with requisition identifier added
+   * 
+   * @example
+   * const serviceRequest = { resourceType: 'ServiceRequest', ... };
+   * addRequisitionToResource(serviceRequest, { resourceType: 'imaging', facilityCode: 'RAD' });
+   */
+  addRequisitionToResource(
+    resource: any,
+    opts?: Parameters<typeof this.generateRequisition>[0]
+  ): any {
+    if (!resource) return resource;
+
+    const requisition = this.generateRequisition(opts);
+
+    // Add to identifier array if it exists, otherwise create it
+    if (!resource.identifier) {
+      resource.identifier = [];
+    }
+    if (!Array.isArray(resource.identifier)) {
+      resource.identifier = [resource.identifier];
+    }
+
+    // Check if requisition already exists (avoid duplicates)
+    const hasRequisition = resource.identifier.some(
+      (id: any) => id.type?.coding?.some((c: any) => c.code === 'PLAC')
+    );
+
+    if (!hasRequisition) {
+      resource.identifier.push(requisition);
+    }
+
+    return resource;
+  }
+
+  /**
+   * Extract requisition number from a FHIR resource's identifiers.
+   * 
+   * @param resource FHIR resource with identifiers
+   * @returns Requisition value or null if not found
+   */
+  getRequisitionFromResource(resource: any): string | null {
+    if (!resource?.identifier) return null;
+
+    const identifiers = Array.isArray(resource.identifier)
+      ? resource.identifier
+      : [resource.identifier];
+
+    const requisition = identifiers.find(
+      (id: any) => id.type?.coding?.some((c: any) => c.code === 'PLAC')
+    );
+
+    return requisition?.value || null;
+  }
 }
 

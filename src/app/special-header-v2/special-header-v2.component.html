@@ -1,0 +1,41 @@
+@if(resourceObject && specialHeader){
+<div class="special-header g-just-flex gap-15" style="align-items: flex-start; ">
+    <!-- <mat-icon>
+        {{specialHeader.specialHeaderIcon??'medication'}}
+
+    </mat-icon> -->
+
+    <div class="words g-just-flex flex-column" style="align-items: flex-start; font-size: 1.1rem;">
+        <strong>
+            <em>
+        {{refinedResourceData?.[specialHeader.strongSectionKey] | titlecase | na}}
+
+
+            </em>
+
+        </strong>
+
+        <div class="g-just-flex gap-8 flex-wrap" style="flex-wrap: wrap;">
+            @for(baseKey of specialHeader.iconSectionKeys; track $index;){
+            @if(refinedResourceData?.[baseKey]){
+                <div [appChips]="refinedResourceData?.[baseKey]" fontSize="14px">
+
+                </div>
+
+            <!-- <div #sc style="align-items: center;"
+                [attr.class]="'small-chips'+' '+'status-'+statusStyles[resourceObject[baseKey.key]]?.['color']+' g-just-flex gap-8'">
+
+                <span> {{resourceObject[baseKey.key]}}
+
+                </span>
+                <mat-icon>
+                    {{statusStyles[resourceObject[baseKey.key]]?.['icon'] || 'medicine'}}
+                </mat-icon>
+
+            </div> -->
+            }}
+
+    </div>
+</div>
+</div>
+}

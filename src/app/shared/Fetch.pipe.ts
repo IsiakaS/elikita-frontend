@@ -26,7 +26,7 @@ export class fetchFromReferencePipe implements PipeTransform {
     if (ref.reference && (!args || args.length == 0)) {
       return of("")
     } else if (ref.reference && args && args.length > 0) {
-      return this.http.get(ref.reference + "?_format=json", {
+      return this.http.get("https://elikita-server.daalitech.com/"+ref.reference + "?_format=json", {
         context: new HttpContext().set(LoadingUIEnabled, false)   //Token(() => { return false })
       }).pipe(//timeout(5000), 
         //delay(120000),

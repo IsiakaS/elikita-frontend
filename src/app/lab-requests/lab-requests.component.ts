@@ -34,17 +34,24 @@ import { SpecimenDetailsComponent } from '../specimen/specimen-details/specimen-
 import { LabrequestDetailsComponent } from '../labrequest-details/labrequest-details.component';
 import { LabreportComponent } from '../labreport/labreport.component';
 import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
+import { StateService } from '../shared/state.service';
+import { ErrorService } from '../shared/error.service';
+import { Resource } from 'fhir/r4';
+import { ChipsDirective } from "../chips.directive";
+import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
+import { NaPipe } from "../shared/na.pipe";
+import { EmptyStateComponent } from "../shared/empty-state/empty-state.component";
 @Component({
   selector: 'app-lab-requests',
   imports: [MatCardModule, MatButtonModule, MatProgressSpinnerModule, DetailBaseComponent,
     MatFormField, MatDividerModule, DatePipe, RouterLink,
-    RouterLinkActive, CommonModule,
+    RouterLinkActive, CommonModule, ReferenceDisplayDirective,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
     MatChipsModule, MatMenuModule,
     MatInputModule,
     MatMenuModule, AgePipe, TableHeaderComponent,
-    MatTableModule, MatIconModule, ReactiveFormsModule, References2Pipe, fetchFromReferencePipe, CodeableRef2Pipe, CodeableConcept2Pipe],
+    MatTableModule, MatIconModule, ReactiveFormsModule, References2Pipe, fetchFromReferencePipe, CodeableRef2Pipe, CodeableConcept2Pipe, ChipsDirective, NaPipe, EmptyStateComponent],
   templateUrl: './lab-requests.component.html',
   styleUrls: ['../medicine-requests/medicine-requests.component.scss', './lab-requests.component.scss']
 })
@@ -89,6 +96,7 @@ export class LabRequestsComponent {
   ])
 
 
+
   labRequestsTableFilterArray = this.labRequestsTableFilter;
   labRequestsFiltersFormControlObject: any = {};
   // patientName!: Observable<string>;
@@ -114,7 +122,21 @@ export class LabRequestsComponent {
   user: any = null;
   patientId: string | null = null;
   patientname: string | null = null;
+  canAddRequests$ = this.auth.user.pipe(
+    map(user => {
+      return this.auth.can('labRequest', 'add');
+    })
+  );
+  canExportRequests$ = this.auth.user.pipe(
+    map(user => {
+      return this.auth.can('labRequest', 'viewAll');
+    })
+  );
+  stateService = inject(StateService);
+  errorService = inject(ErrorService);
+  state = inject(StateService);
   ngOnInit() {
+
     this.auth.user.subscribe((user) => {
       this.user = user;
 
@@ -129,9 +151,17 @@ export class LabRequestsComponent {
     })
 
 
-    this.patientId = this.utilityService.getPatientIdFromRoute();
+    // this.patientId = this.utilityService.getPatientIdFromRoute();
 
-
+    if((this.stateService.isEncounterActive() && !this.stateService.currentEncounter?.getValue()?.patientId) ||
+    !this.stateService.currentPatientIdFromResolver.getValue()
+  ){
+this.errorService.openandCloseError("No patient selected. Please select a patient to view lab requests.");
+this.router.navigate(['/app/patients']);
+return;
+    }else{
+      this.patientId = this.stateService.currentEncounter?.getValue()?.patientId!
+    }
 
 
     this.tableDataSource.connect = () => {
@@ -145,7 +175,7 @@ export class LabRequestsComponent {
       }
     }
 
-    this.route.data.pipe(
+    // this.route.data.pipe(
       // tap((data) => {
       //   console.log(data)
 
@@ -172,28 +202,37 @@ export class LabRequestsComponent {
       //   return toReturnData;
       // })
 
-
-    ).subscribe((allData) => {
+this.stateService.PatientResources.serviceRequests.
+    subscribe((allData
+    ) => {
+      allData = allData.
+        filter((r:any) => { 
+          console.log(r);
+          return r.actualResource.category &&
+           r.actualResource.category.some((c: any) => { return c.text?.trim()?.toLowerCase() === 'laboratory' ||
+     c.coding?.some((cc: any) => cc.code?.trim()?.toUpperCase().includes('LAB') || cc.display?.trim()?.toLowerCase().includes('laboratory'))})}
+      ).reverse();
       console.log(allData)
 
-      this.labRequests = allData['labRequests'] //.slice(0, 5);
 
-        //  this.references = new Map(allData['patMed']['references']);
-        //  console.log(this.references);
-        .entry?.map((e: BundleEntry, index: any) => {
-          for (const [key, value] of Object.entries(e.resource as ServiceRequest)) {
-            console.log(value.reference);
-            if (this.isLinkObj.hasOwnProperty(key)) {
-              this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
-            } else {
-              this.isLinkObj[key] = new Map();
-              this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
-            }
-            console.log(this.isLinkObj[key]);
+       this.labRequests = allData.map((e: any) => e.actualResource) //.slice(0, 5);
 
-          }
-          return e.resource as ServiceRequest
-        });
+      //   //  this.references = new Map(allData['patMed']['references']);
+      //   //  console.log(this.references);
+      //   .entry?.map((e: BundleEntry, index: any) => {
+      //     for (const [key, value] of Object.entries(e.resource as ServiceRequest)) {
+      //       console.log(value.reference);
+      //       if (this.isLinkObj.hasOwnProperty(key)) {
+      //         this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
+      //       } else {
+      //         this.isLinkObj[key] = new Map();
+      //         this.isLinkObj[key].set(index, this.islink.returnLinkFromReferences(value));
+      //       }
+      //       console.log(this.isLinkObj[key]);
+
+      //     }
+      //     return e.resource as ServiceRequest
+      //   });
       const sortedAccRequisition: { [key: string]: ServiceRequest[] } = {}
       this.labRequests?.forEach((e: ServiceRequest) => {
         if (e.hasOwnProperty('requisition') && e.requisition?.hasOwnProperty('value')) {
@@ -210,11 +249,13 @@ export class LabRequestsComponent {
       console.log(sortedAccRequisition);
       this.sortedWithRequisitionKeys = Object.keys(sortedAccRequisition);
       console.log(this.sortedWithRequisitionKeys);
-      Object.values(sortedAccRequisition).forEach((e: ServiceRequest[]) => {
-        this.labRequestsData = [...this.labRequestsData || [], ...e];
+      this.labRequestsData = [];
+      Object.values(sortedAccRequisition)
+      .forEach((e: ServiceRequest[]) => {
+        this.labRequestsData!.push(...e);
       });
       // alert("Lab Requests Data Loaded Successfully" + this.labRequestsData?.length);
-      this.tableDataLevel2.next(this.labRequestsData);
+      this.tableDataLevel2.next(this.labRequestsData || []);
 
     });
   }

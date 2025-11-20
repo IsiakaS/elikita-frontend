@@ -1,14 +1,30 @@
-<mat-card class="p-20" style="width: max-content">
+<mat-card class="p-20" 
+     style="width: max-content; max-width: 100%; box-sizing: border-box;">
 
     <mat-card-header>
-        <mat-card-title>Specimens</mat-card-title>
-        <mat-card-subtitle>View Available specimens here, you can add specimens for a lab test in the test request
-            page</mat-card-subtitle>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
+            <div class="left">
+                <mat-card-title>Specimens</mat-card-title>
+                <mat-card-subtitle>
+                    View Available specimens here, you can add specimens for a lab test in the test request page
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                @if (canExportSpecimen$ | async) {
+                <a mat-flat-button extended class="secondary-button small-button" (click)="onExportSpecimens()">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>}
+                @if (canAddSpecimen$ | async) {
+                <a mat-flat-button extended (click)="onAddSpecimen()">
+                    <mat-icon>add</mat-icon> Add Specimen
+                </a>}
+            </div>
+        </div>
     </mat-card-header>
     <div class="mt-20"></div>
     <mat-divider></mat-divider>
     <div class="mb-10"></div>
-    @if(testingTabeledOption.rawTableData !== null){
+    @if(testingTabeledOption.rawTableData !== null && false){
 
     <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData" [columns]="testingTabeledOption.columns"
         [rawTableData]="testingTabeledOption.rawTableData" [tableHeaderMetaData]="testingTabeledOption.headerFilter">

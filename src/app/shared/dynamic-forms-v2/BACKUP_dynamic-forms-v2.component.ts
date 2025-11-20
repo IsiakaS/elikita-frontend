@@ -30,6 +30,7 @@ import flatpickr from "flatpickr"
 import { StretchDirective } from '../../stretch.directive';
 import { UploadUiComponent } from '../../upload-ui/upload-ui.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from "@angular/material/menu";
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
@@ -40,8 +41,8 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   imports: [MatCardModule, ReactiveFormsModule, MatCheckboxModule, MatSlideToggleModule,
     SplitHashPipe, MatDatepickerModule, MatRadioModule, CommonModule,
     MatFormFieldModule, MatSelectModule, MatAutocompleteModule, MatInputModule, AsyncPipe, StretchDirective, UploadUiComponent,
-    TitleCasePipe, MatIconModule, JsonPipe, MatTooltipModule
-    , MatButtonModule],
+    TitleCasePipe, MatIconModule, JsonPipe, MatTooltipModule,
+    MatButtonModule, MatMenuModule],
 
   templateUrl: './dynamic-forms-v2.component.html',
   providers: [provideNativeDateAdapter()],
@@ -311,6 +312,8 @@ export class DynamicFormsV2Component {
   http = inject(HttpClient);
   searchCodeableConceptFromBackEnd(fieldApiName: string, value: string) {
     if (value.trim() !== "") {
+      fieldApiName = fieldApiName.replace(/-(.*)$/g, '');
+      // alert(fieldApiName);
       const url = this.searchableObject[fieldApiName];
       this.fieldAutoCompleteObject[fieldApiName] = this.http.get(`${url}&filter=${value.trim()}`).pipe(
         map((data: any) => {

@@ -32,7 +32,10 @@ import {
 import { FormFieldsSelectDataService } from '../shared/form-fields-select-data.service';
 import { AuthService, capacityObject } from '../shared/auth/auth.service';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
-
+import { StateService } from '../shared/state.service';
+import { EmptyStateComponent } from "../shared/empty-state/empty-state.component";
+import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
+import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
 
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
@@ -41,8 +44,7 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   imports: [...commonImports,
     CommonModule,
     JsonPipe, CodeableConcept2Pipe, CodeableRef2Pipe, References2Pipe, fetchFromReferencePipe,
-    MatProgressSpinnerModule, DetailBaseComponent
-  ],
+    MatProgressSpinnerModule, DetailBaseComponent, EmptyStateComponent],
   templateUrl: './medicine-requests.component.html',
   styleUrl: './medicine-requests.component.scss'
 })
@@ -67,7 +69,7 @@ export class MedicineRequestsComponent implements tablePropInt {
     if (!this.getPatientId()) return;
     this.patientName = this.utilityService.getPatientName(this.getPatientId)
   }
-
+stateService = inject(StateService);
   getPatientId(): string | null {
     return this.patientId = this.route.parent?.snapshot.params['id'] || this.utilityService.getPatientIdFromRoute();
   }
@@ -78,8 +80,10 @@ export class MedicineRequestsComponent implements tablePropInt {
   }
   isLinkObj: { [key: string]: Map<any, any> } = {}
   subscribeToResolver(): void {
-    this.route.data.subscribe((allData) => {
-      this.immutableLevelTableData = (allData['medReqRes'] as Bundle).entry!.map((e, index) => {
+    this.stateService.PatientResources.medicationRequests.//asObservable().pipe().subscribe((medReqs) => {
+    subscribe((allData: any) => {
+      this.immutableLevelTableData = allData.map((e:any, index:number) => {
+        e.resource = e.actualResource as MedicationRequest;
         for (const [key, value] of Object.entries(e.resource as MedicationRequest)) {
           console.log(value.reference);
           if (this.isLinkObj.hasOwnProperty(key)) {
@@ -110,6 +114,7 @@ export class MedicineRequestsComponent implements tablePropInt {
       console.log(sortedAccRequisition);
       this.sortedWithRequisitionKeys = Object.keys(sortedAccRequisition);
       console.log(this.sortedWithRequisitionKeys);
+      this.immutableLevelTableData = [];
       Object.values(sortedAccRequisition).forEach((e: MedicationRequest[]) => {
         this.immutableLevelTableData = [...this.immutableLevelTableData || [], ...e];
       });
@@ -127,6 +132,13 @@ export class MedicineRequestsComponent implements tablePropInt {
   encounterService = inject(EncounterServiceService);
   capacityObject = capacityObject;
   ngOnInit() {
+
+//retun early ithere is no patient id
+if(this.stateService.currentPatientIdFromResolver.getValue() === null){
+  this.errorService.openandCloseError("No patient selected. Please select a patient to view medication requests.");
+  return;
+}
+
     this.auth.user.subscribe((user) => {
       this.user = user;
 
@@ -168,9 +180,46 @@ export class MedicineRequestsComponent implements tablePropInt {
   dialog: MatDialog = inject(MatDialog);
   errorService: ErrorService = inject(ErrorService);
   showRow(row: any): void {
-    console.log(row);
+    this.dialog.open(DetailzViewzComponent, {
+      maxHeight: '93vh',
+      maxWidth: '900px',
+      data: {
+        resourceData:row,
+        detailsBuilderObject: this.detailsBuilder
+      }
+    })
   }
-
+  detailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Medication Request',
+    resourceIcon: 'prescriptions',
+    specialHeader: {
+      strongSectionKey: 'medicationCodeableConcept',
+      iconSectionKeys: ['status', 'intent'],
+      contentSectionKeys: ['subject', 'authoredOn']
+    },
+    groups: [
+      {
+        groupName: 'Classification',
+        groupIcon: 'category',
+        groupKeys: ['priority', 'status', 'intent', 'category']
+      },
+      {
+        groupName: 'Participants',
+        groupIcon: 'group',
+        groupKeys: ['subject', 'requester', 'performer', 'performerType']
+      },
+      {
+        groupName: 'Clinical Details',
+        groupIcon: 'science',
+        groupKeys: ['medicationCodeableConcept', 'medicationReference', 'dosageInstruction', 'reasonCode']
+      },
+      {
+        groupName: 'Fulfilment',
+        groupIcon: 'check_circle',
+        groupKeys: ['authoredOn', 'dispenseRequest', 'substitution',]
+      }
+    ]
+  }
   alltds(td: HTMLTableCellElement): void {
     //  alert(td!.parentElement!.innerHTML);
     const tdArr = Array.from(document.getElementsByTagName("td")) as HTMLElement[]

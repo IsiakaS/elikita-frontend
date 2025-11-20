@@ -1,5 +1,5 @@
-//port { HttpClient } from '@angular/common/http';
-import { Component, inject, Input } from '@angular/core';
+//port { HttpClient } from '@angular/common/http};
+import { Component, inject, Input, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
 import { Bundle, CodeableReference, Dosage, FhirResource, Medication, MedicationRequest, Reference, Resource } from 'fhir/r5';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -37,6 +37,8 @@ import { FormFieldsSelectDataService } from '../form-fields-select-data.service'
 import { ErrorService } from '../error.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { LoadingUIEnabled } from '../../loading.interceptor';
+import { RESOURCE_PROPERTY_TYPES } from '../fhir-resource-transform.service';
+import { ReferenceDisplayDirective } from '../reference-display.directive';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 
@@ -50,46 +52,58 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
       RouterLinkActive, CommonModule,
       MatExpansionModule, MatCheckboxModule, TitleCasePipe,
       MatTableModule, AsyncPipe,
-      MatChipsModule,
+      MatChipsModule, ReferenceDisplayDirective,
       MatInputModule, ReferencePipe, CodeableConceptLabelPipe,
       MatMenuModule, CodeableReferencePipe, FhirReferenceLabelPipe,
       MatTableModule, MatIconModule, ReactiveFormsModule, MatProgressSpinnerModule,],
   templateUrl: './detail-base.component.html',
   styleUrl: './detail-base.component.scss'
 })
-export class DetailBaseComponent {
+export class DetailBaseComponent implements OnChanges {
   @Input() url!: string;
-
+  @Input() exclude: string[] = [];
+  @Input() onlyInclude: string[] = [];
+keyTypes = RESOURCE_PROPERTY_TYPES;
   http = inject(HttpClient);
   resource: any = "";
   statuStyles: any;
   intentStyles: any;
+  onLoading$ = new BehaviorSubject<boolean>(true);
   ngOnInit() {
-    this.statuStyles = baseStatusStyles
-    this.intentStyles = medicationIntentStyles
-    this.http.get<any>(
-      // "https:hapi.fhir.org/baseR4/MedicationRequest?_format=json",
-      this.url + "?_format=json", {
-      context: new HttpContext().set(LoadingUIEnabled, false)
-    }
-    ).pipe(map((dataBundle) => {
-      //   console.log(dataBundle);
-      if (dataBundle) {
-        // console.log(dataBundle)
-        return dataBundle
-      } else {
-        return ""
-      }
-    }))
-      .subscribe({
-        next: (resource) => {
-          this.resource = resource
-        },
-        error: (e: any) => {
-          console.log(e)
-        }
-      })
+    this.statuStyles = baseStatusStyles;
+    this.intentStyles = medicationIntentStyles;
+    this.fetchResource(this.url);
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const urlChange = changes['url'];
+    if (urlChange?.currentValue && !urlChange.firstChange && urlChange.currentValue !== urlChange.previousValue) {
+      // alert("url changed "+urlChange.currentValue);
+      this.fetchResource(urlChange.currentValue);
+    }
+  }
+
+  private fetchResource(url?: string): void {
+    if (!url) return;
+    this.onLoading$.next(true);
+
+    this.http.get<any>(`${url}?_format=json`, {
+      context: new HttpContext().set(LoadingUIEnabled, false)
+    })
+      .pipe(map((dataBundle) => dataBundle ?? ''))
+      .subscribe({
+
+        next: (resource) => {
+          this.resource = resource;
+          this.onLoading$.next(false);
+        },
+        error: (e) => {
+          console.log(e);
+          this.onLoading$.next(false);
+        }
+      });
+  }
+
 
   sortAccordingToSequence(dosageArray: any[]): Dosage[] {
     return dosageArray.sort((a: Dosage, b: Dosage) => {
@@ -139,11 +153,15 @@ export class DetailBaseComponent {
   // }
 
   fieldKeys(data: any, exclude: any[] = []) {
+     exclude = this.exclude || exclude;
+    //  alert("exclude list "+exclude.join(", "));
+     if(!this.onlyInclude || this.onlyInclude.length==0){
     return Object.keys(data).filter((e) => {
-      if (exclude.length == 0) {
+      if (exclude.length !== 0) {
 
 
         if (exclude.includes(e)) {
+          // alert("excluded " + e);
           return false
         } else {
           return true
@@ -153,6 +171,15 @@ export class DetailBaseComponent {
         return true;
       }
     });
+      }else{
+        return Object.keys(data).filter((e) => {
+          if (this.onlyInclude.length == 0) {
+            return true;
+          } else {
+            return this.onlyInclude.includes(e);
+          }
+        });
+      }
 
   }
 

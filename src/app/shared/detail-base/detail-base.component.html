@@ -1,4 +1,4 @@
-@if (resource) {
+@if (resource && !(onLoading$ | async)) {
 <mat-card class="profile-card pb-20 detail-base" style="width: 100%;">
     <mat-card-header>
         <mat-card-title>
@@ -23,11 +23,21 @@
 
             <div class="other-details">
                 @for(key of fieldKeys(resource); track $index;){
-
+                        
                 <div class="field-group" style="width: 100%; overflow-x: auto;">
+
+                    @if(keyTypes[resource.resourceType] && keyTypes[resource.resourceType]?.[key] == 'Reference'
+                    && resource[key]
+                    ){
+                                          <!-- {{resource[key] | json}} -->
+                        <div [appReferenceDisplay]="resource[key]?.reference"
+                        [InstantfetchAndRepace]="true" class="field-value"
+                        ></div>
+                    }@else{
+                   
                     <div class="field-value" [innerHTML]="renderOtherFields(resource, key)">
 
-                    </div>
+                    </div>}
                     <div class="field-title subtitle-text-color" style="font-weight: bold;">
                         {{key | titlecase}}
                     </div>

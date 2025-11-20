@@ -2,13 +2,15 @@ import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, Subject, throwError } from 'rxjs';
 import { LoadingUIEnabled } from '../loading.interceptor';
-import { Bundle, BundleEntry, CodeableConcept, CodeSystem, HealthcareService, Practitioner, Reference, ValueSet, Location, Patient, Encounter } from 'fhir/r5';
+import { Bundle, BundleEntry, CodeableConcept, CodeSystem, HealthcareService, Practitioner, Reference, ValueSet, Location, Patient, Encounter, ServiceRequest } from 'fhir/r4';
 import { ReferenceDataType } from './dynamic-forms.interface2';
+import { backendEndPointToken } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormFieldsSelectDataService {
+  backendApiEndPoint = inject(backendEndPointToken);
   allUrls = {
     'referral': {
       'organization': "https://server.fire.ly/r5/Organization?_format=json",
@@ -88,7 +90,8 @@ export class FormFieldsSelectDataService {
     'specimen': {
       'status': "http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/specimen-status&_FORMAT=JSON",
       "type": "http://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v2-0487&_FORMAT=JSON",
-      "subject": "https://server.fire.ly/r4/Patient",
+      "subject": `https://elikita-server.daalitech.com/Patient?_count=1000&_format=json`,
+      "request": `https://elikita-server.daalitech.com/ServiceRequest?_format=json&_count=1000`,
       "collector": "/encounter/encounter_participant.json",
       "bodySite": "/dummy.json",
       "condition": "http://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v2-0493&_FORMAT=JSON"
@@ -247,7 +250,61 @@ export class FormFieldsSelectDataService {
         return {
           reference,
           display,
-          type: resource.resourceType ?? 'Practitioner'
+          // type: resource.resourceType ?? 'Practitioner'
+        } as ReferenceDataType;
+      })
+      .filter((ref): ref is ReferenceDataType => !!ref?.reference);
+      
+  }
+
+  patientBundleToReferenceData(value: Bundle<Patient> | null = null): ReferenceDataType[] {
+    if (!value?.entry?.length) return [];
+
+    return value.entry
+      .map((entry: BundleEntry<Patient>) => {
+        const resource = entry.resource;
+        if (!resource?.id) return null;
+
+        const statusFlag = (resource as any)?.isActive ?? resource.active;
+        const isActive =
+          typeof statusFlag === 'string'
+            ? statusFlag.toLowerCase() === 'active'
+            : statusFlag === true;
+
+        if (!isActive) return null;
+
+        const name = resource.name?.[0];
+        const display =
+          name?.text
+          || [name?.given?.join(' '), name?.family].filter(Boolean).join(' ').trim()
+          || resource.id;
+
+        return {
+          reference: `${resource.resourceType ?? 'Patient'}/${resource.id}`,
+          display,
+          // type: resource.resourceType ?? 'Patient'
+        } as ReferenceDataType;
+      })
+      .filter((ref): ref is ReferenceDataType => !!ref?.reference);
+  }
+
+  serviceRequestBundleToReferenceData(value: Bundle<ServiceRequest> | null = null): ReferenceDataType[] {
+    if (!value?.entry?.length) return [];
+
+    return value.entry
+      .map((entry: BundleEntry<ServiceRequest>) => {
+        const resource = entry.resource;
+        if (!resource?.id) return null;
+
+        const code = resource.code?.text
+          || resource.code?.coding?.[0]?.display
+          || resource.code?.coding?.[0]?.code
+          || 'Unnamed Service Request';
+
+        return {
+          reference: `${resource.resourceType ?? 'ServiceRequest'}/${resource.id}`,
+          display: code,
+          type: resource.resourceType ?? 'ServiceRequest'
         } as ReferenceDataType;
       })
       .filter((ref): ref is ReferenceDataType => !!ref?.reference);
@@ -501,7 +558,7 @@ export class FormFieldsSelectDataService {
       ward: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
           // alert(this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase());
-          return this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase().includes('ward');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('ward');
         }).map((entry: BundleEntry<Location>) => {
           // alert(entry.resource?.name || 'Unnamed Location');
           const rd = {
@@ -515,7 +572,7 @@ export class FormFieldsSelectDataService {
 
       room: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase().includes('room');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('room');
         }).map((entry: BundleEntry<Location>) => {
           const rd = {
             reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
@@ -529,7 +586,7 @@ export class FormFieldsSelectDataService {
 
       bed: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase().includes('bed');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('bed');
         }).map((entry: BundleEntry<Location>) => {
           const rd = {
             reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
@@ -785,9 +842,12 @@ export class FormFieldsSelectDataService {
           return `${item.code}$#$${item.display}$#$${item.system}`;
         });
       },
+      'request': (value: any) => {
+      return this.serviceRequestBundleToReferenceData(value);
+      },
       'subject': (value: any) => {
-        console.log(value);
-        return value;
+        // console.log(value);
+        return this.practitionerBundleToReferenceData(value);
       },
 
       'collector': (value: any) => {
@@ -795,7 +855,7 @@ export class FormFieldsSelectDataService {
         return value;
       },
       'bodySite': (value: any) => {
-        return ['https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/bodySite&_format=json']
+        return ['http://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/body-site&_format=json']
 
       },
 

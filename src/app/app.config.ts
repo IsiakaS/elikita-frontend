@@ -8,9 +8,9 @@ import { loadingInterceptor } from './loading.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 export const frontendUrlToken = new InjectionToken('base url on the frontend for resources')
 export const backendUrlforSamplesToken = new InjectionToken<string>('backend url used for fetching sample data for this frontend');
-export const backendUrlforSamplesValue = 'https://hapi.fhir.org'
+export const backendUrlforSamplesValue = 'https://elikita-server.daalitech.com'
 export const backendUrlforSamplesToken2 = new InjectionToken<string>('backend-2 url used for fetching sample data for this frontend');
-export const backendUrlforSamplesValue2 = 'https://server.fire.ly'
+export const backendUrlforSamplesValue2 = 'https://elikita-server.daalitech.com'
 
 
 export const backendEndPointToken = new InjectionToken<string>('backend api base url');

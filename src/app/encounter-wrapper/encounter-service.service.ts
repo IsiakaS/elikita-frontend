@@ -6,4 +6,8 @@ import { Injectable } from '@angular/core';
 export class EncounterServiceService {
 
   constructor() { }
+
+  addSpecimen(): void {
+    console.warn('EncounterServiceService.addSpecimen is not implemented yet.');
+  }
 }

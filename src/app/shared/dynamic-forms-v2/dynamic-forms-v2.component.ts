@@ -34,6 +34,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { backendEndPointToken } from '../../app.config';
 import { NotificationService } from '../notification/notification.service';
 import { InfoDialogService } from '../info-dialog/info-dialog.service';
+import { DetailBaseComponent } from '../detail-base/detail-base.component';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
@@ -42,9 +45,9 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
     class: "app-dynamic-forms-v2"
   },
   imports: [MatCardModule, ReactiveFormsModule, MatCheckboxModule, MatSlideToggleModule,
-    SplitHashPipe, MatDatepickerModule, MatRadioModule, CommonModule,
+    SplitHashPipe, MatDatepickerModule, MatRadioModule, CommonModule, MatMenuModule,
     MatFormFieldModule, MatSelectModule, MatAutocompleteModule, MatInputModule, AsyncPipe, StretchDirective, UploadUiComponent,
-    TitleCasePipe, MatIconModule, JsonPipe, MatTooltipModule
+    TitleCasePipe, MatIconModule, JsonPipe, MatTooltipModule, DetailBaseComponent
     , MatButtonModule],
 
   templateUrl: './dynamic-forms-v2.component.html',
@@ -660,6 +663,50 @@ export class DynamicFormsV2Component {
       const newValues = files;
       control.setValue([...existingValues, ...newValues]);
     }
+  }
+  private overlay = inject(Overlay);
+  private menuOpenTimer?: ReturnType<typeof setTimeout>;
+  private menuCloseTimer?: ReturnType<typeof setTimeout>;
+  public lastHoveredTrigger?: MatMenuTrigger;
+  toUseUrl = `https://elikita-server.daalitech.com`;
+  triggerForMatMenu(trigger?: MatMenuTrigger, cdRef?: string): void {
+    // alert(cdRef);
+    this.toUseUrl = `https://elikita-server.daalitech.com/${cdRef}`;
+    if (!trigger) return;
+    this.lastHoveredTrigger = trigger;
+    clearTimeout(this.menuCloseTimer);
+    clearTimeout(this.menuOpenTimer);
+
+    this.menuOpenTimer = setTimeout(() => {
+      trigger.openMenu();
+
+      setTimeout(() => {
+        const overlayRef = (trigger as any)?._overlayRef as OverlayRef | undefined;
+        if (!overlayRef) return;
+
+        const originEl = (trigger as any)?._elementRef?.nativeElement as HTMLElement | undefined;
+        const top = (originEl?.getBoundingClientRect().top ?? 0) + window.scrollY;
+
+        overlayRef.updatePositionStrategy(
+          this.overlay.position().global().left('0px').top(`${Math.max(top, 0)}px`)
+        );
+      });
+    }, 120);
+  }
+
+  closeMenu(trigger?: MatMenuTrigger): void {
+    clearTimeout(this.menuOpenTimer);
+    clearTimeout(this.menuCloseTimer);
+
+    this.menuCloseTimer = setTimeout(() => {
+      if (!trigger || trigger !== this.lastHoveredTrigger) return;
+      trigger.closeMenu();
+      this.lastHoveredTrigger = undefined;
+    }, 150);
+  }
+
+  cancelPendingMenuClose(): void {
+    clearTimeout(this.menuCloseTimer);
   }
 }
 
