@@ -47,7 +47,7 @@ export class AppComponent {
     // Developer mode: set user to doctor and route to a specific patient's summary
     // const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/tests-requests';
     //speimens
-    const target = 'app/login'
+    const target = 'app/patients'
     const current = this.auth.user.getValue();
     if (!current || current.role !== 'lab') {
       // Ensure login redirects to our target route

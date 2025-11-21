@@ -35,6 +35,8 @@ import { EmptyStateComponent } from '../shared/empty-state/empty-state.component
 import { AuthService } from '../shared/auth/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RowDetailsDialogComponent } from './add-observation/add-observation.component';
+import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
+import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
 
 
 @Component({
@@ -80,14 +82,30 @@ export class PatientObservationComponent {
   patientId!: string;
   patientOpenAndClose = inject(PatientDetailsKeyService);
   patientObservationDisplayedColumns = ['dateTaken', 'category', 'name', 'status',
-    'result', 'practitioner',
-  ]
+    'result', 'practitioner', 'action'
+  ];
   // ['basedOn', 'category', 'code', 'subject', 'performer', 'referenceRange', 'value[x]', 'status', 'effective[x]', 'component', 'issued'];
   // ['category', 'code', 'value', 'unit', 'status'];
   http = inject(HttpClient);
   // Inject auth and track role
   authService = inject(AuthService);
   userRole: string | null = null;
+
+  observationDetailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Observation',
+    resourceIcon: 'monitor_heart',
+    specialHeader: {
+      strongSectionKey: 'code',
+      iconSectionKeys: ['status'],
+      contentSectionKeys: ['subject', 'effectiveDateTime']
+    },
+    groups: [
+      { groupName: 'Context', groupIcon: 'info', groupKeys: ['status', 'category', 'encounter', 'issued'] },
+      { groupName: 'Result', groupIcon: 'analytics', groupKeys: ['valueQuantity', 'valueString', 'valueCodeableConcept', 'interpretation', 'referenceRange'] },
+      { groupName: 'Participants', groupIcon: 'group', groupKeys: ['performer'] },
+      { groupName: 'Notes', groupIcon: 'notes', groupKeys: ['note'] }
+    ]
+  };
 
   ngOnInit() {
     this.patientId = this.route.parent?.snapshot.params['id'] || '';
@@ -163,7 +181,32 @@ export class PatientObservationComponent {
       data: { title, row }
     });
   }
+  showDetails(observation: any) {
+    const excludeKeys = this.computeEmptyValueKeys(observation);
+    this.dialog.open(DetailzViewzComponent, {
+      maxHeight: '93vh',
+      maxWidth: '90vh',
+      data: {
+        resourceData: observation,
+        detailsBuilderObject: this.observationDetailsBuilder,
+        excludeKeys
+      }
+    });
+  }
 
+  private computeEmptyValueKeys(observation: any): string[] {
+    if (!observation) return [];
+    return Object.keys(observation)
+      .filter(key => key.startsWith('value') && this.isEmptyValue(observation[key]));
+  }
+
+  private isEmptyValue(value: any): boolean {
+    if (value == null) return true;
+    if (typeof value === 'string') return value.trim() === '';
+    if (Array.isArray(value)) return value.length === 0 || value.every(v => this.isEmptyValue(v));
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+    return false;
+  }
 
   private isBloodPressure(obs: any): boolean {
     const codeable = obs?.code;

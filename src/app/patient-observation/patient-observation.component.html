@@ -175,12 +175,17 @@
 
                     </td>
                 </ng-container>
-
-
-
-
-
-
+                <!-- action column -->
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Actions
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-button color="primary" (click)="showDetails(element)">
+                            View
+                        </button>
+                    </td>
+                </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="patientObservationDisplayedColumns" matHeaderRowDefSticky="true">
                 </tr>

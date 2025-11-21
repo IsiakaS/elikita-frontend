@@ -176,10 +176,59 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
       case 'string[]':
         return this.ensureArray(value).join(', ');
       default:
-        if (Array.isArray(value)) return value.map(v => this.stringifyValue(v, 'primitive')).join(', ');
-        if (typeof value === 'object') return JSON.stringify(value);
-        return String(value);
+        return this.stringifyAnyValue(value);
     }
+  }
+
+  private stringifyAnyValue(value: any): string {
+    if (value == null) return '';
+    if (Array.isArray(value)) {
+      return value.map(v => this.stringifyAnyValue(v)).filter(Boolean).join(', ');
+    }
+    if (typeof value === 'object') {
+      if (this.isQuantityLike(value)) return this.stringifyQuantity(value);
+      if (this.isRangeLike(value)) return this.stringifyRange(value);
+      if (this.isPeriodLike(value)) return this.stringifyPeriod(value);
+      if (value.reference || value.display) return this.stringifyReference(value);
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return String(value);
+      }
+    }
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    return String(value);
+  }
+
+  private isQuantityLike(value: any): boolean {
+    return typeof value === 'object' && value !== null && ('value' in value) && ('unit' in value || 'code' in value);
+  }
+
+  private stringifyQuantity(value: any): string {
+    const magnitude = value.value ?? value.numerator?.value ?? '';
+    const unit = value.unit ?? value.code ?? value.numerator?.unit ?? '';
+    if (magnitude === '' && unit === '') return '';
+    return `${magnitude}${unit ? ` ${unit}` : ''}`.trim();
+  }
+
+  private isRangeLike(value: any): boolean {
+    return typeof value === 'object' && value !== null && ('low' in value || 'high' in value);
+  }
+
+  private stringifyRange(value: any): string {
+    const low = value.low ? this.stringifyQuantity(value.low) : '';
+    const high = value.high ? this.stringifyQuantity(value.high) : '';
+    return [low, high].filter(Boolean).join(' – ');
+  }
+
+  private isPeriodLike(value: any): boolean {
+    return typeof value === 'object' && value !== null && ('start' in value || 'end' in value);
+  }
+
+  private stringifyPeriod(value: any): string {
+    const start = value.start ? new Date(value.start).toLocaleString() : '';
+    const end = value.end ? new Date(value.end).toLocaleString() : '';
+    return [start, end].filter(Boolean).join(' → ');
   }
 
   private stringifyConcept(concept: any): string {

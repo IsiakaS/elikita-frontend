@@ -27,7 +27,9 @@ import { NaPipe } from "../shared/na.pipe";
 import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 import { ChipsDirective } from '../chips.directive';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
-
+import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
+import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 
@@ -55,7 +57,7 @@ import { EmptyStateComponent } from '../shared/empty-state/empty-state.component
     RouterLinkActive, ReferenceDisplayDirective,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
-    MatChipsModule,
+    MatChipsModule,TableHeaderComponent,
     MatInputModule,
     MatMenuModule, AgePipe, TableHeaderComponent,
     MatTableModule, MatIconModule, ReactiveFormsModule, CodeableConcept2Pipe, NaPipe],
@@ -87,12 +89,29 @@ export class PatientConditionComponent {
   patientId!: string;
   patientConditionDisplayedColumns = ['recordedDate', 'code', 'verificationStatus', 'clinicalStatus',
     'severity',
-    'asserter'
-  ]
+    'asserter',
+    'action'
+  ];
   authService = inject(AuthService);
   http = inject(HttpClient);
   patientOpenAndClose = inject(PatientDetailsKeyService);
   encounterService = inject(EncounterServiceService);
+  private dialog = inject(MatDialog);
+  conditionDetailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Condition',
+    resourceIcon: 'healing',
+    specialHeader: {
+      strongSectionKey: 'code',
+      iconSectionKeys: ['clinicalStatus', 'verificationStatus'],
+      contentSectionKeys: ['subject', 'recordedDate']
+    },
+    groups: [
+      { groupName: 'Classification', groupIcon: 'category', groupKeys: ['clinicalStatus', 'verificationStatus', 'category', 'severity'] },
+      { groupName: 'Timeline', groupIcon: 'schedule', groupKeys: ['onsetDateTime', 'abatementDateTime', 'recordedDate'] },
+      { groupName: 'People', groupIcon: 'group', groupKeys: ['subject', 'asserter', 'encounter'] },
+      { groupName: 'Notes', groupIcon: 'notes', groupKeys: ['note'] }
+    ]
+  };
   constructor(private router: Router) {
   }
   canAddDiagnosis = this.authService.user.pipe(map(user => {
@@ -154,6 +173,17 @@ export class PatientConditionComponent {
   errorService = inject(ErrorService);
 
   showRow(row: any) {
-    console.log(row);
+    this.showDetails(row);
+  }
+
+  showDetails(condition: any) {
+    this.dialog.open(DetailzViewzComponent, {
+      maxHeight: '93vh',
+      maxWidth: '90vh',
+      data: {
+        resourceData: condition,
+        detailsBuilderObject: this.conditionDetailsBuilder
+      }
+    });
   }
 }

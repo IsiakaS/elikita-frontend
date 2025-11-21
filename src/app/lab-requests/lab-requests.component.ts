@@ -385,6 +385,7 @@ export class LabRequestsComponent {
       }
     })
   }
+  private snackBar = inject(MatSnackBar);
   private buildLabRequestActions(): DetailActionButton[] {
     return [
       {
@@ -400,6 +401,13 @@ export class LabRequestsComponent {
         icon: 'biotech',
         color: 'accent',
         capabilities: [{ resource: 'observation', action: 'add' }]
+      },
+      {
+        key: 'changeStatus',
+        label: 'Change Status',
+        icon: 'sync',
+        color: 'warn',
+        capabilities: [{ resource: 'labRequest', action: 'update' }]
       }
     ];
   }
@@ -412,9 +420,17 @@ export class LabRequestsComponent {
       case 'addResult':
         this.launchResultDialog(row);
         break;
+      case 'changeStatus':
+        this.promptStatusChange(row);
+        break;
       default:
         break;
     }
+  }
+
+  private promptStatusChange(row: ServiceRequest) {
+    const label = row?.id ?? 'request';
+    this.snackBar.open(`Change status clicked for ${label}`, 'Dismiss', { duration: 2500 });
   }
 authService = inject(AuthService);
 fhirTransformService = inject(FhirResourceTransformService);
@@ -491,7 +507,6 @@ fhirResourceService = inject(FhirResourceService)
         });
     // this.encounterService.addSpecimen(patientId, row.id);
   }
-snackBar = inject(MatSnackBar);
   private launchResultDialog(row: ServiceRequest) {
     const patientId = this.extractPatientId(row) ?? this.patientId;
     this.addLabResults(patientId || null);
