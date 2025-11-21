@@ -242,7 +242,11 @@ export class SidemenuComponent {
           link: "/app/dashboard",
           icon: "dashboard"
         },
-
+ {
+        link: "/app/patients",
+        title: "Patients",
+        icon: "people"
+      },
         {
           link: "/app/medicine-requests",
           title: "Medicine Requests",
@@ -501,6 +505,11 @@ export class SidemenuComponent {
           link: "/app/dashboard",
           icon: 'dashboard'
         },
+         {
+        link: "/app/patients",
+        title: "Patients",
+        icon: "people"
+      },
         {
           link: "/app/tests-requests",
           title: "Tests Request",

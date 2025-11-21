@@ -31,12 +31,18 @@
                 <app-special-header-v2 [resourceObject]="resourceData" [specialHeader]="specialHeader"></app-special-header-v2>
                 }
                 <div class="action-button mb-15 gap-15">
-<!-- 
-                    <a mat-flat-button class=" header-group" (click)="takeStock(data.resourceType)">
-                        <mat-icon>edit</mat-icon>
-                        <span>Restock</span>
-                    </a> -->
-
+@if(actionButtons?.length){
+    <div class="g-just-flex gap-10 flex-wrap">
+        @for(button of actionButtons; track button.key){
+            @if(canShowAction(button)){
+            <button mat-flat-button [color]="button.color || 'primary'" (click)="triggerAction(button)">
+                @if(button.icon){<mat-icon>{{button.icon}}</mat-icon>}
+                {{button.label || (button.key | titlecase)}}
+            </button>
+            }
+        }
+    </div>
+}
                 </div>
             </div>
 
@@ -72,19 +78,23 @@
 
             @for(field of group.groupKeys; track $index;){
          <!-- {{keyVsResourceType[resourceData?.resourceType || '']?.[field]}} -->
-            
-            <div class="field-group" #fg>
-                <div class="field-value">
-                    <div #sc class="value-with-icon">
-                     {{refinedResourceData?.[field] |titlecase | na}}
-
-
-                    </div>
+            <!--if  type of key is not backbonelement-->
+@if(!isBackboneField(field)){
+    <div class="field-group" #fg>
+        <div class="field-value">
+            <div #sc class="value-with-icon">
+             @if(isReferenceField(field)){
+                <span [appReferenceDisplay]="refinedResourceData?.[field]" InstantfetchAndRepace="true"></span>
+             } @else {
+                {{refinedResourceData?.[field] | titlecase | na}}
+                }
                 </div>
-                <div class="field-title">
-                    {{resourceKeyLabels[resourceData!.resourceType]?.[field] | titlecase}}
-                </div>
-            </div>
+        </div>
+        <div class="field-title">
+            {{resourceKeyLabels[resourceData!.resourceType]?.[field] | titlecase}}
+        </div>
+    </div>
+}
             
             }
         </div>

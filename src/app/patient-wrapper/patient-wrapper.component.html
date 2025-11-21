@@ -4,6 +4,7 @@
 
         </app-patient-sidedetails>
     </mat-drawer> -->
+@if((auth.user | async)?.role == 'doctor' || (auth.user | async)?.role == 'nurse' ){
 @if(!isPatientAdmitted){
 <div style="width: 100%; padding: 0px 20px; box-sizing: border-box;">
     <div class="" style="display: flex; width: 100%;
@@ -152,4 +153,9 @@
 <app-patient-admission-wrapper>
 
 </app-patient-admission-wrapper>
+}
+}@else {
+     <router-outlet>
+
+                    </router-outlet>
 }

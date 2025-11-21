@@ -182,7 +182,7 @@ if(this.stateService.currentPatientIdFromResolver.getValue() === null){
   showRow(row: any): void {
     this.dialog.open(DetailzViewzComponent, {
       maxHeight: '93vh',
-      maxWidth: '900px',
+      maxWidth: '90vh',
       data: {
         resourceData:row,
         detailsBuilderObject: this.detailsBuilder

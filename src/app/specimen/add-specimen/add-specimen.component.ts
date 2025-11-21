@@ -69,17 +69,23 @@ export class AddSpecimenComponent {
   }
 
   // Sync single field edits from ResourceDataReviewComponent
-  onFieldEdited(index: number, evt: { fieldApiName: string; newValue: any; isArray?: boolean; arrayIndex?: number }) {
+  async onFieldEdited(index: number, evt: { fieldApiName: string; newValue: any; isArray?: boolean; arrayIndex?: number }) {
     const group = this.items.at(index) as FormGroup;
     if (!group) return;
+    if(await this.processValues({...this.items.at(index).value, [evt.fieldApiName]: evt.newValue}, 
+  true) as boolean){
+
     group.patchValue({ [evt.fieldApiName]: evt.newValue });
+  }
   }
 
   // Sync full resource object updates
-  onResourceUpdated(index: number, updated: any) {
+  async onResourceUpdated(index: number, updated: any) {
     const group = this.items.at(index) as FormGroup;
     if (!group) return;
+    if(await this.processValues(updated, true) as boolean){
     group.patchValue(updated);
+  }
   }
 
   dialog = inject(MatDialog)
@@ -88,7 +94,7 @@ export class AddSpecimenComponent {
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     @Inject(backendEndPointToken) public backendEndPoint: string
   ) {
-    // alert(JSON.stringify(data));\
+    //  alert(JSON.stringify(data));
     if(this.data && this.data.patientId ){
       this.patientId = this.data.patientId;
     }
@@ -171,7 +177,7 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
          // priority: this.formFieldsDataService.getFormFieldSelectData('serviceRequest', 'priority'),
        }).subscribe({
          next: (g: any) => {
-   
+  //  alert(this._patientId); alert(this._serviceRequestId)
    
           //  const dRef = this.dialog.open(DynamicFormsV2Component, {
             //  maxHeight: '90vh',
@@ -190,7 +196,7 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
                      fieldApiName: 'status',
                      fieldName: 'Status of Specimen',
                      fieldLabel: 'Status of Specimen',
-                     value: 'Availabe',
+                     value: 'Available',
                      auth: {
                        read: 'all',
                        write: 'doctor, nurse'
@@ -230,8 +236,8 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
                      fieldApiName: 'subject',
                      fieldName: 'Who Specimen is from',
                      fieldLabel: 'Who Specimen is from',
-                     value:this.patientId?"Patient/"+this.patientId:"",
-                     isHidden:this.patientId?true:false,
+                     value:this._patientId?"Patient/"+this._patientId:"",
+                     isHidden:this._patientId?true:false,
                      auth: {
                        read: 'all',
                        write: 'doctor, nurse'
@@ -248,8 +254,8 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
                      fieldName: 'Referenced Lab Test Request ',
                      fieldLabel: 'Referenced Lab Test Request ',
                      moreHint: "Lab request for which this specimen is intended",
-                     value:this.serviceRequestId?"ServiceRequest/"+this.serviceRequestId:"",
-                     isHidden:this.serviceRequestId?true:false,
+                     value:this._serviceRequestId?"ServiceRequest/"+this._serviceRequestId:"",
+                     isHidden:this._serviceRequestId?true:false,
    
                      auth: {
                        read: 'all',
@@ -366,8 +372,69 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
   }
 
 @ViewChild('cref') dynamicFormComponent!: DynamicFormsV2Component;
-  processValues(values: any) {
-    if (!values) return;
+// stringifiedService = inject()
+ async processValues(values: any, returnBooleanValue: boolean = false): Promise<boolean | void> {
+ 
+    if (!values) {
+       if(!returnBooleanValue){
+      return;}else{
+        return false;
+      }
+
+
+    }else{
+
+//can you do a check here whether the service request chosen belongs to the subject chosen also
+let constructedRequestValue: string = "";
+ if(typeof values.request === 'object' && values.request !== null){
+   if('reference' in values.request){
+     constructedRequestValue = values.request.reference;
+    }}else{
+      constructedRequestValue = values.request.split('$#$')[1]??values.request;
+    }
+
+this.http.get(`${this.backendEndPoint}/${constructedRequestValue}`).subscribe({
+      next: (sr: any) => {
+        let constructedSubjectValue: string = "";
+        if(typeof values.subject === 'object' && values.subject !== null){
+          if('reference' in values.subject){
+            constructedSubjectValue = values.subject.reference;
+           }}else{
+             constructedSubjectValue = values.subject.split('$#$')[1]??values.subject;
+           }
+        if (sr.subject && sr.subject.reference !== constructedSubjectValue) {
+          this.errorService.openandCloseError('The selected Service Request does not belong to the selected Subject/Patient. You can hover on the info of each service request to see the patient it belongs to.');
+          if (!returnBooleanValue) {
+            return;
+          }else{
+            return false;
+          }
+          return;
+        }
+        if (!returnBooleanValue) {
+        this.continueProcess(values);
+        return;
+        }else{
+          return true;
+        }
+      
+      },
+      error: (err: any) => {
+        this.errorService.openandCloseError('An error occurred while validating the Service Request.');
+        return;
+      }
+      
+      
+      })
+      // Add explicit return for the async function when returnBooleanValue is true
+      if (returnBooleanValue) {
+        return false;
+      }
+    }
+    }
+    continueProcess(values: any) {
+
+
 //type, status, subject and service requested are required
     if(
 !values.type || !values.status || !values.subject || !values.request
@@ -390,6 +457,7 @@ console.log(`${this.backendEndPoint}/ServiceRequest`)
 
   submitAllRequests() {
     const allValues = this.items.value;
+    // alert(JSON.stringify(allValues));
     if (this.dialogRef) {
       this.dialogRef.close({ values: allValues });
     }

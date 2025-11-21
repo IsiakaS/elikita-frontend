@@ -13,13 +13,13 @@ import { MatFormField } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider'
 import { MatChipsModule } from '@angular/material/chips'
 import { AsyncPipe, CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import { AgePipe } from '../age.pipe';
 import { TableHeaderComponent } from '../table-header/table-header.component';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
-import { Bundle, BundleEntry, ServiceRequest } from 'fhir/r5';
+import { Bundle, BundleEntry, ServiceRequest } from 'fhir/r4';
 import { References2Pipe } from "../shared/references2.pipe";
 import { fetchFromReferencePipe } from "../shared/Fetch.pipe";
 import { LinkInReferencesService } from '../shared/link-in-references.service';
@@ -29,7 +29,7 @@ import { CodeableRef2Pipe } from "../shared/codeable-ref2.pipe";
 import { CodeableConcept2Pipe } from "../shared/codeable-concept2.pipe";
 import { AuthService, capacityObject } from '../shared/auth/auth.service';
 import { UtilityService } from '../shared/utility.service';
-import { SpecimenComponent } from '../specimen/specimen.component';
+import { SpecimenComponent } from '../specimen/specimen_old.component';
 import { SpecimenDetailsComponent } from '../specimen/specimen-details/specimen-details.component';
 import { LabrequestDetailsComponent } from '../labrequest-details/labrequest-details.component';
 import { LabreportComponent } from '../labreport/labreport.component';
@@ -41,6 +41,13 @@ import { ChipsDirective } from "../chips.directive";
 import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 import { NaPipe } from "../shared/na.pipe";
 import { EmptyStateComponent } from "../shared/empty-state/empty-state.component";
+import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
+import { DetailzViewzComponent, DetailActionButton } from '../detailz-viewz/detailz-viewz.component';
+import { AddSpecimenComponent } from '../specimen/add-specimen/add-specimen.component';
+import { FhirResourceTransformService } from '../shared/fhir-resource-transform.service';
+import { FhirResourceService } from '../shared/fhir-resource.service';
+import { SuccessMessageComponent } from '../shared/success-message/success-message.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-lab-requests',
   imports: [MatCardModule, MatButtonModule, MatProgressSpinnerModule, DetailBaseComponent,
@@ -101,13 +108,17 @@ export class LabRequestsComponent {
   labRequestsFiltersFormControlObject: any = {};
   // patientName!: Observable<string>;
   // patientId!: string;
-  labRequestsDisplayedColumns = [
-    'requisition', 'authoredOn', 'status', 'priority', 'code', 'action', 'groupReport'
-    // 'subject', 'date', 'duration', 'status', 'serviceType', 'appointmentType',
-    // //'reason', 'priority', 'contact', 'specialty', 'subject', 
-  ]
-
-
+  private readonly baseDisplayedColumns = [
+    'requisition',
+    'authoredOn',
+    'status',
+    'priority',
+    'code',
+    'action',
+    'groupReport'
+  ];
+  labRequestsDisplayedColumns = [...this.baseDisplayedColumns];
+  // ...existing code...
   http = inject(HttpClient);
   route = inject(ActivatedRoute);
   encounterService = inject(EncounterServiceService);
@@ -135,6 +146,8 @@ export class LabRequestsComponent {
   stateService = inject(StateService);
   errorService = inject(ErrorService);
   state = inject(StateService);
+  private useOrgWideServiceRequests = false;
+
   ngOnInit() {
 
     this.auth.user.subscribe((user) => {
@@ -153,16 +166,24 @@ export class LabRequestsComponent {
 
     // this.patientId = this.utilityService.getPatientIdFromRoute();
 
-    if((this.stateService.isEncounterActive() && !this.stateService.currentEncounter?.getValue()?.patientId) ||
-    !this.stateService.currentPatientIdFromResolver.getValue()
-  ){
-this.errorService.openandCloseError("No patient selected. Please select a patient to view lab requests.");
-this.router.navigate(['/app/patients']);
-return;
-    }else{
-      this.patientId = this.stateService.currentEncounter?.getValue()?.patientId!
-    }
+    const resolvedPatientId = this.stateService.currentPatientIdFromResolver.getValue();
+    const encounterPatientId = this.stateService.currentEncounter.getValue()?.patientId ?? null;
+    const canViewAllLabRequests = this.auth.can('labRequest', 'viewAll');
 
+    if (!resolvedPatientId && !encounterPatientId) {
+      if (!canViewAllLabRequests) {
+        this.errorService.openandCloseError("No patient selected. Please select a patient to view lab requests.");
+        this.router.navigate(['/app/patients']);
+        return;
+      }
+      this.useOrgWideServiceRequests = true;
+      this.patientId = null;
+      this.baseDisplayedColumns.splice(5,0,'subject')
+      this.labRequestsDisplayedColumns = [...this.baseDisplayedColumns];
+    } else {
+      this.patientId = resolvedPatientId ?? encounterPatientId;
+      this.labRequestsDisplayedColumns = [...this.baseDisplayedColumns];
+    }
 
     this.tableDataSource.connect = () => {
       return this.tableDataLevel2;
@@ -202,16 +223,21 @@ return;
       //   return toReturnData;
       // })
 
-this.stateService.PatientResources.serviceRequests.
-    subscribe((allData
-    ) => {
-      allData = allData.
-        filter((r:any) => { 
+    const serviceRequestsSource = this.useOrgWideServiceRequests
+      ? this.stateService.orgWideResources.serviceRequests
+      : this.stateService.PatientResources.serviceRequests;
+
+    serviceRequestsSource.subscribe((allData) => {
+      allData = allData
+        .filter((r: any) => {
           console.log(r);
           return r.actualResource.category &&
-           r.actualResource.category.some((c: any) => { return c.text?.trim()?.toLowerCase() === 'laboratory' ||
-     c.coding?.some((cc: any) => cc.code?.trim()?.toUpperCase().includes('LAB') || cc.display?.trim()?.toLowerCase().includes('laboratory'))})}
-      ).reverse();
+            r.actualResource.category.some((c: any) => {
+              return c.text?.trim()?.toLowerCase() === 'laboratory' ||
+                c.coding?.some((cc: any) => cc.code?.trim()?.toUpperCase().includes('LAB') || cc.display?.trim()?.toLowerCase().includes('laboratory'));
+            });
+        })
+        .reverse();
       console.log(allData)
 
 
@@ -262,15 +288,37 @@ this.stateService.PatientResources.serviceRequests.
 
   dialog = inject(MatDialog)
 
-  showRow(row: any) {
-    console.log(row);
-    // this.dialog.open(AppointmentDetailsComponent, {
-    //   maxWidth: '450px',
-    //   maxHeight: '90vh'
-    // })
-    //  }
+  detailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Lab Request',
+    resourceIcon: 'biotech',
+    specialHeader: {
+      strongSectionKey: 'code',
+      iconSectionKeys: ['status', 'priority'],
+      contentSectionKeys: ['subject', 'authoredOn']
+    },
+    groups: [
+      { groupName: 'Classification', groupIcon: 'category', groupKeys: ['status', 'intent', 'priority', 'performerType'] },
+      { groupName: 'Participants', groupIcon: 'group', groupKeys: ['subject', 'requester', 'performer'] },
+      { groupName: 'Clinical Details', groupIcon: 'science', groupKeys: ['code', 'reasonCode', 'note'] },
+      { groupName: 'Logistics', groupIcon: 'calendar_today', groupKeys: ['authoredOn', 'requisition'] }
+    ]
+  };
 
+  showRow(row: ServiceRequest) {
+    const dialogRef = this.dialog.open(DetailzViewzComponent, {
+      maxHeight: '93vh',
+      maxWidth: '90vh',
+      data: {
+        resourceData: row,
+        detailsBuilderObject: this.detailsBuilder,
+        actionButtons: this.buildLabRequestActions()
+      }
+    });
 
+    const sub = dialogRef.componentInstance?.actionInvoked.subscribe(({ key }) => {
+      this.handleDetailAction(key, row);
+    });
+    dialogRef.afterClosed().subscribe(() => sub?.unsubscribe());
   }
 
   alltds(td: HTMLTableCellElement): void {
@@ -336,5 +384,122 @@ this.stateService.PatientResources.serviceRequests.
         observationCategoryValue: "laboratory"
       }
     })
+  }
+  private buildLabRequestActions(): DetailActionButton[] {
+    return [
+      {
+        key: 'addSpecimen',
+        label: 'Add Specimen',
+        icon: 'science',
+        color: 'primary',
+        capabilities: [{ resource: 'specimen', action: 'add' }]
+      },
+      {
+        key: 'addResult',
+        label: 'Add Result',
+        icon: 'biotech',
+        color: 'accent',
+        capabilities: [{ resource: 'observation', action: 'add' }]
+      }
+    ];
+  }
+
+  private handleDetailAction(actionKey: string, row: ServiceRequest) {
+    switch (actionKey) {
+      case 'addSpecimen':
+        this.launchSpecimenDialog(row);
+        break;
+      case 'addResult':
+        this.launchResultDialog(row);
+        break;
+      default:
+        break;
+    }
+  }
+authService = inject(AuthService);
+fhirTransformService = inject(FhirResourceTransformService);
+fhirResourceService = inject(FhirResourceService)
+  private launchSpecimenDialog(row: ServiceRequest) {
+    const patientId = this.extractPatientId(row);
+     const dialogRef = this.dialog.open(AddSpecimenComponent, {
+          maxHeight: '90vh',
+          maxWidth: '650px',
+          autoFocus: false,
+          data: { patientId, serviceRequestId: row.id }
+        });
+    
+        dialogRef.afterClosed().subscribe((result) => {
+          if (!result || !result.values || (Array.isArray(result.values) && result.values.length === 0)) {
+            this.errorService.openandCloseError('No Specimen was created as the form was closed without submission.');
+            return;
+          }
+    
+          let values = result.values;
+          if (!Array.isArray(values)) {
+            values = [values];
+          }
+    
+          const practitionerId = this.authService.user.getValue()?.['userId'];
+          const practitionerRef = practitionerId ? `Practitioner/${practitionerId}` : null;
+    
+          const specimenResources = values.map((val: any) => {
+            const resource: any = {
+              ...this.fhirTransformService.transformValues('Specimen', val),
+              resourceType: 'Specimen'
+            };
+            if (practitionerRef) {
+              resource.collection = {
+                ...(resource.collection || {}),
+                collector: { reference: practitionerRef }
+              };
+            }
+            resource.status = resource.status?.toLowerCase();
+        //  return resource;
+            return resource;
+          });
+    
+          const bundle: Bundle<any> = {
+            resourceType: 'Bundle',
+            type: 'transaction',
+            entry: specimenResources.map((resource: any) => ({
+              resource,
+              request: { method: 'POST', url: 'Specimen' }
+            }))
+          };
+    
+          this.fhirResourceService.postBundle(bundle).subscribe({
+            next: (response) => {
+              const persistedResources =
+                response?.bundle?.entry?.map((entry: any) => entry.resource).filter(Boolean) ?? specimenResources;
+    
+              persistedResources.forEach((resource: any) => {
+                this.stateService.persistOrgWideResource(resource, 'saved');
+                if (patientId) {
+                  this.stateService.persistPatientResource(resource, 'saved');
+                }
+              });
+    
+              this.snackBar.openFromComponent(SuccessMessageComponent, {
+                data: { message: 'Specimen record(s) created successfully.' },
+                duration: 3000
+              });
+            },
+            error: () => {
+              this.errorService.openandCloseError('Error creating specimen record(s). Please try again later.');
+            }
+          });
+        });
+    // this.encounterService.addSpecimen(patientId, row.id);
+  }
+snackBar = inject(MatSnackBar);
+  private launchResultDialog(row: ServiceRequest) {
+    const patientId = this.extractPatientId(row) ?? this.patientId;
+    this.addLabResults(patientId || null);
+  }
+
+  private extractPatientId(row: ServiceRequest): string | undefined {
+    const ref = row.subject?.reference || '';
+    const [, id] = ref.split('/');
+    return id || undefined;
   }
 }

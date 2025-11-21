@@ -103,6 +103,7 @@ export class ResourceDataReviewComponent implements OnInit {
         });
         const dialogRef = this.dialog.open(DynamicFormsV2Component, {
             width: '800px',
+            maxHeight: '90vh',
             data: {
                 formMetaData: { formName: 'Edit Details', submitText: 'Save Changes', closeDialogOnSubmit: true },
                 formFields: fieldsWithValues

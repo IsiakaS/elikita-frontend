@@ -195,7 +195,7 @@ export class LabrequestDetailsComponent {
   auth = inject(AuthService);
   user: any = null;
   encounterService = inject(EncounterServiceService);
-  capacityObject = capacityObject;
+  capacityObject = capacityObject as any;
   ngOnInit() {
     this.auth.user.subscribe((user) => {
       this.user = user;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Encounter, Observation, Resource, ServiceRequest } from 'fhir/r4';
+import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration } from 'fhir/r4';
 import { Condition, Medication, MedicationRequest, Patient } from 'fhir/r4';
 import { BehaviorSubject, mergeMapTo, Observable } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
@@ -62,6 +62,26 @@ export class StateService {
       savedStatus: 'saved' | 'unsaved',
       actualResource: MedicationRequest
     }>>([]),
+    specimens: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Specimen
+    }>>([]),
+    medications: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Medication
+    }>>([]),
+    medicationDispenses: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: MedicationDispense
+    }>>([]),
+    medicationAdministrations: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: MedicationAdministration
+    }>>([]),
     encounters: new BehaviorSubject<Array<{
       referenceId: string | null,
       savedStatus: 'saved' | 'unsaved',
@@ -81,10 +101,66 @@ export class StateService {
       savedStatus: 'saved' | 'unsaved',
       actualResource: Resource
     }>>([]),
-
   }
 
 
+
+  orgWideResources = {
+    observations: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Observation
+    }>>([]),
+    condition: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Condition
+    }>>([]),
+    medicationRequests: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: MedicationRequest
+    }>>([]),
+    specimens: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Specimen
+    }>>([]),
+    medications: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Medication
+    }>>([]),
+    medicationDispenses: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: MedicationDispense
+    }>>([]),
+    medicationAdministrations: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: MedicationAdministration
+    }>>([]),
+    encounters: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Encounter
+    }>>([]),
+    currentPatient: new BehaviorSubject<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Patient
+    }>({
+      referenceId: null,
+      savedStatus: 'unsaved',
+      actualResource: {} as Patient
+    }),
+    serviceRequests: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Resource
+    }>>([]),
+  }
 
   private encounterChecklistCompleted = new BehaviorSubject<boolean>(false);
   encounterChecklistCompleted$ = this.encounterChecklistCompleted.asObservable();
@@ -159,6 +235,16 @@ export class StateService {
       if (this.isResourceForCurrentEncounter(resource)) {
         this.addResourceToCurrentEncounterResources(resource, status);
       }
+    }
+  }
+
+  processOrgWideBundleTransaction(bundle: Bundle) {
+    const entries = bundle?.entry ?? [];
+    for (const entry of entries) {
+      const resource = entry.resource as Resource | undefined;
+      if (!resource) continue;
+      const status: 'saved' | 'unsaved' = resource.id ? 'saved' : 'unsaved';
+      this.addResourceToOrgWideResources(resource, status);
     }
   }
 
@@ -244,6 +330,38 @@ export class StateService {
         });
         break;
       }
+      case 'Specimen': {
+        this.upsertToSubject(this.PatientResources.specimens, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as Specimen
+        });
+        break;
+      }
+      case 'Medication': {
+        this.upsertToSubject(this.PatientResources.medications, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as Medication
+        });
+        break;
+      }
+      case 'MedicationDispense': {
+        this.upsertToSubject(this.PatientResources.medicationDispenses, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as MedicationDispense
+        });
+        break;
+      }
+      case 'MedicationAdministration': {
+        this.upsertToSubject(this.PatientResources.medicationAdministrations, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as MedicationAdministration
+        });
+        break;
+      }
       case 'Encounter': {
         this.addEncounterToPatientResources(resource as Encounter, savedStatus);
         break;
@@ -275,6 +393,41 @@ export class StateService {
       }
       default:
         // Unsupported resource types can be handled here if needed.
+        break;
+    }
+  }
+
+  private addResourceToOrgWideResources(resource: Resource, savedStatus: 'saved' | 'unsaved' = 'unsaved') {
+    const referenceId = this.toRefId(resource);
+    switch (resource.resourceType) {
+      case 'Observation':
+        this.upsertToSubject(this.orgWideResources.observations, { referenceId, savedStatus, actualResource: resource as Observation });
+        break;
+      case 'Condition':
+        this.upsertToSubject(this.orgWideResources.condition, { referenceId, savedStatus, actualResource: resource as Condition });
+        break;
+      case 'MedicationRequest':
+        this.upsertToSubject(this.orgWideResources.medicationRequests, { referenceId, savedStatus, actualResource: resource as MedicationRequest });
+        break;
+      case 'Specimen':
+        this.upsertToSubject(this.orgWideResources.specimens, { referenceId, savedStatus, actualResource: resource as Specimen });
+        break;
+      case 'Medication':
+        this.upsertToSubject(this.orgWideResources.medications, { referenceId, savedStatus, actualResource: resource as Medication });
+        break;
+      case 'MedicationDispense':
+        this.upsertToSubject(this.orgWideResources.medicationDispenses, { referenceId, savedStatus, actualResource: resource as MedicationDispense });
+        break;
+      case 'MedicationAdministration':
+        this.upsertToSubject(this.orgWideResources.medicationAdministrations, { referenceId, savedStatus, actualResource: resource as MedicationAdministration });
+        break;
+      case 'Encounter':
+        this.upsertToSubject(this.orgWideResources.encounters, { referenceId, savedStatus, actualResource: resource as Encounter });
+        break;
+      case 'ServiceRequest':
+        this.upsertToSubject(this.orgWideResources.serviceRequests, { referenceId, savedStatus, actualResource: resource as ServiceRequest });
+        break;
+      default:
         break;
     }
   }
@@ -341,6 +494,14 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
       this.addResourceToPatientResources(resource, savedStatus);
 
     }
+  }
+
+  public persistPatientResource(resource: Resource, savedStatus: 'saved' | 'unsaved' = 'unsaved') {
+    this.addResourceToPatientResources(resource, savedStatus);
+  }
+
+  public persistOrgWideResource(resource: Resource, savedStatus: 'saved' | 'unsaved') {
+    this.addResourceToOrgWideResources(resource, savedStatus);
   }
 
   private buildCodeableConcept(raw: any): any {

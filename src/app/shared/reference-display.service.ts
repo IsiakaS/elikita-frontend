@@ -17,15 +17,15 @@ export class ReferenceDisplayService {
     readonly refDisplays$ = new BehaviorSubject<Record<string, string>>({});
 
     // Ensure display is available (fetch if needed)
-    ensure(ref: string): Observable<string> {
+    ensure(ref: string, options?: { instantReplace?: boolean; keepReference?: boolean }): Observable<string> {
         if (!ref) return of('');
         const cached = this.cache[ref];
-        if (cached) return of(cached);
+        if (cached) return of(this.applyDisplayFormatting(ref, cached, options));
 
         const { type, id } = this.splitRef(ref);
         if (!type || !id) {
             this.updateCache(ref, ref);
-            return of(ref);
+            return of(this.applyDisplayFormatting(ref, ref, options));
         }
 
         return this.http.get<any>(`${this.backend}/${type}/${id}`, {
@@ -34,11 +34,12 @@ export class ReferenceDisplayService {
         }).pipe(
             map((res) => this.buildDisplayFromResource(type, res) || `${type}/${id}`),
             tap((display) => this.updateCache(ref, display)),
+            map((display) => this.applyDisplayFormatting(ref, display, options)),
             catchError(() => {
                 const fallback = `${type}/${id}`;
 
                 this.updateCache(ref, fallback);
-                return of(fallback);
+                return of(this.applyDisplayFormatting(ref, fallback, options));
             })
         );
     }
@@ -46,6 +47,16 @@ export class ReferenceDisplayService {
     private updateCache(ref: string, display: string) {
         this.cache[ref] = display;
         this.refDisplays$.next({ ...this.cache });
+    }
+
+    private applyDisplayFormatting(ref: string, display: string, options?: { instantReplace?: boolean; keepReference?: boolean }): string {
+        if (!options?.instantReplace) {
+            return display;
+        }
+        if (options.keepReference) {
+            return `${ref}\n${display}`;
+        }
+        return display;
     }
 
     private splitRef(ref: string): { type: string | null; id: string | null } {
@@ -97,6 +108,18 @@ export class ReferenceDisplayService {
                 if (cc?.text) return String(cc.text);
                 const coding = Array.isArray(cc?.coding) ? cc.coding : [];
                 return coding[0]?.display || coding[0]?.code || res?.id || '';
+            }
+            case 'servicerequest': {
+                const code = res?.code || {};
+                const coding = Array.isArray(code?.coding) ? code.coding : [];
+                return (
+                    code?.text ||
+                    coding[0]?.display ||
+                    coding[0]?.code ||
+                    res?.requisition?.value ||
+                    res?.id ||
+                    ''
+                );
             }
             default:
                 return res?.id || '';

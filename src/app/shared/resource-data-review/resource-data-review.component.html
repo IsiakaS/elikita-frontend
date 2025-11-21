@@ -16,7 +16,7 @@
                     @for (sf of simpleFields; track sf.fieldApiName; let last = $last) {
                     <div class="field-row">
                         <span class="field-label subtitle-text-color-2">{{ sf.fieldLabel }}</span>
-                        <span class="field-value">{{( sf.data.display || (sf.data?.split('$#$')?.length>1 ? (sf.data  | splitHash:1 ) : sf.data)) | titlecase }}</span>
+                        <span class="field-value">{{( sf.data?.display || (sf.data?.split('$#$')?.length>1 ? (sf.data  | splitHash:1 ) : sf.data)) | titlecase }}</span>
                     </div>
                     @if(!$last){
                     <mat-divider></mat-divider>

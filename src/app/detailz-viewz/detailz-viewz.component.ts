@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnInit, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { DetailsBuilderService, DetailsBuilderObject } from './details-builder.service';
 import { Resource } from 'fhir/r4b';
  import { JsonPipe, TitleCasePipe } from '@angular/common';
@@ -17,7 +17,7 @@ import { LinkInReferencesService } from '../shared/link-in-references.service';
 import { fetchFromReferencePipe } from "../shared/Fetch.pipe";
 import { CodeableReferenceDisplayComponent } from "../shared/codeable-reference-display/codeable-reference-display.component";
 import { SpecialHeaderComponent } from "../shared/special-header/special-header.component";
-import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common';
 import { forkJoin, map, Observable } from 'rxjs';
 import { baseStatusStyles } from '../shared/statusUIIcons';
 import { ReferenceDisplayComponent } from "../shared/reference-display/reference-display.component";
@@ -32,6 +32,7 @@ import { TabledOptionComponent } from '../tabled-option/tabled-option.component'
 import { RESOURCE_PROPERTY_TYPES } from '../shared/fhir-resource-transform.service';
 import { NaPipe } from "../shared/na.pipe";
 import { SpecialHeaderV2Component } from '../special-header-v2/special-header-v2.component';
+import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 
 export const RESOURCE_KEY_LABELS: Record<string, Record<string, string>> = {
   MedicationRequest: {
@@ -50,7 +51,14 @@ export const RESOURCE_KEY_LABELS: Record<string, Record<string, string>> = {
     authoredOn: 'Authored On',
     dispenseRequest: 'Dispense Request',
     substitution: 'Substitution',
-    groupIdentifier: 'Group Identifier'
+    groupIdentifier: 'Group Identifier',
+    'dosageInstruction.text': 'Dosage Instructions (Text)',
+    'dosageInstruction.additionalInstruction': 'Additional Instructions',
+    'dosageInstruction.patientInstruction': 'Patient Instructions',
+    'dosageInstruction.timing': 'Timing',
+    'dosageInstruction.route': 'Route',
+    'dosageInstruction.method': 'Method',
+    'dosageInstruction.doseAndRate': 'Dose & Rate'
   },
   ServiceRequest: {
     status: 'Status',
@@ -65,14 +73,106 @@ export const RESOURCE_KEY_LABELS: Record<string, Record<string, string>> = {
     reasonCode: 'Reason Code',
     authoredOn: 'Authored On',
     identifier: 'Identifier',
-    specimen: 'Specimen'
+    specimen: 'Specimen',
+    'orderDetail.parameterCodeableConcept': 'Order Detail Code',
+    'orderDetail.parameterString': 'Order Detail Notes',
+    'orderDetail.parameterQuantity': 'Order Detail Quantity'
+  },
+  Specimen: {
+    status: 'Status',
+    type: 'Specimen Type',
+    subject: 'Subject',
+    request: 'Associated Request',
+    collection: 'Collection Details',
+    'collection.collector': 'Collected By',
+    'collection.collectedDateTime': 'Collection Time',
+    'collection.bodySite': 'Collection Site',
+    'collection.method': 'Collection Method',
+    'collection.quantity': 'Collection Quantity',
+    receivedTime: 'Received Time',
+    condition: 'Condition',
+    bodySite: 'Body Site',
+    note: 'Notes'
+  },
+  Observation: {
+    status: 'Status',
+    category: 'Category',
+    code: 'Observation Code',
+    subject: 'Subject',
+    encounter: 'Encounter',
+    effectiveDateTime: 'Effective Time',
+    valueQuantity: 'Value (Quantity)',
+    valueString: 'Value (Text)',
+    performer: 'Performer',
+    interpretation: 'Interpretation',
+    referenceRange: 'Reference Range',
+    specimen: 'Specimen',
+    'component.code': 'Component Code',
+    'component.valueQuantity': 'Component Value',
+    'component.valueString': 'Component Value (Text)',
+    'component.valueCodeableConcept': 'Component Concept',
+    'component.interpretation': 'Component Interpretation'
+  },
+  Condition: {
+    clinicalStatus: 'Clinical Status',
+    verificationStatus: 'Verification Status',
+    category: 'Category',
+    severity: 'Severity',
+    code: 'Diagnosis Code',
+    subject: 'Patient',
+    encounter: 'Encounter',
+    onsetDateTime: 'Onset Date',
+    abatementDateTime: 'Abatement Date',
+    recordedDate: 'Recorded Date',
+    asserter: 'Asserter',
+    note: 'Notes',
+    'stage.summary': 'Stage Summary',
+    'stage.assessment': 'Stage Assessment',
+    'stage.type': 'Stage Type'
+  },
+  Medication: {
+    code: 'Medication Code',
+    status: 'Status',
+    manufacturer: 'Manufacturer',
+    form: 'Form',
+    amount: 'Amount',
+    ingredient: 'Ingredients'
+  },
+  MedicationDispense: {
+    status: 'Status',
+    medicationCodeableConcept: 'Medication',
+    subject: 'Patient',
+    performer: 'Dispenser',
+    authorizingPrescription: 'Authorizing Prescription',
+    quantity: 'Quantity',
+    whenHandedOver: 'Handed Over',
+    dosageInstruction: 'Dosage Instructions'
+  },
+  MedicationAdministration: {
+    status: 'Status',
+    medicationCodeableConcept: 'Medication',
+    subject: 'Patient',
+    performer: 'Performer',
+    encounter: 'Encounter',
+    effectiveDateTime: 'Effective Time',
+    dosage: 'Dosage',
+    reasonCode: 'Reason',
+    note: 'Notes'
   }
 };
+
+export interface DetailActionButton {
+  key: string;
+  label?: string;
+  icon?: string;
+  color?: 'primary' | 'accent' | 'warn';
+  capabilities?: Array<{ resource: keyof typeof capacityObject; action: string }>;
+}
 
 @Component({
   selector: 'app-detailz-viewz',
   imports: [MatCardModule,
-    JsonPipe, SpecialHeaderV2Component,
+    JsonPipe, SpecialHeaderV2Component, ReferenceDisplayDirective,
     TitleCasePipe, MatIconModule, MatDividerModule, TabledOptionComponent,
     DetailsCardzComponent,
     DetailBaseComponent, ...commonImports, fetchFromReferencePipe, CodeableReferenceDisplayComponent, SpecialHeaderComponent, ReferenceDisplayComponent, NaPipe],
@@ -85,22 +185,37 @@ export class DetailzViewzComponent implements OnInit {
   dialogData = inject(MAT_DIALOG_DATA, { optional: true }) as {
     resourceData?: Resource;
     detailsBuilderObject?: DetailsBuilderObject;
+    excludeKeys?: string[];
+    showOnlyKeysWithValues?: boolean;
+    actionButtons?: DetailActionButton[];
   } | null;
 
   keyVsResourceType = RESOURCE_PROPERTY_TYPES;
   @Input() resourceData?: Resource;
   @Input() detailsBuilderObject?: DetailsBuilderObject;
+  @Input() excludeKeys?: string[];
+  @Input() showOnlyKeysWithValues = false;
+  @Input() actionButtons?: DetailActionButton[];
+  @Output() actionInvoked = new EventEmitter<{ key: string; resource?: Resource }>();
 
   refinedResourceData: Record<string, any> | null = null;
+  private auth = inject(AuthService);
 
   ngOnInit(): void {
     if (!this.resourceData && this.dialogData?.resourceData) {
       this.resourceData = this.dialogData.resourceData;
-      console.log(this.resourceData)
     }
     if (!this.detailsBuilderObject && this.dialogData?.detailsBuilderObject) {
       this.detailsBuilderObject = this.dialogData.detailsBuilderObject;
-      console.log(this.detailsBuilderObject);
+    }
+    if (!this.excludeKeys && this.dialogData?.excludeKeys) {
+      this.excludeKeys = this.dialogData.excludeKeys;
+    }
+    if (this.dialogData?.showOnlyKeysWithValues !== undefined) {
+      this.showOnlyKeysWithValues = this.dialogData.showOnlyKeysWithValues;
+    }
+    if (!this.actionButtons && this.dialogData?.actionButtons) {
+      this.actionButtons = this.dialogData.actionButtons;
     }
     this.buildRefinedResource();
   }
@@ -117,11 +232,61 @@ export class DetailzViewzComponent implements OnInit {
       return;
     }
     const { resourceType, ...payload } = this.resourceData as Resource & Record<string, any>;
-    this.refinedResourceData = this.detailsBuilderService.stringifyResource(
-      resourceType,
-      payload
-      
-    );
+    const refined = this.detailsBuilderService.stringifyResource(resourceType, payload);
+    this.refinedResourceData = this.applyDisplayFilters(refined);
+  }
+
+  private applyDisplayFilters(data: Record<string, any> | null): Record<string, any> | null {
+    if (!data) return null;
+    const filtered: Record<string, any> = {};
+    const excludes = (this.excludeKeys || []).map(k => k.toLowerCase());
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (excludes.includes(key.toLowerCase())) return;
+      if (this.showOnlyKeysWithValues) {
+        if (value === null || value === undefined || value === '' || (Array.isArray(value) && !value.length)) {
+          return;
+        }
+      }
+      filtered[key] = value;
+    });
+
+    return filtered;
+  }
+
+  canShowAction(button: DetailActionButton): boolean {
+    if (!button?.capabilities || !button.capabilities.length) return true;
+    return button.capabilities.some(cap => this.auth.can(cap.resource, cap.action));
+  }
+
+  triggerAction(button: DetailActionButton): void {
+    this.actionInvoked.emit({ key: button.key, resource: this.resourceData });
+  }
+
+  isBackboneField(field: string): boolean {
+    const typeMap = this.keyVsResourceType[this.resourceData?.resourceType || ''];
+    const entry = typeMap?.[field];
+    return !!entry && typeof entry === 'object' && 'kind' in entry && entry.kind === 'BackboneElement';
+  }
+
+  isReferenceField(field: string): boolean {
+    const typeMap = this.keyVsResourceType[this.resourceData?.resourceType || ''];
+    return (typeMap?.[field] === 'Reference');
+  }
+
+  getReferenceValue(field: string): any {
+    const value = (this.resourceData as any)?.[field];
+    if (value?.reference) {
+      return value.reference;
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return null;
+  }
+
+  explainFilteredResponse(): string {
+    return 'The previous response was blocked by the platform’s safety filters.';
   }
 }
 
@@ -226,7 +391,7 @@ export class DetailzViewzComponent implements OnInit {
 // import { fetchFromReferencePipe } from "../shared/Fetch.pipe";
 // import { CodeableReferenceDisplayComponent } from "../shared/codeable-reference-display/codeable-reference-display.component";
 // import { SpecialHeaderComponent } from "../shared/special-header/special-header.component";
-// import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common';
 // import { forkJoin, map, Observable } from 'rxjs';
 // import { baseStatusStyles } from '../shared/statusUIIcons';
 // import { ReferenceDisplayComponent } from "../shared/reference-display/reference-display.component";

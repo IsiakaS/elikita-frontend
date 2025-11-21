@@ -25,8 +25,26 @@ export type PropertyKind =
     'string[]' |
     'primitive';
 
+export interface BackboneProperty {
+    kind: 'BackboneElement';
+    fields: ResourcePropertyMap;
+    isArray?: boolean;
+}
+
+export type ResourcePropertyMap = Record<string, PropertyKind | BackboneProperty>;
+export type ResourcePropertyRegistry = Record<string, ResourcePropertyMap>;
+
+export const isBackboneProperty = (value: any): value is BackboneProperty =>
+    !!value && typeof value === 'object' && value.kind === 'BackboneElement';
+
+const backbone = (fields: ResourcePropertyMap, isArray = false): BackboneProperty => ({
+    kind: 'BackboneElement',
+    fields,
+    isArray
+});
+
 // Minimal mapping (extend as needed)
-export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind>> = {
+export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
     Patient: {
         gender: 'string',
         maritalStatus: 'CodeableConcept',
@@ -49,7 +67,19 @@ export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind
         method: 'CodeableConcept',
         focus: 'Reference[]',
         subject: 'Reference',
-        performer: 'Reference[]'
+        performer: 'Reference[]',
+        component: backbone({
+            code: 'CodeableConcept',
+            valueQuantity: 'primitive',
+            valueString: 'string',
+            valueCodeableConcept: 'CodeableConcept',
+            interpretation: 'CodeableConcept[]'
+        }, true),
+        'component.code': 'CodeableConcept',
+        'component.valueQuantity': 'primitive',
+        'component.valueString': 'string',
+        'component.valueCodeableConcept': 'CodeableConcept',
+        'component.interpretation': 'CodeableConcept[]'
     },
     ServiceRequest: {
         status: 'string',
@@ -58,9 +88,18 @@ export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind
         code: 'CodeableConcept',
         category: 'CodeableConcept[]',
         reasonCode: 'CodeableConcept[]',
+        requester: 'Reference',
         subject: 'Reference',
         performer: 'Reference[]',
-        performerType: 'CodeableConcept'
+        performerType: 'CodeableConcept',
+        orderDetail: backbone({
+            parameterCodeableConcept: 'CodeableConcept',
+            parameterString: 'string',
+            parameterQuantity: 'primitive'
+        }, true),
+        'orderDetail.parameterCodeableConcept': 'CodeableConcept',
+        'orderDetail.parameterString': 'string',
+        'orderDetail.parameterQuantity': 'primitive'
     },
     MedicationRequest: {
         status: 'string',
@@ -71,7 +110,23 @@ export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind
         reasonCode: 'CodeableConcept[]',
         reasonReference: 'Reference[]',
         performerType: 'CodeableConcept',
-        requester: 'Reference'
+        requester: 'Reference',
+        dosageInstruction: backbone({
+            text: 'string',
+            additionalInstruction: 'CodeableConcept[]',
+            patientInstruction: 'string',
+            timing: 'primitive',
+            route: 'CodeableConcept',
+            method: 'CodeableConcept',
+            doseAndRate: 'primitive'
+        }, true),
+        'dosageInstruction.text': 'string',
+        'dosageInstruction.additionalInstruction': 'CodeableConcept[]',
+        'dosageInstruction.patientInstruction': 'string',
+        'dosageInstruction.timing': 'primitive',
+        'dosageInstruction.route': 'CodeableConcept',
+        'dosageInstruction.method': 'CodeableConcept',
+        'dosageInstruction.doseAndRate': 'primitive'
     },
     AllergyIntolerance: {
         clinicalStatus: 'CodeableConcept',
@@ -120,7 +175,21 @@ export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind
     Specimen: {
         type: 'CodeableConcept',
         subject: 'Reference',
-        collection: 'Reference'
+        collection: backbone({
+            collector: 'Reference',
+            collectedDateTime: 'string',
+            bodySite: 'CodeableConcept',
+            method: 'CodeableConcept',
+            quantity: 'primitive'
+        }),
+        'collection.collector': 'Reference',
+        'collection.collectedDateTime': 'string',
+        'collection.bodySite': 'CodeableConcept',
+        'collection.method': 'CodeableConcept',
+        'collection.quantity': 'primitive',
+        request: 'Reference[]',
+        condition: 'CodeableConcept[]',
+        note: 'string[]'
     },
     Task: {
         status: 'string',
@@ -143,7 +212,15 @@ export const RESOURCE_PROPERTY_TYPES: Record<string, Record<string, PropertyKind
     Condition: {
         code: 'CodeableConcept',
         category: 'CodeableConcept[]',
-        subject: 'Reference'
+        subject: 'Reference',
+        stage: backbone({
+            summary: 'CodeableConcept',
+            assessment: 'Reference[]',
+            type: 'CodeableConcept'
+        }, true),
+        'stage.summary': 'CodeableConcept',
+        'stage.assessment': 'Reference[]',
+        'stage.type': 'CodeableConcept'
     }
 };
 
@@ -164,8 +241,15 @@ export class FhirResourceTransformService {
                 result[key] = value;
                 return;
             }
-            const kind: PropertyKind = typeMap[key] || this.inferKind(value);
-            result[key] = this.applyKindTransform(value, kind);
+            const configEntry = typeMap[key];
+            if (isBackboneProperty(configEntry)) {
+                result[key] = this.transformBackbone(value, configEntry);
+            } else if (configEntry) {
+                result[key] = this.applyKindTransform(value, configEntry as PropertyKind);
+            } else {
+                const inferred = this.inferKind(value);
+                result[key] = this.applyKindTransform(value, inferred);
+            }
         });
         return result;
     }
@@ -185,6 +269,30 @@ export class FhirResourceTransformService {
         if (Array.isArray(value)) return 'string[]';
         if (typeof value === 'string') return 'string';
         return 'primitive';
+    }
+
+    private transformBackbone(value: any, config: BackboneProperty): any {
+        if (value == null) return value;
+        if (config.isArray) {
+            return this.ensureArray(value).map(item => this.transformBackboneFields(item, config.fields));
+        }
+        if (typeof value !== 'object') return value;
+        return this.transformBackboneFields(value, config.fields);
+    }
+
+    private transformBackboneFields(value: Record<string, any>, fields: ResourcePropertyMap): Record<string, any> {
+        const result: Record<string, any> = {};
+        Object.entries(value || {}).forEach(([childKey, childVal]) => {
+            const childConfig = fields[childKey];
+            if (isBackboneProperty(childConfig)) {
+                result[childKey] = this.transformBackbone(childVal, childConfig);
+            } else if (childConfig) {
+                result[childKey] = this.applyKindTransform(childVal, childConfig as PropertyKind);
+            } else {
+                result[childKey] = childVal;
+            }
+        });
+        return result;
     }
 
     private applyKindTransform(value: any, kind: PropertyKind): any {

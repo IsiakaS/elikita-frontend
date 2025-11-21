@@ -108,31 +108,45 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
         console.warn('Failed to load observations:', err);
         return of([]);
       })
-    )
+    ),
     //medicationRequest
-    ,    // Fetch patient medication requests
+    // Fetch patient medication requests
     http.get<Bundle<any>>(`${baseUrl}/MedicationRequest?patient=${patientId}&_count=200`).pipe(
-      map((medRequests: Bundle<any>) => {
-        console.log('Successfully fetched medication requests from FHIR server:', medRequests);
-        return medRequests.entry?.map((mr: BundleEntry<any>) => mr.resource) || [];
-      })),
+      map((medRequests) => medRequests.entry?.map((mr: BundleEntry<any>) => mr.resource) || [])
+    ),
     //allergies
     http.get<Bundle<any>>(`${baseUrl}/AllergyIntolerance?patient=${patientId}&_count=200`).pipe(
       map((allergies: Bundle<any>) => {
         console.log('Successfully fetched allergies from FHIR server:', allergies);
         return allergies.entry?.map((a: BundleEntry<any>) => a.resource) || [];
       })),
-
     //fetch patient labRequests - service Requests filtered to laboratory type
     http.get<Bundle<any>>(`${baseUrl}/ServiceRequest?patient=${patientId}&_count=199`).pipe(
       map((labRequests: Bundle<any>) => {
         console.log('Successfully fetched lab requests from FHIR server:', labRequests);
         return labRequests.entry?.map((lr: BundleEntry<any>) => lr.resource) || [];
-      }))
-
-
-
-  ]).pipe(map(([patient, encounters, conditions, observations, MedicationRequest, AllergyIntolerance, serviceRequests]) => {
+      })),
+    //specimens
+    http.get<Bundle<any>>(`${baseUrl}/Specimen?patient=${patientId}&_count=199`).pipe(
+      map((bundle) => bundle.entry?.map((entry: BundleEntry<any>) => entry.resource) || []),
+      catchError(() => of([]))
+    ),
+    //medications
+    http.get<Bundle<any>>(`${baseUrl}/Medication?patient=${patientId}&_count=199`).pipe(
+      map((bundle) => bundle.entry?.map((entry: BundleEntry<any>) => entry.resource) || []),
+      catchError(() => of([]))
+    ),
+    //medicationDispense
+    http.get<Bundle<any>>(`${baseUrl}/MedicationDispense?patient=${patientId}&_count=199`).pipe(
+      map((bundle) => bundle.entry?.map((entry: BundleEntry<any>) => entry.resource) || []),
+      catchError(() => of([]))
+    ),
+    //medicationAdministration
+    http.get<Bundle<any>>(`${baseUrl}/MedicationAdministration?patient=${patientId}&_count=199`).pipe(
+      map((bundle) => bundle.entry?.map((entry: BundleEntry<any>) => entry.resource) || []),
+      catchError(() => of([]))
+    )
+  ]).pipe(map(([patient, encounters, conditions, observations, MedicationRequest, AllergyIntolerance, serviceRequests, specimens, medications, medicationDispenses, medicationAdministrations]) => {
 
     stateService.PatientResources.condition.next(
       (conditions || []).reverse().map((condition: any) => {
@@ -182,7 +196,34 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
         actualResource: medRequest
       }))
     );
-
+    stateService.PatientResources.specimens.next(
+      (specimens || []).map(specimen => ({
+        referenceId: specimen.id ? `Specimen/${specimen.id}` : null,
+        savedStatus: 'saved',
+        actualResource: specimen
+      }))
+    );
+    stateService.PatientResources.medications.next(
+      (medications || []).map(med => ({
+        referenceId: med.id ? `Medication/${med.id}` : null,
+        savedStatus: 'saved',
+        actualResource: med
+      }))
+    );
+    stateService.PatientResources.medicationDispenses.next(
+      (medicationDispenses || []).map(medDispense => ({
+        referenceId: medDispense.id ? `MedicationDispense/${medDispense.id}` : null,
+        savedStatus: 'saved',
+        actualResource: medDispense
+      }))
+    );
+    stateService.PatientResources.medicationAdministrations.next(
+      (medicationAdministrations || []).map(medAdmin => ({
+        referenceId: medAdmin.id ? `MedicationAdministration/${medAdmin.id}` : null,
+        savedStatus: 'saved',
+        actualResource: medAdmin
+      }))
+    );
     // Preserve direct access to patient name/gender/etc while adding arrays
     return {
       ...patient,

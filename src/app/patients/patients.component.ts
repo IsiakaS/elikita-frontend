@@ -21,6 +21,7 @@ import { PatientAddressPipe } from '../shared/pipes/patient-address.pipe';
 import { PatientContactsPipe } from '../shared/pipes/patient-contacts.pipe';
 import { PatientAgePipe } from '../shared/pipes/patient-age.pipe';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
+import { AuthService } from '../shared/auth/auth.service';
 
 
 @Component({
@@ -60,6 +61,8 @@ export class PatientsComponent {
     title: 'No active patients found',
     subtitle: 'There are currently no active patients in the system or all patients have been filtered out.'
   };
+
+  private auth = inject(AuthService);
 
   constructor() {
 
@@ -169,10 +172,18 @@ export class PatientsComponent {
     
     console.log('Navigating to patient:', patientId);
     
+    const segments = [patientId];
+    const role = this.auth.user.getValue()?.role;
+    if (role === 'lab') {
+      segments.push('tests-requests');
+    } else if (role === 'pharmacy') {
+      segments.push('medications');
+    }
+
     if (this.route.routeConfig?.path?.split('/').includes("admitted-patients")) {
-      this.router.navigate([patientId], { relativeTo: this.route });
+      this.router.navigate(segments, { relativeTo: this.route });
     } else {
-      this.router.navigate([patientId], { relativeTo: this.route });
+      this.router.navigate(segments, { relativeTo: this.route });
     }
   }
 

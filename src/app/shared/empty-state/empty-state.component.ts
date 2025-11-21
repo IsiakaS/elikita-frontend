@@ -72,6 +72,7 @@ export class EmptyStateComponent {
     EMPTY: 'folder_open',
     SEARCH: 'search_off',
     FILTER: 'filter_list_off',
+    SCIENCE: 'science',
 
     // Medical/Healthcare
     PATIENTS: 'people_outline',

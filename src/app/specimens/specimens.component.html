@@ -1,33 +1,110 @@
-<mat-card class="p-20" 
-     style="width: max-content; max-width: 100%; box-sizing: border-box;">
+<mat-card class="p-20" style="width: max-content; max-width: 100%; box-sizing: border-box;">
+  <mat-card-header>
+    <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
+      <div class="left">
+        <mat-card-title>Specimens</mat-card-title>
+        <mat-card-subtitle>
+          View available specimens for the selected patient. Add new specimens from the relevant lab request.
+        </mat-card-subtitle>
+      </div>
+      <div class="right gap-10 g-just-flex">
+        @if (canExportSpecimen$ | async) {
+        <a mat-flat-button extended class="secondary-button small-button" (click)="onExportSpecimens()">
+          <mat-icon>file_download</mat-icon>
+          Export
+        </a>
+        }
+        @if (canAddSpecimen$ | async) {
+        <a mat-flat-button extended (click)="onAddSpecimen()">
+          <mat-icon>add</mat-icon>
+          Add Specimen
+        </a>
+        }
+      </div>
+    </div>
+  </mat-card-header>
 
-    <mat-card-header>
-        <div class="g-just-flex flex-between w-100 flex-wrap gap-30">
-            <div class="left">
-                <mat-card-title>Specimens</mat-card-title>
-                <mat-card-subtitle>
-                    View Available specimens here, you can add specimens for a lab test in the test request page
-                </mat-card-subtitle>
-            </div>
-            <div class="right gap-10 g-just-flex">
-                @if (canExportSpecimen$ | async) {
-                <a mat-flat-button extended class="secondary-button small-button" (click)="onExportSpecimens()">
-                    <mat-icon>file_download</mat-icon> Export
-                </a>}
-                @if (canAddSpecimen$ | async) {
-                <a mat-flat-button extended (click)="onAddSpecimen()">
-                    <mat-icon>add</mat-icon> Add Specimen
-                </a>}
-            </div>
-        </div>
-    </mat-card-header>
-    <div class="mt-20"></div>
+  <mat-card-content class="mt-20">
     <mat-divider></mat-divider>
-    <div class="mb-10"></div>
-    @if(testingTabeledOption.rawTableData !== null && false){
+    @let specimens = (tableDataLevel2 | async) ?? [];
+    @if (specimens.length > 0) {
+    <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table mt-20">
+      <ng-container matColumnDef="receivedTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="receivedTime">Received</th>
+        <td mat-cell *matCellDef="let specimen">
+          {{ specimen.receivedTime | date : 'medium' | na }}
+        </td>
+      </ng-container>
 
-    <app-tabled-option [columnMetaData]="testingTabeledOption.columnMetaData" [columns]="testingTabeledOption.columns"
-        [rawTableData]="testingTabeledOption.rawTableData" [tableHeaderMetaData]="testingTabeledOption.headerFilter">
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
+        <td mat-cell *matCellDef="let specimen">
+          @if (specimen.status) {
+          <div [appChips]="specimen.status" [fontSize]="'14px'"></div>
+          } @else {
+          <span class="subtitle-text-color-2">N/A</span>
+          }
+        </td>
+      </ng-container>
 
-    </app-tabled-option>}
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="type">Type</th>
+        <td mat-cell *matCellDef="let specimen">
+          {{ specimen.type | codeableConcept2 | na | titlecase }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="subject">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="subject">Patient</th>
+        <td mat-cell *matCellDef="let specimen">
+          @if (specimen.subject?.reference) {
+          <span [appReferenceDisplay]="specimen.subject.reference" InstantfetchAndRepace="true"></span>
+          } @else {
+          <span class="subtitle-text-color-2">N/A</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="request">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="request">Lab Request</th>
+        <td mat-cell *matCellDef="let specimen">
+          @if (specimen.request?.length) {
+          <span [appReferenceDisplay]="specimen.request[0].reference" InstantfetchAndRepace="true"></span>
+          } @else {
+          <span class="subtitle-text-color-2">N/A</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let specimen">
+          <button mat-icon-button [matMenuTriggerFor]="specimenMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #specimenMenu="matMenu">
+            <button mat-menu-item (click)="showRow(specimen)">
+              <mat-icon>visibility</mat-icon>
+              <span>View Details</span>
+            </button>
+            <!-- <button mat-menu-item (click)="encounterService.addObservation(patientId || '', 'lab-test')">
+              <mat-icon>science</mat-icon>
+              <span>Record Result</span>
+            </button> -->
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="specimenDisplayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: specimenDisplayedColumns;"></tr>
+    </table>
+    } @else {
+    <app-empty-state
+      class="py-40"
+      [icon]="'SCIENCE'"
+      [title]="'No Specimens Found'"
+      [subtitle]="'No specimens are recorded for this patient yet.'">
+    </app-empty-state>
+    }
+  </mat-card-content>
 </mat-card>

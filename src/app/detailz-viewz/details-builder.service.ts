@@ -1,7 +1,6 @@
 import { Injectable, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FhirResourceTransformService } from '../shared/fhir-resource-transform.service';
+import { FhirResourceTransformService, RESOURCE_PROPERTY_TYPES, PropertyKind, BackboneProperty, isBackboneProperty } from '../shared/fhir-resource-transform.service';
 import { Resource } from 'fhir/r4';
-import { RESOURCE_PROPERTY_TYPES, PropertyKind } from '../shared/fhir-resource-transform.service';
 
 /**
  * TODO (FHIR resource integration checklist):
@@ -113,15 +112,52 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     const result: Record<string, string> = {};
 
     Object.entries(data || {}).forEach(([key, value]) => {
-      console.log('key',key);
-      console.log('value',value);
-      const kind = typeMap[key] || this.inferKind(value);
-     
+      const configEntry = typeMap[key];
+      if (isBackboneProperty(configEntry)) {
+        result[key] = this.stringifyBackboneValue(value);
+        this.flattenBackboneFields(result, key, value, configEntry);
+        return;
+      }
+      const kind = (configEntry as PropertyKind) || this.inferKind(value);
       result[key] = this.stringifyValue(value, kind);
-    
     });
 
     return result;
+  }
+
+  private stringifyBackboneValue(value: any): string {
+    if (value == null) return '';
+    if (typeof value === 'string') return value;
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+
+  private flattenBackboneFields(
+    bucket: Record<string, string>,
+    prefix: string,
+    value: any,
+    config: BackboneProperty
+  ): void {
+    if (value == null) return;
+    const entries = config.isArray ? this.ensureArray(value) : [value];
+    entries.forEach((entry, index) => {
+      const currentPrefix = config.isArray ? `${prefix}[${index}]` : prefix;
+      Object.entries(config.fields).forEach(([childKey, childConfig]) => {
+        const childValue = entry?.[childKey];
+        if (childValue == null) return;
+        const dottedKey = `${currentPrefix}.${childKey}`;
+        if (isBackboneProperty(childConfig)) {
+          bucket[dottedKey] = this.stringifyBackboneValue(childValue);
+          this.flattenBackboneFields(bucket, dottedKey, childValue, childConfig);
+        } else {
+          const kind = (childConfig as PropertyKind) || this.inferKind(childValue);
+          bucket[dottedKey] = this.stringifyValue(childValue, kind);
+        }
+      });
+    });
   }
 
   private stringifyValue(value: any, kind: PropertyKind): string {

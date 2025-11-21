@@ -53,7 +53,7 @@ import { ImmunizationComponent } from './immunization/immunization.component';
 import { LabreportComponent } from './labreport/labreport.component';
 import { AddReportComponent } from './labreport/add-report/add-report.component';
 import { EncounterV2Component } from './encounter-v2/encounter-v2.component';
-import { SpecimenComponent } from './specimen/specimen.component';
+import { SpecimenComponent } from './specimen/specimen_old.component';
 import { LabSupplyComponent } from './lab-supply/lab-supply.component';
 import { SpecimensComponent } from './specimens/specimens.component';
 import { CreateScheduleComponent } from './create-schedule/create-schedule.component';
@@ -74,6 +74,7 @@ import { PatientRegistrationCenterComponent } from './patient-registration-cente
 import { patientRegistrationCenterResolver } from './patient-registration-center/patient-registration-center.resolver';
 import { PatientRegistrationApprovedComponent } from './patient-registration-center/patient-registration-approved.component';
 import { PatientRegistrationDeceasedComponent } from './patient-registration-center/patient-registration-deceased.component';
+import { appWrapperDataResolver } from './app-wrapper/app-wrapper-data.resolver';
 
 export const routes: Routes = [
 
@@ -248,6 +249,7 @@ export const routes: Routes = [
     {
         path: "app",
         component: AppWrapperComponent,
+        resolve: { orgWide: appWrapperDataResolver },
         canActivate: [appAuthGuard],
         canActivateChild: [appAuthGuard],
         children: [

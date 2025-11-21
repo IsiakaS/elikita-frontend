@@ -34,8 +34,7 @@
                 <div class="action-button mb-15 gap-15" style="flex-wrap: wrap;">
 
                     @if(
-                    capacityObject['labRequest']['request'].includes(user.role)
-
+                    user && capacityObject['labRequest']['request'].includes(user.role) && patientId !== null
                     )
                     { <a mat-flat-button class=" header-group" (click)="encounterService.addServiceRequest(patientId)">
                         <mat-icon>add</mat-icon>
@@ -43,8 +42,7 @@
                     </a>
                     }
                     @if(
-                    capacityObject['labRequest']['request'].includes(user.role)
-
+                    user && capacityObject['labRequest']['request'].includes(user.role) && patientId !== null
                     )
                     { <a mat-flat-button class=" header-group" (click)="encounterService.addServiceRequest(patientId)">
                         <mat-icon>edit</mat-icon>
@@ -52,7 +50,7 @@
                     </a>
                     }
                     @if(
-                    capacityObject['labRequest']['order'].includes(user.role)
+                    capacityObject['labRequest']['add'].includes(user.role)
                     )
                     { <a mat-flat-button class=" header-group">
                         <mat-icon>assignment</mat-icon>

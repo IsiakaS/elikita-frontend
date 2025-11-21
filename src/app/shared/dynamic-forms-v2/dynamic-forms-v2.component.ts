@@ -679,6 +679,8 @@ export class DynamicFormsV2Component {
 
     this.menuOpenTimer = setTimeout(() => {
       trigger.openMenu();
+      //can i  make the panel scroll itself if its going out of the view port
+      
 
       setTimeout(() => {
         const overlayRef = (trigger as any)?._overlayRef as OverlayRef | undefined;
@@ -690,8 +692,26 @@ export class DynamicFormsV2Component {
         overlayRef.updatePositionStrategy(
           this.overlay.position().global().left('0px').top(`${Math.max(top, 0)}px`)
         );
+        this.ensureOverlayWithinViewport(overlayRef);
       });
     }, 120);
+  }
+
+  private ensureOverlayWithinViewport(overlayRef: OverlayRef) {
+    if (!overlayRef?.overlayElement) return;
+    requestAnimationFrame(() => {
+      const rect = overlayRef.overlayElement.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const padding = 12;
+
+      if (rect.bottom > viewportHeight) {
+        const delta = rect.bottom - viewportHeight + padding;
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      } else if (rect.top < 0) {
+        const delta = rect.top - padding;
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+    });
   }
 
   closeMenu(trigger?: MatMenuTrigger): void {

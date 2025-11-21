@@ -31,7 +31,7 @@
                     ){
                                           <!-- {{resource[key] | json}} -->
                         <div [appReferenceDisplay]="resource[key]?.reference"
-                        [InstantfetchAndRepace]="true" class="field-value"
+                        [InstantfetchAndRepace]="true" [keepReference]="true" class="field-value"
                         ></div>
                     }@else{
                    

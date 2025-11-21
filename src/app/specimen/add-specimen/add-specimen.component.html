@@ -1,1 +1,60 @@
-<p>add-specimen works!</p>
+<div class="component-wrapper g-just-flex p-20">
+    <div style="position: relative;"
+        [ngClass]="{'mb50': isChosenOption, 'mb-100': isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData}">
+        <mat-form-field appearance="outline" floatLabel="always"
+            style="display:block; justify-content:center; margin:auto; width:max-content; padding-bottom: 20px;">
+            <mat-label>
+                Single or Group
+            </mat-label>
+            <mat-hint>
+                Add a Single or Group of Specimens
+            </mat-hint>
+            <mat-select [formControl]="isMultiple">
+                <mat-option value="Single">Single</mat-option>
+                <mat-option value="Multiple">Group</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        @if(isChosenOption && formFields && formMetaData){
+            <!-- {{isMultiple.value}} -->
+        <!-- @for(form of medicineForms; track $index; ){ -->
+        <app-dynamic-forms-v2 [formFields]="formFields" [formMetaData]="formMetaData"
+            (formSubmitted)="await processValues($event)" #cref>
+        </app-dynamic-forms-v2>
+        <!-- } -->
+        }
+        @if(isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData){
+        <!-- A "request more test and finish-OR-WHATEVER IS APPROPPRIATE" button LOCATED TO THE END OF THE CONTAINER WITH 40PX GAP -->
+        
+
+        <!--form group here-->
+        <form [formGroup]="requestForm" class="mt-30">
+            <div formArrayName="items">
+                @for(group of items.controls; track $index) {
+                <div [formGroupName]="$index" class="one-request mb-30">
+                    <app-resource-data-review [resource]="group.value" [formFields]="formFields"
+                        [submittedData]="group.value" (fieldEdited)="await onFieldEdited($index, $event)"
+                        (resourceUpdated)="await onResourceUpdated($index, $event)" [showEditButtons]="true">
+                    </app-resource-data-review>
+                </div>
+                }
+            </div>
+        </form>
+        <div class="g-just-flex gap-30 justify-content-end mt-20 dactions flex-wrap">
+
+
+@if(requestForm && requestForm.valid && items && items.length > 0 ){
+            <button mat-flat-button (click)="submitAllRequests()">
+                <mat-icon>check</mat-icon>
+                <span>Submit All Requests</span>
+            </button>
+
+        }
+        </div>
+
+        }@else{ }
+
+
+    </div>
+
+</div>

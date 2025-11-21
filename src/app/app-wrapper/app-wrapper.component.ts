@@ -21,6 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AichatComponent } from '../aichat/aichat.component';
 import { AichatService } from '../aichat.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-app-wrapper',
@@ -79,12 +80,17 @@ export class AppWrapperComponent {
       }
     })
 
+    this.route.data.subscribe(({ orgWide }) => {
+      this.orgWideDataLoaded = !!orgWide;
+    });
   }
   sideNavService = inject(ToggleSideNavService)
   auth = inject(AuthService);
   collapseSideNav: boolean = this.sideNavService.sideNavCollapsed.getValue();
   vCRef = inject(ViewContainerRef);
   topactionsService = inject(TopActionsService);
+  private route = inject(ActivatedRoute);
+  orgWideDataLoaded = false;
   ngAfterViewInit() {
 
   }

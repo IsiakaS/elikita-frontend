@@ -29,6 +29,14 @@ export class ReferenceDisplayDirective implements OnChanges {
     }
     @Input() tooltipPosition: 'above' | 'below' | 'left' | 'right' = 'above';
     @Input() showRawRef: boolean = true;
+    @Input()
+    set keepReference(value: any) {
+        this._keepReference = this.coerceBoolean(value);
+    }
+    get keepReference(): boolean {
+        return this._keepReference;
+    }
+    private _keepReference = false;
     // Instant fetch/replace option (primary and compatibility alias as requested)
     @Input() instantFetchAndReplace: boolean = false;
     @Input('InstantfetchAndRepace') set InstantfetchAndRepace(v: any) { this.instantFetchAndReplace = this.coerceBoolean(v); }
@@ -79,8 +87,6 @@ export class ReferenceDisplayDirective implements OnChanges {
     private tryInstantResolveAndReplace() {
         const ref = (this.ref || '').trim();
         if (!ref || !this.isLikelyReference(ref)) return;
-
-        // Only replace if host is empty or currently shows the raw ref, else assume already resolved
         const host = this.el.nativeElement;
         const current = (host.textContent || '').trim();
         const shouldReplace = !current || current === ref || this.showRawRef;
@@ -88,28 +94,57 @@ export class ReferenceDisplayDirective implements OnChanges {
         if (!shouldReplace) return;
 
         this.showMiniLoader();
-        this.svc.ensure(ref)
+        const options = this.instantFetchAndReplace
+            ? { instantReplace: true, keepReference: this._keepReference }
+            : undefined;
+
+        this.svc.ensure(ref, options)
             .pipe(finalize(() => this.hideMiniLoader()))
             .subscribe(display => {
-                const text = display || ref;
-                // Replace the visible text
-                this.r2.setProperty(host, 'textContent', text);
-                // Also update tooltip
-                this.tooltip.message = text;
-                this.r2.setAttribute(host, 'title', text);
+                if (this.instantFetchAndReplace && this._keepReference) {
+                    this.renderReferenceWithResolved(ref, display || ref);
+                } else {
+                    const text = display || ref;
+                    this.r2.setProperty(host, 'textContent', text);
+                }
+                this.tooltip.message = display || ref;
+                this.r2.setAttribute(host, 'title', display || ref);
             });
+    }
+
+    private renderReferenceWithResolved(reference: string, formatted: string) {
+        const host = this.el.nativeElement;
+        host.innerHTML = '';
+        const [_, ...rest] = formatted.split('\n');
+        const resolvedText = rest.join('\n').trim() || formatted;
+
+        const refSpan = this.r2.createElement('span');
+        this.r2.addClass(refSpan, 'ref-display-original');
+        this.r2.setProperty(refSpan, 'textContent', reference);
+
+        const br = this.r2.createElement('br');
+
+        const resolvedSpan = this.r2.createElement('span');
+        this.r2.addClass(resolvedSpan, 'ref-display-resolved');
+        this.r2.setProperty(resolvedSpan, 'textContent', resolvedText);
+
+        this.r2.appendChild(host, refSpan);
+        this.r2.appendChild(host, br);
+        this.r2.appendChild(host, resolvedSpan);
     }
 
     private applyEllipsisStyles() {
         const el = this.el.nativeElement;
+        const hasTableAncestor = !!this.findAncestor(el, 'TD') || !!this.findAncestor(el, 'TR');
+        if (!hasTableAncestor) {
+            return;
+        }
         this.r2.setStyle(el, 'display', 'inline-block');
         this.r2.setStyle(el, 'max-width', this.maxWidth);
-
         this.r2.setStyle(el, 'overflow', 'hidden');
         this.r2.setStyle(el, 'text-overflow', 'ellipsis');
         this.r2.setStyle(el, 'white-space', 'nowrap');
         this.r2.setStyle(el, 'vertical-align', 'bottom');
-        // do not set title aggressively; it will be set when tooltip has content
     }
 
     // Find nearest ancestor by tag name
