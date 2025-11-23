@@ -384,33 +384,129 @@ export class DynamicFormsV2Component {
   http = inject(HttpClient);
   // infoServ = inject(InfoDialogService);
   searchCodeableConceptFromBackEnd(fieldApiName: string, value: string) {
-    if (value.trim() !== "") {
-      const url = this.searchableObject[fieldApiName];
-      const allowOthers = !!this.formFields?.find((f: FormFields) => f.generalProperties.fieldApiName === fieldApiName)?.generalProperties?.allowedOthers;
-      this.http.get(`${url}&filter=${value.trim()}`).pipe(
-        map((data: any) => {
-          const base: any[] = (data?.expansion?.contains || []).map((item: any) => `${item.code}$#$${item.display}$#$${item.system}`);
-          // de-duplicate results within a single backend response
-          const deduped = Array.from(new Set(base));
-          return allowOthers && !deduped.includes('Others') ? [...deduped, 'Others'] : deduped;
-        }),
-        catchError((err) => {
-          console.error('Error fetching codeable concept options from backend:', err);
-          this.infoServ.show(`Failed to load options from backend.
-            ${allowOthers ? "You can, instead, select \"Others\" from the dropdown and then enter the value" : ""}`, { title: 'Select Options', duration: 4000 });
-          return of(allowOthers ? ['Others'] : []);
-        })
-      ).subscribe((options: any[]) => {
-        // Merge with existing cached options and de-duplicate to avoid clearing the list
-        const current = this.backendOptions[fieldApiName]?.getValue?.() || [];
-        const merged = Array.from(new Set([...(current || []), ...(options || [])]));
-        if (!this.backendOptions[fieldApiName]) {
-          this.backendOptions[fieldApiName] = new BehaviorSubject<any[]>(merged);
-        } else {
-          this.backendOptions[fieldApiName].next(merged);
-        }
-      });
+    const trimmedValue = (value ?? '').trim();
+    if (!trimmedValue || trimmedValue.toLowerCase() === 'undefined') {
+      return;
     }
+
+    const rawUrl = this.searchableObject[fieldApiName];
+    const baseUrl = Array.isArray(rawUrl) ? rawUrl[0] : rawUrl;
+
+    if (typeof baseUrl !== 'string' || !baseUrl.length) {
+      console.warn('CodeableConceptFieldFromBackEnd is missing a search URL for field:', fieldApiName, rawUrl);
+      return;
+    }
+
+    const allowOthers = !!this.formFields?.find((f: FormFields) => f.generalProperties.fieldApiName === fieldApiName)?.generalProperties?.allowedOthers;
+    const control = this.aForm.get(fieldApiName) as FormControl | null;
+
+    const handleEmptyResults = () => {
+      if (!allowOthers) {
+        return [];
+      }
+      this.infoServ.show('No options returned from the server. Defaulting to "Others".', { title: 'Select Options', duration: 4000 });
+      if (control && control.value !== 'Others') {
+        control.setValue('Others');
+      }
+      return ['Others'];
+    };
+
+    // Check if URL is RxNorm based - updated to match actual RxNorm endpoint
+    const isRxNorm = baseUrl.includes('rxnav.nlm.nih.gov');
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    const encodedTerm = encodeURIComponent(trimmedValue);
+    const searchUrl = isRxNorm ? `${baseUrl}${separator}name=${encodedTerm}` : `${baseUrl}${separator}filter=${encodedTerm}`;
+
+    this.http.get(searchUrl).pipe(
+      map((data: any) => {
+        let base: any[] = [];
+
+        if (isRxNorm && this.isRxNormResponse(data)) {
+          // Handle RxNorm drugGroup response
+          base = this.transformRxNormToValueSet(data, baseUrl);
+        } else {
+          // Handle standard FHIR ValueSet response
+          base = (data?.expansion?.contains || []).map((item: any) =>
+            `${item.code}$#$${item.display}$#$${item.system}`
+          );
+        }
+
+        // De-duplicate results within a single backend response
+        const deduped = Array.from(new Set(base));
+        if (!deduped.length) {
+          return handleEmptyResults();
+        }
+        control?.setValue('');
+        return allowOthers && !deduped.includes('Others') ? [...deduped, 'Others'] : deduped;
+
+      }),
+      catchError((err) => {
+        console.error('Error fetching codeable concept options from backend:', err);
+        this.infoServ.show(`Failed to load options from backend.
+            ${allowOthers ? "You can, instead, select \"Others\" from the dropdown and then enter the value" : ""}`, { title: 'Select Options', duration: 4000 });
+        if (allowOthers && control && control.value !== 'Others') {
+          control.setValue('Others');
+        }
+        return of(allowOthers ? ['Others'] : []);
+      })
+    ).subscribe((options: any[]) => {
+      // Merge with existing cached options and de-duplicate to avoid clearing the list
+      const current = this.backendOptions[fieldApiName]?.getValue?.() || [];
+      const merged = Array.from(new Set([...(current || []), ...(options || [])]));
+      if (!this.backendOptions[fieldApiName]) {
+        this.backendOptions[fieldApiName] = new BehaviorSubject<any[]>(merged);
+      } else {
+        this.backendOptions[fieldApiName].next(merged);
+      }
+    });
+  }
+
+  private isRxNormResponse(data: any): boolean {
+    const conceptGroups = data?.drugGroup?.conceptGroup;
+    if (!conceptGroups) {
+      return false;
+    }
+    const groups = Array.isArray(conceptGroups) ? conceptGroups : [conceptGroups];
+    return groups.some((group: any) => Array.isArray(group?.conceptProperties) && group.conceptProperties.length > 0);
+  }
+
+  private transformRxNormToValueSet(data: any, url: string): string[] {
+    const results: string[] = [];
+
+    // Extract type filter from URL if present
+    const typeMatch = url.match(/type=([^&]+)/i);
+    const filterType = typeMatch ? typeMatch[1].toUpperCase() : null;
+    // alert(JSON.stringify(filterType))
+    const conceptGroups = data?.drugGroup?.conceptGroup;
+    if (!conceptGroups) {
+
+      return results;
+    }
+
+    const groups = Array.isArray(conceptGroups) ? conceptGroups : [conceptGroups];
+    groups.forEach((group: any) => {
+      const tty = group?.tty?.toUpperCase();
+      if (filterType && tty !== filterType) {
+        return;
+      }
+
+      const properties = Array.isArray(group?.conceptProperties) ? group.conceptProperties : [];
+      properties.forEach((concept: any) => {
+        const code = concept?.rxcui;
+        const rawDisplay = (concept?.name ?? '').trim();
+        const display = rawDisplay.split('/')[0]?.trim();
+        if (!code || !display) {
+          return;
+        }
+        const system = 'http://www.nlm.nih.gov/research/umls/rxnorm';
+        const fullText = rawDisplay || display;
+        // Append the original RxNorm term (after the third delimiter) so filtering
+        // can still match against strength/dose text that was trimmed from display.
+        results.push(`${code}$#$${display}$#$${system}$#$${fullText}`);
+      });
+    });
+    console.log(results)
+    return results;
   }
   // Open Material dialog to collect a custom value when 'Others' is chosen
   openAddOtherValueDialog(fieldApiName: string, control: FormControl, field: FormFields) {
@@ -449,12 +545,14 @@ export class DynamicFormsV2Component {
 
 
 
-  displayConceptFieldDisplay(conceptField: string | { display?: string }): string {
-    if (conceptField) {
-      // alert(JSON.stringify(conceptField))
-      return typeof (conceptField) === 'string' ? (conceptField as string).split('$#$')[1] || "" : (conceptField as { display?: string }).display || "" + conceptField;
+  displayConceptFieldDisplay(conceptField: string | { display?: string } | null | undefined): string {
+    if (!conceptField) {
+      return '';
     }
-    return conceptField;
+    if (typeof conceptField === 'string') {
+      return conceptField.split('$#$')[1] || '';
+    }
+    return (conceptField as { display?: string }).display ?? '';
   }
   getAFormArrayControl(fieldApiName: string): FormArray {
     // console.log(fieldApiName, this.aForm.value);
@@ -680,7 +778,7 @@ export class DynamicFormsV2Component {
     this.menuOpenTimer = setTimeout(() => {
       trigger.openMenu();
       //can i  make the panel scroll itself if its going out of the view port
-      
+
 
       setTimeout(() => {
         const overlayRef = (trigger as any)?._overlayRef as OverlayRef | undefined;

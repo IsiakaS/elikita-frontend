@@ -42,7 +42,7 @@ export class AddMedicationComponent {
                   inputType: 'text',
                   isArray: false,
                   isGroup: false,
-
+                  allowedOthers: true,
                   auth: {
                     read: 'all',
                     write: 'doctor, nurse'
@@ -80,41 +80,128 @@ export class AddMedicationComponent {
             formFields: <FormFields[]>[
               <CodeableConceptField>{
                 generalProperties: <generalFieldsData>{
-                  fieldApiName: 'doseForm',
-                  fieldName: "Dose Form",
+                  fieldApiName: 'form',
+                  fieldName: "Medicine Form",
                   fieldType: 'CodeableConceptField',
                   inputType: 'text',
                   isArray: false,
                   isGroup: false,
+                  moreHint: 'e.g. tablet, capsule, syrup e.t.c.',
 
                   auth: {
                     read: 'all',
                     write: 'doctor, nurse'
                   },
                 },
-                data: g.doseForm
+                data: [
+
+                  'tablet$#$Tablet$#$https://elikita-server.daalitech.com',
+                  'capsule$#$Capsule$#$https://elikita-server.daalitech.com',
+                  'syrup$#$Syrup$#$https://elikita-server.daalitech.com',
+                  'injection$#$Injection$#$https://elikita-server.daalitech.com',
+                  'ointment$#$Ointment$#$https://elikita-server.daalitech.com',
+                  'drop$#$Drop$#$https://elikita-server.daalitech.com',
+                  'inhaler$#$Inhaler$#$https://elikita-server.daalitech.com',
+                  'suppository$#$Suppository$#$https://elikita-server.daalitech.com',
+                  'patch$#$Patch$#$https://elikita-server.daalitech.com',
+                  'Others$#$Others$#$https://elikita-server.daalitech.com'
+
+
+                ]
               },
 
             ]
           }], [
-          'totalVolume', {
+          'amount', {
             formFields: <FormFields[]>[
-              <IndividualField>{
+              <GroupField>{
                 generalProperties: <generalFieldsData>{
-                  fieldApiName: 'totalVolume',
-                  fieldName: "Total Volume",
-                  fieldPlaceholder: " 2 / 2 capsules / 5 ml e.t.c.",
+                  fieldApiName: 'amount',
+                  fieldName: "Dosage Strength",
+                  fieldLabel: "Dosage Strength",
+                  fieldPlaceholder: "500 mg per tablet",
                   fieldType: 'IndividualField',
                   inputType: 'text',
                   isArray: false,
-                  isGroup: false,
-
+                  isGroup: true,
+                  groupFieldsHint: 'Capture ratios like 500 mg per tablet, 250 mg per 5 mL, 1 mg per 1 mL, or 5 mg per actuation.',
+                  moreHint: 'Fill all four fields to express "Amount" per "Unit".',
                   auth: {
                     read: 'all',
                     write: 'doctor, nurse'
                   },
                 },
-
+                keys: ['numeratorValue', 'numeratorUnit', 'denominatorValue', 'denominatorUnit'],
+                groupFields: {
+                  'numeratorValue': <IndividualField>{
+                    generalProperties: <generalFieldsData>{
+                      fieldApiName: 'numeratorValue',
+                      fieldName: "Amount Value",
+                      fieldLabel: "Amount Value",
+                      fieldPlaceholder: '500',
+                      fieldHint: 'Numeric amount of active ingredient (e.g., 500).',
+                      fieldType: 'IndividualField',
+                      inputType: 'number',
+                      isArray: false,
+                      isGroup: false,
+                      auth: {
+                        read: 'all',
+                        write: 'doctor, nurse'
+                      },
+                    },
+                  },
+                  'numeratorUnit': <IndividualField>{
+                    generalProperties: <generalFieldsData>{
+                      fieldApiName: 'numeratorUnit',
+                      fieldName: "Amount Unit",
+                      fieldLabel: "Amount Unit",
+                      fieldPlaceholder: 'mg',
+                      fieldHint: 'Unit for the amount (mg, mcg, g, etc.).',
+                      fieldType: 'IndividualField',
+                      inputType: 'text',
+                      isArray: false,
+                      isGroup: false,
+                      auth: {
+                        read: 'all',
+                        write: 'doctor, nurse'
+                      },
+                    },
+                  },
+                  'denominatorValue': <IndividualField>{
+                    generalProperties: <generalFieldsData>{
+                      fieldApiName: 'denominatorValue',
+                      fieldName: "Per Value",
+                      fieldLabel: "Per Value",
+                      fieldPlaceholder: '1',
+                      fieldHint: 'How many units/volume the amount applies to.',
+                      fieldType: 'IndividualField',
+                      inputType: 'number',
+                      isArray: false,
+                      isGroup: false,
+                      auth: {
+                        read: 'all',
+                        write: 'doctor, nurse'
+                      },
+                    },
+                  },
+                  'denominatorUnit': <IndividualField>{
+                    generalProperties: <generalFieldsData>{
+                      fieldApiName: 'denominatorUnit',
+                      fieldName: "Per Unit",
+                      fieldLabel: "Per Unit",
+                      fieldPlaceholder: 'tablet',
+                      fieldHint: 'Unit/volume for the denominator (tablet, mL, actuation, etc.).',
+                      fieldType: 'IndividualField',
+                      inputType: 'text',
+                      isArray: false,
+                      isGroup: false,
+                      auth: {
+                        read: 'all',
+                        write: 'doctor, nurse'
+                      },
+                    },
+                  }
+                }
               },
 
             ]

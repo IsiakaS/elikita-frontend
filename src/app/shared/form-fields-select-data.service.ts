@@ -62,7 +62,8 @@ export class FormFieldsSelectDataService {
 
     },
     'medication': {
-      'medication': "https://snowstorm.ihtsdotools.org/fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=isa/763158003&_format=json",
+      // 'medication': "https://snowstorm.ihtsdotools.org/fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=isa/763158003&_format=json",
+      'medication': "dummy.json",
       'status': "/medication/status.json",
       'intent': "/medication/intent.json",
       'performerType': "/medication/performerType.json",
@@ -254,7 +255,7 @@ export class FormFieldsSelectDataService {
         } as ReferenceDataType;
       })
       .filter((ref): ref is ReferenceDataType => !!ref?.reference);
-      
+
   }
 
   patientBundleToReferenceData(value: Bundle<Patient> | null = null): ReferenceDataType[] {
@@ -419,12 +420,12 @@ export class FormFieldsSelectDataService {
       doseForm: this.baseFunctionToRetrieveValueset,
       ingredientStrength: this.baseFunctionToRetrieveValueset,
       ingredientItem: (val: any) => {
-        return "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medication-codes&_format=json"
+        return "[https://rxnav.nlm.nih.gov/REST/drugs.json?type=IN"
 
 
       },
       "code": (val: any) => {
-        return "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medication-codes&_format=json"
+        return ["https://rxnav.nlm.nih.gov/REST/drugs.json?type=SBD"]
       }
     },
     'allergy': {
@@ -558,7 +559,7 @@ export class FormFieldsSelectDataService {
       ward: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
           // alert(this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase());
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('ward');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('ward');
         }).map((entry: BundleEntry<Location>) => {
           // alert(entry.resource?.name || 'Unnamed Location');
           const rd = {
@@ -572,7 +573,7 @@ export class FormFieldsSelectDataService {
 
       room: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('room');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('room');
         }).map((entry: BundleEntry<Location>) => {
           const rd = {
             reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
@@ -586,7 +587,7 @@ export class FormFieldsSelectDataService {
 
       bed: (value: Bundle<Location>) => {
         return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form ).toLowerCase().includes('bed');
+          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('bed');
         }).map((entry: BundleEntry<Location>) => {
           const rd = {
             reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
@@ -843,7 +844,7 @@ export class FormFieldsSelectDataService {
         });
       },
       'request': (value: any) => {
-      return this.serviceRequestBundleToReferenceData(value);
+        return this.serviceRequestBundleToReferenceData(value);
       },
       'subject': (value: any) => {
         // console.log(value);
@@ -924,20 +925,20 @@ export class FormFieldsSelectDataService {
 
     },
     medication: {
+      // 'medication': (value: any) => {
+      //   //console.log(value);
+      //   return value.expansion.contains.map((item: any) => {
+      //     // return {
+      //     //   code: item.code,
+      //     //   display: item.display,
+      //     //   system: item.system
+      //     // };
+      //     ///alert(`${item.code}$#$${item.display}$#$${item.system}`);
+      //     return `${item.code}$#$${item.display}$#$${item.system}`;
+      //   });
+      // },
       'medication': (value: any) => {
-        //console.log(value);
-        return value.expansion.contains.map((item: any) => {
-          // return {
-          //   code: item.code,
-          //   display: item.display,
-          //   system: item.system
-          // };
-          ///alert(`${item.code}$#$${item.display}$#$${item.system}`);
-          return `${item.code}$#$${item.display}$#$${item.system}`;
-        });
-      },
-      'code': (value: any) => {
-        return ['https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medication-codes&_format=json']
+        return ['https://rxnav.nlm.nih.gov/REST/drugs.json?type=SBD']
       },
       'performerType': (value: any) => {
         return value.concept.map((item: any) => {

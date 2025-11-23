@@ -57,7 +57,7 @@ import { MatDialog } from '@angular/material/dialog';
     RouterLinkActive, ReferenceDisplayDirective,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe,
     MatTableModule, AsyncPipe,
-    MatChipsModule,TableHeaderComponent,
+    MatChipsModule, TableHeaderComponent,
     MatInputModule,
     MatMenuModule, AgePipe, TableHeaderComponent,
     MatTableModule, MatIconModule, ReactiveFormsModule, CodeableConcept2Pipe, NaPipe],
@@ -99,6 +99,7 @@ export class PatientConditionComponent {
   private dialog = inject(MatDialog);
   conditionDetailsBuilder: DetailsBuilderObject = {
     resourceName: 'Condition',
+    resourceLabel: 'Diagnosis Details',
     resourceIcon: 'healing',
     specialHeader: {
       strongSectionKey: 'code',

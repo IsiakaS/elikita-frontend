@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { assert } from 'fhirclient/lib/lib';
 
 export interface FhirReference {
     reference: string;
@@ -231,6 +232,11 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
     },
     Condition: {
         code: 'CodeableConcept',
+        clinicalStatus: 'CodeableConcept',
+        verificationStatus: 'CodeableConcept',
+        severity: 'CodeableConcept',
+        asserter: 'Reference',
+        encounter: 'Reference',
         category: 'CodeableConcept[]',
         subject: 'Reference',
         stage: backbone({
@@ -334,27 +340,28 @@ export class FhirResourceTransformService {
     public toCodeableConcept(raw: any): FhirCodeableConcept | any {
         if (!raw) return raw;
         if (typeof raw === 'object' && (raw.display || raw.code || raw.text)) {
-            if(!raw.code && !raw.display && raw.text){
-            return {text: raw.text}
+            if (!raw.code && !raw.display && raw.text) {
+                return { text: raw.text }
             }
-            if(raw.code || raw.display){
-return {
-    text: raw.text || raw.display || raw.code,
-    coding: [
-        {
-            code: raw.code || raw.display,
-            display: raw.display || raw.code,
-            system: raw.system || 'https://elikita-server.daalitech.com'
+            if (raw.code || raw.display) {
+                return {
+                    text: raw.text || raw.display || raw.code,
+                    coding: [
+                        {
+                            code: raw.code || raw.display,
+                            display: raw.display || raw.code,
+                            system: raw.system || 'https://elikita-server.daalitech.com'
 
 
+                        }
+                    ]
+                }
+
+            }
         }
-    ]
-}
-            
-        }}
-    
+
         // if (typeof raw !== 'string') return { text: String(raw) };
-        const parts = raw.split('$#$').map((p:any) => p.trim());
+        const parts = raw.split('$#$').map((p: any) => p.trim());
         if (parts.length === 3 && this.allPartsHaveValue(parts)) {
             const [code, display, system] = parts;
             return { coding: [{ code, display, system }], text: display };

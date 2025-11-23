@@ -23,8 +23,8 @@ import { Resource } from 'fhir/r4';
   providedIn: 'root'
 })
 export class DetailsBuilderService extends FhirResourceTransformService implements OnChanges {
-@Input()resourceData?: Resource;
-@Input()detailsBuilderObject?: DetailsBuilderObject 
+  @Input() resourceData?: Resource;
+  @Input() detailsBuilderObject?: DetailsBuilderObject
   constructor() {
     super();
   }
@@ -37,7 +37,7 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     this.refinedResourceData = this.stringifyResource(
       resourceType,
       payload,
-    
+
     );
   }
 
@@ -45,64 +45,64 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
 
 
 
-//  detailsBuilderObject = {
-//     resourceName: "Low Supply Detail",
-//     resourceIcon: 'inventory_2',
-//     specialHeader: {
-//       specialHeaderKey: 'code',
-//       specialHeaderIcon: 'inventory_2',
-//       specialHeaderDataType: 'CodeableConcept',
-//       ReferenceDeepPath: null, // ['name', '0'].join('$#$');
-//       valueDeepPath: null,
+  //  detailsBuilderObject = {
+  //     resourceName: "Low Supply Detail",
+  //     resourceIcon: 'inventory_2',
+  //     specialHeader: {
+  //       specialHeaderKey: 'code',
+  //       specialHeaderIcon: 'inventory_2',
+  //       specialHeaderDataType: 'CodeableConcept',
+  //       ReferenceDeepPath: null, // ['name', '0'].join('$#$');
+  //       valueDeepPath: null,
 
-//     },
-//     groups: [{
-//       groupName: 'Details',
-//       groupIcon: 'info',
-//       groupMembers: [
+  //     },
+  //     groups: [{
+  //       groupName: 'Details',
+  //       groupIcon: 'info',
+  //       groupMembers: [
 
-//         //name
-//         {
-//           key: 'code',
-//           label: 'Name',
-//           keyDataType: 'string',
-//           referenceDeepPath: null,
-//           valueDeepPath: ['coding', '0', 'display'].join('$#$'),
-//         },
-//         //alias
-//         {
-//           key: 'category',
-//           label: 'Category',
-//           keyDataType: 'CodeableConcept',
-//           referenceDeepPath: null,
-//           valueDeepPath: null,
-//         },
-//         {
-//           key: 'netContent',
-//           label: 'In Stock',
-//           keyDataType: 'number',
-//           referenceDeepPath: null,
-//           valueDeepPath: ['value'].join('$#$'),
-//         },
-//         {
-//           key: 'baseUnit',
-//           label: 'Base Unit',
-//           keyDataType: 'CodeableConcept',
-//           referenceDeepPath: null,
-//           valueDeepPath: null,
-//         },
+  //         //name
+  //         {
+  //           key: 'code',
+  //           label: 'Name',
+  //           keyDataType: 'string',
+  //           referenceDeepPath: null,
+  //           valueDeepPath: ['coding', '0', 'display'].join('$#$'),
+  //         },
+  //         //alias
+  //         {
+  //           key: 'category',
+  //           label: 'Category',
+  //           keyDataType: 'CodeableConcept',
+  //           referenceDeepPath: null,
+  //           valueDeepPath: null,
+  //         },
+  //         {
+  //           key: 'netContent',
+  //           label: 'In Stock',
+  //           keyDataType: 'number',
+  //           referenceDeepPath: null,
+  //           valueDeepPath: ['value'].join('$#$'),
+  //         },
+  //         {
+  //           key: 'baseUnit',
+  //           label: 'Base Unit',
+  //           keyDataType: 'CodeableConcept',
+  //           referenceDeepPath: null,
+  //           valueDeepPath: null,
+  //         },
 
-//         {
-//           key: 'inStockStatus',
-//           label: 'Quantity in Stock',
-//           keyDataType: 'IndividualField',
-//           referenceDeepPath: null,
-//           valueDeepPath: null,
-//         },
+  //         {
+  //           key: 'inStockStatus',
+  //           label: 'Quantity in Stock',
+  //           keyDataType: 'IndividualField',
+  //           referenceDeepPath: null,
+  //           valueDeepPath: null,
+  //         },
 
-//       ]
-//     }]
-//   };
+  //       ]
+  //     }]
+  //   };
 
   stringifyResource(
     resourceType: string,
@@ -163,7 +163,7 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
   private stringifyValue(value: any, kind: PropertyKind): string {
     if (value == null) return '';
     switch (kind) {
-      case 'CodeableConcept': 
+      case 'CodeableConcept':
         return this.stringifyConcept(value);
       case 'CodeableConcept[]':
         return this.ensureArray(value).map(v => this.stringifyConcept(v)).filter(Boolean).join(', ');
@@ -247,6 +247,7 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
 
 export interface DetailsBuilderObject {
   resourceName: string;
+  resourceLabel?: string;
   resourceIcon: string;
   specialHeader: {
     strongSectionKey: string;
@@ -258,5 +259,5 @@ export interface DetailsBuilderObject {
     groupIcon: string;
     groupKeys: string[];
   }[]
-otherKeys?: string[];
-  }
+  otherKeys?: string[];
+}
