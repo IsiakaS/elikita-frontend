@@ -1,9 +1,39 @@
 <section class="add-admission-location">
-  <h2>Add Admission Location</h2>
+  <h2><span
+    style="vertical-align: sub;"
+    >Add Admission Ward Location</span> <button 
+    mat-stroked-button
+    class="ms-12" style="padding: 4px !important; padding-left: 12px !important; padding-right: 12px !important;
+    ">
+    <mat-icon>add</mat-icon>
+    Add Other Locations
+
+  </button></h2> 
+  <!--Add other types of Location button-->
   <p>Define reusable location metadata (wards, rooms, beds, etc.).</p>
 
+  <!--Section for SameAddress?-->
+  <div class="py-15">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Same As Hospital / Organization Address?</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-slide-toggle
+                            [formControl]="addressSameAsHospital"
+                            class="me-15">
+                            <span class="ms-8">
+  Is this Addmission Ward located at the same address as the Hospital/Organization?
+                    
+                            </span>
+                              </mat-slide-toggle>
+        </mat-card-content>
+    </mat-card>
+
+  </div>
+
   <ng-container *ngIf="!loading; else loadingState">
-    <app-dynamic-forms-v2
+    <app-dynamic-forms-v2 #generalLocationForm
       [formMetaData]="formMetaData"
       [formFields]="formFields">
     </app-dynamic-forms-v2>

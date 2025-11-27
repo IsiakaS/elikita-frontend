@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { DynamicFormsV2Component } from '../shared/dynamic-forms-v2/dynamic-forms-v2.component';
 import { FormFieldsSelectDataService } from '../shared/form-fields-select-data.service';
@@ -13,11 +13,16 @@ import {
   SingleCodeField,
   formMetaData
 } from '../shared/dynamic-forms.interface2';
+import { FormControl } from '@angular/forms';
+import { Location, Organization } from 'fhir/r4';
+import { UtilityService } from '../shared/utility.service';
+import { commonImports } from '../shared/table-interface';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-add-admission-location',
   standalone: true,
-  imports: [CommonModule, DynamicFormsV2Component],
+  imports: [CommonModule, DynamicFormsV2Component, ...commonImports, MatSlideToggleModule],
   templateUrl: './add-admission-location.component.html',
   styles: [`
     .add-admission-location { padding: 1rem; }
@@ -34,15 +39,58 @@ export class AddAdmissionLocationComponent {
   };
 
   formFields: FormFields[] = [];
+  locationsAvailable?: Location[] = [];
   loading = true;
+  //reactive form to determine whether the address is same as hosptial address
+  addressSameAsHospital = new FormControl(false);
+  hospitalAddress? : Organization['address'];
+  locationResourceToSubmit:Location = {
+    //initial structure
+    address: {},
+    resourceType: 'Location',
+    name: '',
+    status: 'active',
+  }
+
+//partOf-Type formControl
+partOfType = new FormControl('');
+//PHYSICALtYPE DROPDOWM
+setPartOfTypeValue(value: string){
+    this.partOfType.setValue(value);
+}
+@ViewChild('pOT') partOfTypeFormRef!: DynamicFormsV2Component;
+// generalLocationForm
+@ViewChild('generalLocationForm') generalLocationFormRef!: DynamicFormsV2Component;
+
+ngAfterViewInit(){
+    this.partOfTypeFormRef.aForm.get('partOfType')?.valueChanges.subscribe(value => {
+        this.setPartOfTypeValue(value);
+    });
+}
+  processingForm(values: any){
+
+
+//after transforming values
+
+    if(this.addressSameAsHospital.value && this.hospitalAddress){
+        this.locationResourceToSubmit.address = this.hospitalAddress[0];
+    }else{
+
+    }
+  }
+utilityService = inject(UtilityService)
+filteredLocations?: Location[] 
 
   ngOnInit(): void {
     forkJoin({
     //   status: this.selectDataService.getFormFieldSelectData('location', 'status'),
       physicalType: this.selectDataService.getFormFieldSelectData('location', 'physicalType'),
-      partOf: this.selectDataService.getFormFieldSelectData('location', 'partOf')
-    }).subscribe({
+      partOf: this.selectDataService.getFormFieldSelectData('location', 'partOf'),
+      location: this.utilityService.getResourceData('Location'),
+       }).subscribe({
       next: (resolved) => {
+        this.locationsAvailable = resolved.location as Location[];
+        this.filteredLocations = this.locationsAvailable;
         this.formFields = this.buildLocationFormFields( resolved.physicalType, resolved.partOf);
         this.loading = false;
       },
@@ -51,6 +99,32 @@ export class AddAdmissionLocationComponent {
         this.loading = false;
       }
     });
+
+    this.addressSameAsHospital.valueChanges.subscribe(value => {
+        if(value){
+            // alert('Address is the same as hospital address');
+            this.generalLocationFormRef.formFields = [...this.generalLocationFormRef.formFields.splice(this.generalLocationFormRef.formFields.findIndex(f => f.generalProperties.fieldApiName === 'address'),
+            
+            this.generalLocationFormRef.formFields.findIndex(f => f.generalProperties.fieldApiName === 'address')>-1?1:0)];
+        } else {
+            console.log('Adding address field back', this.formFields);
+
+
+//   this.generalLocationFormRef.formFields.splice(2,0,this.formFields.find(f => f.generalProperties.fieldApiName === 'address'))
+
+
+            // );
+            // this.generalLocationFormRef.formFields.splice(2,0,this.formFields.find(f => f.generalProperties.fieldApiName === 'address')!);
+
+        }});
+
+    this.partOfType.valueChanges.subscribe((value: string | null) => {
+  if (value && this.locationsAvailable) {
+    this.filteredLocations = this.utilityService.filterResourceByACodeableConceptfield(this.locationsAvailable, 'physicalType', value) as Location[];
+    } else {
+    this.filteredLocations = this.locationsAvailable;
+    }
+});
   }
 
   private buildLocationFormFields(

@@ -52,7 +52,7 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
     )
   }).pipe(
     tap(({ locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests, medicationRequests }) => {
-      stateService.orgWideResources.locations?.next(
+      stateService.orgWideResources.locations.next(
         locations.map(loc => ({
           referenceId: loc.id ? `Location/${loc.id}` : null,
           savedStatus: 'saved',

@@ -2,29 +2,30 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import { Location } from 'fhir/r4';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../shared/auth/auth.service';
 import { StateService } from '../shared/state.service';
 import { baseStatusStyles } from '../shared/statusUIIcons';
 import { ChipsDirective } from '../chips.directive';
+import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-admission-location',
   standalone: true,
-  imports: [CommonModule, ChipsDirective],
+  imports: [CommonModule, RouterLink, MatTableModule, ChipsDirective, EmptyStateComponent],
   templateUrl: './admission-location.component.html',
-  styles: [`
+  styles: [
+    `
     .admission-location { padding: 1rem; display: block; }
     .page-header { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
-    .actions { display:flex; gap:0.5rem; }
+    .actions { display:flex; gap:0.5rem; flex-wrap:wrap; }
     .table-wrapper { overflow:auto; margin-top:1rem; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:0.75rem; border-bottom:1px solid #e2e8f0; text-align:left; }
+    table { width:100%; }
     .primary-label { font-weight:600; }
     .secondary-label { color:#64748b; }
-    .chip { padding:0.125rem 0.5rem; border-radius:0.75rem; font-size:0.75rem; text-transform:capitalize; }
-    .chip--neutral { background:#e2e8f0; color:#1f2937; }
-    .actions-col { width:110px; text-align:right; }
-    .empty-state { padding:2rem; text-align:center; border:1px dashed #cbd5f5; border-radius:0.75rem; margin-top:1.5rem; }
+    .actions-col { width:120px; text-align:right; }
+    .empty-state { margin-top:2rem; }
   `]
 })
 export class AdmissionLocationComponent implements OnInit, OnDestroy {
@@ -33,8 +34,11 @@ export class AdmissionLocationComponent implements OnInit, OnDestroy {
   private readonly subs = new Subscription();
 
   statusStyles = baseStatusStyles;
-  tableDataLevel2 = new BehaviorSubject<Location[]>([]);
   canExportLocation$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('location', 'export')));
+
+  tableDataSource = new MatTableDataSource<Location>([]);
+  tableDataLevel2 = new BehaviorSubject<Location[]>([]);
+  displayedColumns: string[] = ['name', 'status', 'physicalType', 'partOf', 'lastUpdated', 'actions'];
 
   ngOnInit(): void {
     this.subs.add(
@@ -42,13 +46,14 @@ export class AdmissionLocationComponent implements OnInit, OnDestroy {
         const locations = (entries ?? [])
           .map(entry => entry.actualResource as Location)
           .filter(Boolean);
+        this.tableDataSource.data = locations;
         this.tableDataLevel2.next(locations);
       })
     );
   }
 
   onExportLocations(): void {
-    const snapshot = this.tableDataLevel2.getValue();
+    const snapshot = this.tableDataSource.data;
     if (!snapshot.length) {
       console.warn('No locations to export.');
       return;

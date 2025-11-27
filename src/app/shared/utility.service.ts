@@ -4,7 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { FormFields } from './dynamic-forms.interface2';
-import { Observation, Resource } from 'fhir/r4';
+import { Bundle, BundleEntry, FhirResource, Observation, Resource, CodeableConcept } from 'fhir/r4';
+import { backendEndPointToken } from '../app.config';
+import { Coding } from 'fhir/r5';
 
 @Injectable({
   providedIn: 'root'
@@ -616,5 +618,36 @@ export class UtilityService {
 
     return requisition?.value || null;
   }
-}
 
+retrieveResourceFromEntry(entry: BundleEntry<FhirResource> | FhirResource): FhirResource {
+    if ('resource' in entry) {
+      return entry.resource as FhirResource;
+    }
+
+    return entry as FhirResource;
+  }
+  backendApiEndpoint = inject(backendEndPointToken);
+getResourceData(resourceType: string): Observable<FhirResource[]> {
+    const url = `${this.backendApiEndpoint}/${resourceType}?_count=1000`;
+    return this.http.get<Bundle>(url).pipe(
+      map((response:Bundle) =>  response?.entry?.map((resourceEntry:BundleEntry<FhirResource>) => this.retrieveResourceFromEntry(resourceEntry) || []) || [])
+    );
+  }
+
+  filterResourceByACodeableConceptfield(resources: FhirResource[], fieldName: string, fieldValue: Coding | string): FhirResource[] {
+    return resources.filter((resource: any) => {
+      const conceptFieldValue = resource[fieldName] as CodeableConcept;
+      if (!conceptFieldValue) {
+        return false;
+      }
+      if (typeof fieldValue === 'string') {
+        return this.searchCodeableConceptByDisplayOrText(conceptFieldValue, fieldValue);
+      } else {
+        return (conceptFieldValue.coding || []).some((coding: any) => {
+          return coding.code === fieldValue.code && coding.system === fieldValue.system;
+        });
+
+      }
+    });
+  }
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration } from 'fhir/r4';
-import { Condition, Medication, MedicationRequest, Patient } from 'fhir/r4';
+import { Condition, Medication, MedicationRequest, Patient , Location} from 'fhir/r4';
 import { BehaviorSubject, mergeMapTo, Observable } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
 
@@ -160,6 +160,11 @@ export class StateService {
       savedStatus: 'saved' | 'unsaved',
       actualResource: Resource
     }>>([]),
+    locations: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Location
+    }>>([])
   }
 
   private encounterChecklistCompleted = new BehaviorSubject<boolean>(false);
@@ -495,10 +500,11 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
 
     }
   }
-
+  
   public persistPatientResource(resource: Resource, savedStatus: 'saved' | 'unsaved' = 'unsaved') {
     this.addResourceToPatientResources(resource, savedStatus);
   }
+
 
   public persistOrgWideResource(resource: Resource, savedStatus: 'saved' | 'unsaved') {
     this.addResourceToOrgWideResources(resource, savedStatus);
@@ -596,14 +602,5 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
     return { success: true, resource: obs };
   }
 
-  ngOnInit(){
-    this.orgWideResources.locations = new BehaviorSubject<Array<{
-      referenceId: string | null,
-      savedStatus: 'saved' | 'unsaved',
-      actualResource: any
-    }>>([]);
-  }
-
-  
 }
 

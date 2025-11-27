@@ -1,6 +1,8 @@
 # Copilot instructions for `elikita-frontend`
 
 ## Architecture & routing
+- use the the most current architecture like @if() instead of *ngIf, @for
+instead of *ngFor, standalone components, etc.
 - Angular 19 uses standalone bootstrap in `src/main.ts`, so every component (e.g., `app/app.component.ts`) declares its own `imports`; there are no NgModules to patch.
 - `app/app.routes.ts` splits sandboxes under `/testing` and the guarded shell under `/app` (`AppWrapperComponent` + `appAuthGuard` + `appWrapperDataResolver`). Always set `data.title`, `breadCrumbTitle`, `breadCrumbIcon`, and `roles` so `BreadcrumbService` and sidebar builders stay consistent.
 

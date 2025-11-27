@@ -5,72 +5,81 @@
       <p>Manage wards, rooms, beds, and any reusable admission spaces.</p>
     </div>
     <div class="actions">
-      <button type="button" routerLink="/app/admission-location/add">
+      <button mat-raised-button color="primary" routerLink="/app/admission-location/add">
         + Add Location
       </button>
-      <button type="button"
-              (click)="onExportLocations?.()"
+      <button mat-stroked-button
+              color="accent"
+              (click)="onExportLocations()"
               [disabled]="!(canExportLocation$ | async)">
         Export
       </button>
     </div>
   </header>
 
-  <ng-container *ngIf="(tableDataLevel2 | async) as locations; else loadingState">
+  <ng-container *ngIf="(tableDataLevel2 | async) as locations">
     <section *ngIf="locations.length; else emptyState" class="table-wrapper">
-      <table class="location-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Physical Type</th>
-            <th>Part Of</th>
-            <th>Last Updated</th>
-            <th class="actions-col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let location of locations"
-              (click)="showRow?.(location)">
-            <td>
-              <div class="primary-label">{{ location.name || 'Unnamed Location' }}</div>
-              <small class="secondary-label">{{ location.description || location.id }}</small>
-            </td>
-            <td>
-              <span class="chip"
-                    [class]="statusStyles?.[location.status || 'unknown']?.chipClass || 'chip--neutral'">
-                {{ (location.status || 'unknown') | titlecase }}
-              </span>
-            </td>
-            <td>
-              {{ location.physicalType?.text
-                || location.physicalType?.coding?.[0]?.display
-                || '—' }}
-            </td>
-            <td>{{ location.partOf?.display || location.partOf?.reference || '—' }}</td>
-            <td>{{ location.meta?.lastUpdated | date:'medium' }}</td>
-            <td class="actions-col">
-              <button type="button"
-                      (click)="showLocationDetails?.(location); $event.stopPropagation();">
-                Details
-              </button>
-            </td>
-          </tr>
-        </tbody>
+      <table mat-table [dataSource]="tableDataSource" class="mat-elevation-z1">
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let location" (click)="showRow(location)">
+            <div class="primary-label">{{ location.name || 'Unnamed Location' }}</div>
+            <small class="secondary-label">{{ location.description || location.id }}</small>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let location">
+            <span [appChips]="location.status || 'unknown'"></span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="physicalType">
+          <th mat-header-cell *matHeaderCellDef>Physical Type</th>
+          <td mat-cell *matCellDef="let location">
+            {{ location.physicalType?.text
+              || location.physicalType?.coding?.[0]?.display
+              || '—' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="partOf">
+          <th mat-header-cell *matHeaderCellDef>Part Of</th>
+          <td mat-cell *matCellDef="let location">
+            {{ location.partOf?.display || location.partOf?.reference || '—' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastUpdated">
+          <th mat-header-cell *matHeaderCellDef>Last Updated</th>
+          <td mat-cell *matCellDef="let location">
+            {{ location.meta?.lastUpdated | date:'medium' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+          <td mat-cell *matCellDef="let location" class="actions-col">
+            <button mat-button color="primary"
+                    (click)="showLocationDetails(location); $event.stopPropagation();">
+              Details
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
     </section>
 
     <ng-template #emptyState>
-      <div class="empty-state">
-        <p>No admission locations captured yet.</p>
-        <button type="button" routerLink="/app/admission-location/add">
-          Create the first location
-        </button>
-      </div>
+      <app-empty-state
+        icon="location_city"
+        title="No Admission Locations Found"
+        subtitle="There are no admission locations captured yet."
+      ></app-empty-state>
     </ng-template>
   </ng-container>
-
-  <ng-template #loadingState>
-    <p>Loading admission locations…</p>
-  </ng-template>
 </section>
