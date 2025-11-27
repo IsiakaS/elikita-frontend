@@ -11,7 +11,11 @@
 
                     </mat-icon>
                 </div>
-                <span> {{detailsBuilderObject.resourceName | titlecase}}</span>
+                <span>
+
+                    {{detailsBuilderObject.resourceName | titlecase}}
+
+                </span>
             </div>
         </mat-card-title>
 
@@ -28,21 +32,22 @@
                 @if(detailsBuilderObject.specialHeader ){
                 @let specialHeader = detailsBuilderObject.specialHeader;
 
-                <app-special-header-v2 [resourceObject]="resourceData" [specialHeader]="specialHeader"></app-special-header-v2>
+                <app-special-header-v2 [resourceObject]="resourceData"
+                    [specialHeader]="specialHeader"></app-special-header-v2>
                 }
                 <div class="action-button mb-15 gap-15">
-@if(actionButtons?.length){
-    <div class="g-just-flex gap-10 flex-wrap">
-        @for(button of actionButtons; track button.key){
-            @if(canShowAction(button)){
-            <button mat-flat-button [color]="button.color || 'primary'" (click)="triggerAction(button)">
-                @if(button.icon){<mat-icon>{{button.icon}}</mat-icon>}
-                {{button.label || (button.key | titlecase)}}
-            </button>
-            }
-        }
-    </div>
-}
+                    @if(actionButtons?.length){
+                    <div class="g-just-flex gap-10 flex-wrap">
+                        @for(button of actionButtons; track button.key){
+                        @if(canShowAction(button)){
+                        <button mat-flat-button [color]="button.color || 'primary'" (click)="triggerAction(button)">
+                            @if(button.icon){<mat-icon>{{button.icon}}</mat-icon>}
+                            {{button.label || (button.key | titlecase)}}
+                        </button>
+                        }
+                        }
+                    </div>
+                    }
                 </div>
             </div>
 
@@ -71,35 +76,44 @@
 
                     <mat-card-content>
                         <!-- <app-details-cardz [group]="group" [resources]="data"></app-details-cardz> -->
-                    <div class="my-10 mt-20">
-    <div class="my-10"></div>
-    <div class="card-content-details">
-        <div class="fields-wrapper g-just-flex gap-22">
+                        <div class="my-10 mt-20">
+                            <div class="my-10"></div>
+                            <div class="card-content-details">
+                                <div class="fields-wrapper g-just-flex gap-22">
+                                    <!-- {{refinedResourceData | json}} -->
+                                    @for(field of group.groupKeys; track $index;){
+                                    <!-- {{keyVsResourceType[resourceData?.resourceType || '']?.[field]}} -->
+                                    <!--if  type of key is not backbonelement-->
+                                    @if(!isBackboneField(field)){
+                                    @let fieldi = field.split('.')?.[0] || "";
+                                    @let field2 = field.substring(0, field.indexOf('[')) || "";
+                                    @if((isBackboneField(fieldi) || isBackboneField(field2))&&
+                                    !(refinedResourceData?.[field])){
+                                    }@else{
+                                    <div class="field-group" #fg>
+                                        <div class="field-value">
+                                            <!-- {{resourceData?.[field] | json}} -->
+                                            <div #sc class="value-with-icon">
+                                                @if(isReferenceField(field)){
+                                                <span [appReferenceDisplay]="refinedResourceData?.[field]"
+                                                    InstantfetchAndRepace="true"></span>
+                                                } @else {
+                                                {{refinedResourceData?.[field] | titlecase | na}}
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="field-title">
 
-            @for(field of group.groupKeys; track $index;){
-         <!-- {{keyVsResourceType[resourceData?.resourceType || '']?.[field]}} -->
-            <!--if  type of key is not backbonelement-->
-@if(!isBackboneField(field)){
-    <div class="field-group" #fg>
-        <div class="field-value">
-            <div #sc class="value-with-icon">
-             @if(isReferenceField(field)){
-                <span [appReferenceDisplay]="refinedResourceData?.[field]" InstantfetchAndRepace="true"></span>
-             } @else {
-                {{refinedResourceData?.[field] | titlecase | na}}
-                }
-                </div>
-        </div>
-        <div class="field-title">
-            {{resourceKeyLabels[resourceData!.resourceType]?.[field] | titlecase}}
-        </div>
-    </div>
-}
-            
-            }
-        </div>
-    </div>
-</div>
+                                            {{(resourceKeyLabels[resourceData!.resourceType][field]??field) |
+                                            titlecase}}
+                                        </div>
+                                    </div>
+                                    }}
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </mat-card-content>
 
 

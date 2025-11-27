@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
-import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest, Location } from 'fhir/r4';
+import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest, Location, MedicationRequest } from 'fhir/r4';
 import { forkJoin, map, catchError, of, tap } from 'rxjs';
 import { StateService } from '../shared/state.service';
 
@@ -42,12 +42,16 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
       map(bundleToResources),
       catchError(() => of([]))
     ),
+    medicationRequests: http.get<Bundle<MedicationRequest>>(`${baseUrl}/MedicationRequest?_count=199`).pipe(
+      map(bundleToResources),
+      catchError(() => of([]))
+    ),
     serviceRequests: http.get<Bundle<ServiceRequest>>(`${baseUrl}/ServiceRequest?_count=199`).pipe(
       map(bundleToResources),
       catchError(() => of([]))
     )
   }).pipe(
-    tap(({ locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests }) => {
+    tap(({ locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests, medicationRequests }) => {
       stateService.orgWideResources.locations?.next(
         locations.map(loc => ({
           referenceId: loc.id ? `Location/${loc.id}` : null,
@@ -81,6 +85,13 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
           referenceId: medAdmin.id ? `MedicationAdministration/${medAdmin.id}` : null,
           savedStatus: 'saved',
           actualResource: medAdmin
+        }))
+      );
+      stateService.orgWideResources.medicationRequests.next(
+        medicationRequests.map(medReq => ({
+          referenceId: medReq.id ? `MedicationRequest/${medReq.id}` : null,
+          savedStatus: 'saved',
+          actualResource: medReq
         }))
       );
       stateService.orgWideResources.serviceRequests.next(

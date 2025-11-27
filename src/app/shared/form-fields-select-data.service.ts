@@ -2,7 +2,7 @@ import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, Subject, throwError } from 'rxjs';
 import { LoadingUIEnabled } from '../loading.interceptor';
-import { Bundle, BundleEntry, CodeableConcept, CodeSystem, HealthcareService, Practitioner, Reference, ValueSet, Location, Patient, Encounter, ServiceRequest } from 'fhir/r4';
+import { Bundle, BundleEntry, CodeableConcept, CodeSystem, HealthcareService, Medication, Practitioner, Reference, ValueSet, Location, Patient, Encounter, ServiceRequest, MedicationRequest } from 'fhir/r4';
 import { ReferenceDataType } from './dynamic-forms.interface2';
 import { backendEndPointToken } from '../app.config';
 
@@ -11,6 +11,8 @@ import { backendEndPointToken } from '../app.config';
 })
 export class FormFieldsSelectDataService {
   backendApiEndPoint = inject(backendEndPointToken);
+
+
   allUrls = {
     'referral': {
       'organization': "https://server.fire.ly/r5/Organization?_format=json",
@@ -47,9 +49,9 @@ export class FormFieldsSelectDataService {
     },
 
     'encounter': {
-      'class': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActEncounterCode&_format=json',
+      'class': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActEncounterCode&_format=json&_count=1000',
       'priority': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActPriority&_format=json',
-      'participant': 'https://elikita-server.daalitech.com/Practitioner?_format=json',
+      'participant': 'https://elikita-server.daalitech.com/Practitioner?_format=json&_count=1000',
       'reason': "/dummy.json",
       'reason_use': 'https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-reason-use&_format=json'
     },
@@ -72,9 +74,17 @@ export class FormFieldsSelectDataService {
     },
     'medication_dispense': {
       'status': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medicationdispense-status&_format=json",
-      'subject': "https://server.fire.ly/r5/Patient?_format=json",
-      'receiver': "https://server.fire.ly/r5/Patient?_format=json",
-      'medication': "https://snowstorm.ihtsdotools.org/fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=isa/763158003&_format=json",
+      'subject': this.backendApiEndPoint + "/Patient?_format=json&_count=1000",
+      'category': "https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medicationdispense-category&_format=json",
+      'receiver': this.backendApiEndPoint + "/Patient?_format=json&_count=1000",
+      // 'medication': "https://snowstorm.ihtsdotools.org/fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=isa/763158003&_format=json",
+      'medication': "dummy.json",
+      medicationReference: this.backendApiEndPoint + "/Medication?_format=json&_count=1000",
+      performer: this.backendApiEndPoint + "/Practitioner?_format=json&_count=1000",
+      authorizingPrescription: this.backendApiEndPoint + "/MedicationRequest?_format=json&_count=1000",
+      substitutionReason: "https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-SubstanceAdminSubstitutionReason&_format=json",
+      substitutionType: "https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-ActSubstanceAdminSubstitutionCode&_format=json"
+
 
     },
     'medication_administration': {
@@ -267,7 +277,7 @@ export class FormFieldsSelectDataService {
 
   }
 
-  patientBundleToReferenceData(value: Bundle<Patient> | null = null): ReferenceDataType[] {
+  patientBundleToReferenceData(value: Bundle<Patient> | null = null, allPatients: boolean = false): ReferenceDataType[] {
     if (!value?.entry?.length) return [];
 
     return value.entry
@@ -281,7 +291,7 @@ export class FormFieldsSelectDataService {
             ? statusFlag.toLowerCase() === 'active'
             : statusFlag === true;
 
-        if (!isActive) return null;
+        if (!isActive && !allPatients) return null;
 
         const name = resource.name?.[0];
         const display =
@@ -293,9 +303,9 @@ export class FormFieldsSelectDataService {
           reference: `${resource.resourceType ?? 'Patient'}/${resource.id}`,
           display,
           // type: resource.resourceType ?? 'Patient'
-        } as ReferenceDataType;
+        } as Reference;
       })
-      .filter((ref): ref is ReferenceDataType => !!ref?.reference);
+      .filter((ref): ref is Reference => !!ref?.reference);
   }
 
   serviceRequestBundleToReferenceData(value: Bundle<ServiceRequest> | null = null): ReferenceDataType[] {
@@ -447,7 +457,7 @@ export class FormFieldsSelectDataService {
       doseForm: this.baseFunctionToRetrieveValueset,
       ingredientStrength: this.baseFunctionToRetrieveValueset,
       ingredientItem: (val: any) => {
-        return "[https://rxnav.nlm.nih.gov/REST/drugs.json?type=IN"
+        return ["https://rxnav.nlm.nih.gov/REST/drugs.json?type=SBD&purpose=INGREDIENT"]
 
 
       },
@@ -998,35 +1008,78 @@ export class FormFieldsSelectDataService {
 
 
     },
+    //  'status': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medicationdispense-status&_format=json",
+    //   'subject': this.backendApiEndPoint + "/Patient?_format=json",
+    //   'category': "https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medicationdispense-category&_format=json",
+    //   // 'receiver': "https://server.fire.ly/r5/Patient?_format=json",
+    //   // 'medication': "https://snowstorm.ihtsdotools.org/fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=isa/763158003&_format=json",
+    //   'medication': "dummy.json",
+    //   medicationReference: this.backendApiEndPoint + "/Medication?_format=json",
+    //   performer: this.backendApiEndPoint + "/Practitioner?_format=json",
+    //   authorizingPrescription: this.backendApiEndPoint + "/MedicationRequest?_format=json",
+    //   substitutionReason: "https://tx.fhir.org/r4/ValueSet/$expand?url=http://terminology.hl7.org/ValueSet/v3-SubstanceAdminSubstitutionReason&_format=json",
+    //   substitutionType:
     'medication_dispense': {
+      'medicationReference': (value: any) => {
+        return value?.entry?.filter((item: BundleEntry<Medication>) => {
+          //out of stock filtered out
+          return (item?.resource?.extension?.find((ext: any) => ext.url?.endsWith('totalRemaining'))?.valueQuantity?.value || 1) > 0;
+        }).map((item: BundleEntry<Medication>) => {
+          return `Medication/${item?.resource?.id || item.resource?.identifier?.[0]?.value}$#$${item?.resource?.code?.text || item?.resource?.code?.coding?.[0]?.display || 'Unnamed Medication'}`;
+        }) || [];
+      },
+      performer: (value: any) => {
+        return this.practitionerBundleToReferenceData(value);
+      },
+      authorizingPrescription: (value: any) => {
+        return value.entry?.map((item: BundleEntry<MedicationRequest>) => {
+          return `MedicationRequest/${item?.resource?.id || item.resource?.identifier?.[0]?.value}}$#$${item?.resource?.medicationCodeableConcept?.text || item?.resource?.medicationCodeableConcept?.coding?.[0]?.display || 'Unnamed MedicationRequest'}`;
+        }) || [];
+      },
+      'substitutionReason': (value: any) => {
+        return this.baseFunctionToRetrieveValueset(value);
+      },
+      'substitutionType': (value: any) => {
+        return this.baseFunctionToRetrieveValueset(value);
+      },
       'status': (value: any) => {
         return value.expansion.contains.map((item: any) => {
           return `${item.code}$#$${item.display}$#$${item.system}`;
         });
       },
+      'category': (value: any) => {
+        return this.baseFunctionToRetrieveValueset(value);
+      },
+
       'subject': (value: any) => {
+        return this.patientBundleToReferenceData(value, true);
         return value.entry.map((item: any) => {
+
           console.log(item, "in subject");
           return `${item.fullUrl}$#$${item.resource.name[0].given[0]} ${item.resource.name[0].family}`;
         });
       },
       'receiver': (value: any) => {
+        return this.patientBundleToReferenceData(value);
         return value.entry.map((item: any) => {
 
           return `${item.fullUrl}$#$${item.resource.name[0].given[0]} ${item.resource.name[0].family}`;
         });
       },
       'medication': (value: any) => {
+        return ["https://rxnav.nlm.nih.gov/REST/drugs.json?type=SBD&purpose=INGREDIENT"]
+
+
         //console.log(value);
-        return value.expansion.contains.map((item: any) => {
-          // return {
-          //   code: item.code,
-          //   display: item.display,
-          //   system: item.system
-          // };
-          ///alert(`${item.code}$#$${item.display}$#$${item.system}`);
-          return `${item.code}$#$${item.display}$#$${item.system}`;
-        });
+        // return value.expansion.contains.map((item: any) => {
+        //   // return {
+        //   //   code: item.code,
+        //   //   display: item.display,
+        //   //   system: item.system
+        //   // };
+        //   ///alert(`${item.code}$#$${item.display}$#$${item.system}`);
+        //   return `${item.code}$#$${item.display}$#$${item.system}`;
+        // });
       },
     },
     serviceRequest: {

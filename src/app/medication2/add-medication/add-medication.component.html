@@ -2,34 +2,96 @@
 <mat-stepper #stepper>
 
     <mat-step label="Medicine Details">
-        <app-dynamic-forms-v2 [formFields]="medicineDetailsFormFields" [formMetaData]="undefined">
+        @if(!medicineDetailsReviewData){
+        <app-dynamic-forms-v2 #medicineDetailsForm [formFields]="medicineDetailsFormFields" [formMetaData]="undefined">
 
         </app-dynamic-forms-v2>
+        }
+        @if(medicineReviewMessage){
+        <p class="text-danger mt-10">{{medicineReviewMessage}}</p>
+        }
         <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
             <button mat-flat-button matStepperPrevious>Back</button>
-            <button mat-flat-button matStepperNext>Next</button>
+            <button mat-flat-button color="primary" (click)="reviewMedicineDetails(stepper)">
+                Review &amp; Continue
+            </button>
 
         </div>
+        @if(medicineDetailsReviewData){
+        <section class="review-section mt-20">
+            <app-resource-data-review [resource]="medicineDetailsReviewData" [submittedData]="medicineDetailsReviewData"
+                [formFields]="medicineDetailsFormFields" (fieldEdited)="onMedicineFieldEdited($event)"
+                (resourceUpdated)="onMedicineResourceUpdated($event)" [showEditButtons]="true">
+            </app-resource-data-review>
+            <div class="button-group my-15 g-just-flex" style="justify-content: flex-end; width: 100%; gap: 20px;">
+                <button mat-flat-button color="primary" (click)="continueAfterMedicineReview(stepper)">
+                    Continue to Inventory Details
+                </button>
+            </div>
+        </section>
+        }
     </mat-step>
     <mat-step label="Inventory Details">
-        <app-dynamic-forms-v2 [formFields]="InventoryDetailsFormFields" [formMetaData]="undefined">
+        @if(!inventoryDetailsReviewData){
+        <app-dynamic-forms-v2 #inventoryDetailsForm [formFields]="InventoryDetailsFormFields"
+            [formMetaData]="undefined">
 
         </app-dynamic-forms-v2>
+        }
+        @if(inventoryReviewMessage){
+        <p class="text-danger mt-10">{{inventoryReviewMessage}}</p>
+        }
         <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
             <button mat-flat-button matStepperPrevious>Back</button>
-            <button mat-flat-button matStepperNext>Next</button>
+            <button mat-flat-button color="primary" (click)="reviewInventoryDetails(stepper)">
+                Review &amp; Continue
+            </button>
 
         </div>
+        @if(inventoryDetailsReviewData){
+        <section class="review-section mt-20">
+            <app-resource-data-review [resource]="inventoryDetailsReviewData"
+                [submittedData]="inventoryDetailsReviewData" [formFields]="InventoryDetailsFormFields"
+                (fieldEdited)="onInventoryFieldEdited($event)" (resourceUpdated)="onInventoryResourceUpdated($event)"
+                [showEditButtons]="true">
+            </app-resource-data-review>
+            <div class="button-group my-15 g-just-flex" style="justify-content: flex-end; width: 100%; gap: 20px;">
+                <button mat-flat-button color="primary" (click)="continueAfterInventoryReview(stepper)">
+                    Continue to Price Details
+                </button>
+            </div>
+        </section>
+        }
     </mat-step>
     <mat-step label="Price Details">
-        <app-dynamic-forms-v2 [formFields]="PriceDetailsFormFields" [formMetaData]="undefined">
+        @if(!priceDetailsReviewData){
+        <app-dynamic-forms-v2 #priceDetailsForm [formFields]="PriceDetailsFormFields" [formMetaData]="undefined">
 
         </app-dynamic-forms-v2>
+        }
+        @if(priceReviewMessage){
+        <p class="text-danger mt-10">{{priceReviewMessage}}</p>
+        }
         <div class="button-group my-15 g-just-flex " style="justify-content: flex-end; width: 100%; gap: 20px;">
             <button mat-flat-button matStepperPrevious>Back</button>
-            <button mat-flat-button matStepperNext>Next</button>
+            <button mat-flat-button color="primary" (click)="reviewPriceDetails(stepper)">
+                Review &amp; Submit
+            </button>
 
         </div>
+        @if(priceDetailsReviewData){
+        <section class="review-section mt-20">
+            <app-resource-data-review [resource]="priceDetailsReviewData" [submittedData]="priceDetailsReviewData"
+                [formFields]="PriceDetailsFormFields" (fieldEdited)="onPriceFieldEdited($event)"
+                (resourceUpdated)="onPriceResourceUpdated($event)" [showEditButtons]="true">
+            </app-resource-data-review>
+            <div class="button-group my-15 g-just-flex" style="justify-content: flex-end; width: 100%; gap: 20px;">
+                <button mat-flat-button color="primary" (click)="submitMedication()" [disabled]="!allReviewDataReady">
+                    Submit Medication
+                </button>
+            </div>
+        </section>
+        }
     </mat-step>
 </mat-stepper>
 }

@@ -46,6 +46,8 @@ export class AppComponent {
   ngOnInit() {
     // Developer mode: set user to doctor and route to a specific patient's summary
     const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/tests-requests';
+    //speimens
+    // const target = 'app/medicine-stock';
     const current = this.auth.user.getValue();
     if (!current || current.role !== 'doctor') {
       // Ensure login redirects to our target route

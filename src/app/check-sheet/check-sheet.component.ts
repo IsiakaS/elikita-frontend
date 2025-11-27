@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { commonImports } from '../shared/table-interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { forkJoin, map, of, switchMap, take, catchError } from 'rxjs';
+import { forkJoin, map, of, switchMap, take, catchError, Subject } from 'rxjs';
 import { AddVitalsComponent } from '../patient-observation/add-vitals/add-vitals.component';
 import { ObsResComponent } from '../obs-res/obs-res.component';
 import { PatSympComponent } from "../pat-symp/pat-symp.component";
@@ -20,11 +20,13 @@ import { MatTableModule } from '@angular/material/table';
 import { ChipsDirective } from '../chips.directive';
 import { Encounter } from 'fhir/r4';
 import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
+import { LabRequestsComponent } from '../lab-requests/lab-requests.component';
+import { NaPipe } from '../shared/na.pipe';
 
 @Component({
   selector: 'app-check-sheet',
-  imports: [...commonImports,
-    MatSelectModule, ChipsDirective,
+  imports: [...commonImports, NaPipe,
+    MatSelectModule, ChipsDirective, LabRequestsComponent,
     AddVitalsComponent, ObsResComponent, PatSympComponent, MatDividerModule, CodeableReferenceDisplayComponent,
     MatMenuModule,
     MatTableModule
@@ -42,6 +44,7 @@ export class CheckSheetComponent {
   labRequestAndValue?: any[];
   medRequestAndValue?: any[];
   // Prefill models for child components
+
   vitalsPrefill: any = {};
   examPrefill: Array<{ name: string; value: string }> = [];
   symptomsPrefill: Array<any> = [];
@@ -77,12 +80,19 @@ export class CheckSheetComponent {
       encounter: [],
       medicationRequests: []
     };
+  @Input() forCheckSheet?: boolean
   @Input() bigSourceData: {
     observations: Observation[],
     condition: any[],
     encounter: any[],
     medicationRequests: any[]
   } | null = null;
+  labRequestFilters = [
+    { field: 'encounter.reference', values: [this.state.getCurrentEncounterReference()?.reference] },
+
+    { field: 'subject.reference', values: [this.state.getPatientReference()?.reference] },
+
+  ]
   ngOnInit() {
 
     if (this.bigSourceData) {
@@ -266,7 +276,7 @@ export class CheckSheetComponent {
   examDisplayedColumns: string[] = ['name', 'value', 'status', 'actions'];
   examTableDataSource: MatTableDataSource<any> = new MatTableDataSource<any>();
   // Complaints table state
-  complaintDisplayedColumns: string[] = ['symptom', 'severity', 'verification', 'onset', 'actions'];
+  complaintDisplayedColumns: string[] = ['symptom', 'severity', 'onset', 'actions'];
   complaintTableDataSource: MatTableDataSource<any> = new MatTableDataSource<any>();
   complaintRows: Array<{ id: string; symptom: string; severity: string; verification: string; onset: string; original: any }> = [];
   vitalRows: Array<{ id: string; display: string; value: string; status: string; original: any }> = [];

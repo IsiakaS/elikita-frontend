@@ -77,6 +77,7 @@ import { PatientRegistrationDeceasedComponent } from './patient-registration-cen
 import { appWrapperDataResolver } from './app-wrapper/app-wrapper-data.resolver';
 import { AdmissionLocationComponent } from './admission-location/admission-location.component';
 import { AddAdmissionLocationComponent } from './admission-location/add-admission-location.component';
+import { MedicationDispenseComponent } from './medication-dispense/medication-dispense.component';
 
 export const routes: Routes = [
 
@@ -402,8 +403,15 @@ export const routes: Routes = [
                 path: "tests-requests",
                 component: LabRequestsComponent,
                 resolve: { labRequests: labRequestsResolver }
-
-
+            },
+            {
+                path: "medication-dispense",
+                component: MedicationDispenseComponent,
+                data: {
+                    title: "Medication Dispenses",
+                    breadCrumbTitle: "Medication Dispenses",
+                    breadCrumbIcon: "medical_services"
+                }
             },
 
             {

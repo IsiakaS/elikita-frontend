@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Ratio } from 'fhir/r4';
 import { assert } from 'fhirclient/lib/lib';
 
 export interface FhirReference {
@@ -24,6 +25,9 @@ export type PropertyKind =
     'Reference[]' |
     'string' |
     'string[]' |
+    'Ratio' |
+    'Quantity' |
+    'Identifier' |
     'primitive';
 
 export interface BackboneProperty {
@@ -111,6 +115,7 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
         reasonCode: 'CodeableConcept[]',
         requester: 'Reference',
         subject: 'Reference',
+        requisition: 'Identifier',
         performer: 'Reference[]',
         performerType: 'CodeableConcept',
         orderDetail: backbone({
@@ -131,6 +136,7 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
         reasonCode: 'CodeableConcept[]',
         reasonReference: 'Reference[]',
         performerType: 'CodeableConcept',
+
         requester: 'Reference',
         dosageInstruction: backbone({
             text: 'string',
@@ -191,7 +197,52 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
     Medication: {
         code: 'CodeableConcept',
         form: 'CodeableConcept',
-        ingredient: 'CodeableConcept[]'
+        amount: 'Ratio',
+        inStock: 'string',
+        batch: backbone({
+            lotNumber: 'string',
+            expirationDate: 'string'
+        }, false),
+        ingredient: backbone({
+
+            itemCodeableConcept: 'CodeableConcept',
+            isActive: 'primitive',
+            strength: 'Ratio'
+        }, true),
+        'ingredient.itemCodeableConcept': 'CodeableConcept',
+        'ingredient.isActive': 'primitive',
+        'ingredient.strength': 'Ratio'
+
+    },
+    MedicationDispense: {
+        status: 'string',
+        medicationReference: 'Reference',
+        medicationCodeableConcept: 'CodeableConcept',
+        subject: 'Reference',
+        performer: 'Reference[]',
+        category: 'CodeableConcept',
+        quantity: 'Quantity',
+        whenHandedOver: 'string',
+        dosageInstruction: backbone({
+            text: 'string',
+            additionalInstruction: 'CodeableConcept[]',
+            schedule: 'primitive',
+            route: 'CodeableConcept',
+            method: 'CodeableConcept'
+        }, true),
+        substitution: backbone({
+            type: 'CodeableConcept',
+            reason: 'CodeableConcept',
+            wasSubstituted: 'primitive'
+        }),
+        'dosageInstruction.text': 'string',
+        'dosageInstruction.additionalInstruction': 'CodeableConcept[]',
+        'dosageInstruction.schedule': 'primitive',
+        'dosageInstruction.route': 'CodeableConcept',
+        'dosageInstruction.method': 'CodeableConcept',
+        'substitution.type': 'CodeableConcept',
+        'substitution.reason': 'CodeableConcept',
+        'substitution.wasSubstituted': 'primitive'
     },
     Specimen: {
         type: 'CodeableConcept',
@@ -225,7 +276,15 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
         subject: 'Reference'
     },
     ChargeItemDefinition: {
-        code: 'CodeableConcept[]'
+        code: 'CodeableConcept[]',
+        status: 'string',
+        title: 'string',
+        url: 'string',
+        priceComponent: backbone({
+            type: 'CodeableConcept',
+            amount: 'primitive',
+            factor: 'primitive'
+        }, true)
     },
     Slot: {
         serviceType: 'CodeableConcept[]'
@@ -329,14 +388,56 @@ export class FhirResourceTransformService {
             case 'Reference[]': return this.ensureArray(value).map(v => this.toReference(v));
             case 'string': return value;
             case 'string[]': return this.ensureArray(value);
-            default: return value;
+            case 'Ratio': return this.toRatio(value);
+            //case 'BackboneElement':
+            default: //return value;
+                break
+        }
+        if (isBackboneProperty(kind)) {
+            return this.toBackbone(value, kind);
+        } else {
+            return value;
         }
     }
 
     public ensureArray(v: any): any[] {
         return Array.isArray(v) ? v : (v == null ? [] : [v]);
     }
+    private parseNumber(value: number | string | undefined): number | undefined {
+        if (value == null || value === '') return undefined;
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : undefined;
+    }
 
+    private normalizeUnit(unit: string | undefined): string | undefined {
+        return unit?.toString().trim() || undefined;
+    }
+
+    public toRatio(raw: {
+        numeratorValue: number | string,
+        numeratorUnit: string,
+        denominatorValue: number | string,
+        denominatorUnit: string
+    }): Ratio | undefined {
+        const numeratorValue = this.parseNumber(raw?.numeratorValue);
+        const denominatorValue = this.parseNumber(raw?.denominatorValue);
+        if (numeratorValue == null && denominatorValue == null) {
+            return undefined;
+        }
+        const numeratorUnit = this.normalizeUnit(raw?.numeratorUnit);
+        const denominatorUnit = this.normalizeUnit(raw?.denominatorUnit);
+        const ratio: Ratio = {
+            numerator: {
+                ...(numeratorValue != null ? { value: numeratorValue } : {}),
+                ...(numeratorUnit ? { unit: numeratorUnit, system: 'http://unitsofmeasure.org' } : {})
+            },
+            denominator: {
+                ...(denominatorValue != null ? { value: denominatorValue } : {}),
+                ...(denominatorUnit ? { unit: denominatorUnit, system: 'http://unitsofmeasure.org' } : {})
+            }
+        };
+        return ratio;
+    }
     public toCodeableConcept(raw: any): FhirCodeableConcept | any {
         if (!raw) return raw;
         if (typeof raw === 'object' && (raw.display || raw.code || raw.text)) {
@@ -350,7 +451,7 @@ export class FhirResourceTransformService {
                         {
                             code: raw.code || raw.display,
                             display: raw.display || raw.code,
-                            system: raw.system || 'https://elikita-server.daalitech.com'
+                            system: raw.system || 'urn:unknown'
 
 
                         }
@@ -362,7 +463,7 @@ export class FhirResourceTransformService {
 
         // if (typeof raw !== 'string') return { text: String(raw) };
         const parts = raw.split('$#$').map((p: any) => p.trim());
-        if (parts.length === 3 && this.allPartsHaveValue(parts)) {
+        if (parts.length >= 3 && this.allPartsHaveValue(parts)) {
             const [code, display, system] = parts;
             return { coding: [{ code, display, system }], text: display };
         }
@@ -394,5 +495,12 @@ export class FhirResourceTransformService {
 
     private allPartsHaveValue(parts: string[]): boolean {
         return parts.every(p => p !== '');
+    }
+
+    public toBackbone(raw: any, config: BackboneProperty): any {
+        if (!config) {
+            return raw;
+        }
+        return this.transformBackbone(raw, config);
     }
 }

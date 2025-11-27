@@ -17,7 +17,7 @@
         </mat-card-header>
         }
         <mat-card-content>
-            <form [formGroup]="aForm" class="mt-20 aform">
+            <form [formGroup]="aForm" class="mt-20 p-20 aform dynamic-form">
                 @for(field of formFields; track $index){
                 @if(!field.generalProperties.hasOwnProperty('isHidden') ||
                 (field.generalProperties.hasOwnProperty('isHidden')
@@ -28,7 +28,10 @@
                 <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
                     <mat-label>{{field.generalProperties.fieldLabel??field.generalProperties.fieldName}}</mat-label>
                     @if(field.generalProperties.fieldHint){
-                    <mat-hint>{{field.generalProperties.fieldHint}}</mat-hint>
+                    <mat-hint matTooltipPosition="above" matTooltipShowDelay="250"
+                        [matTooltip]="field.generalProperties.fieldHint">
+                        {{field.generalProperties.fieldHint}}
+                    </mat-hint>
                     }
 
                     @if(field.generalProperties.suffixIcon){
@@ -108,16 +111,12 @@
                     <input type="text" matInput [formControlName]="field.generalProperties.fieldApiName"
                         [placeholder]="field.generalProperties.fieldPlaceholder??`${field.generalProperties.fieldLabel??field.generalProperties.fieldName}`"
                         [matAutocomplete]="auto">
-                    <mat-autocomplete #auto="matAutocomplete"
-                    [class]="'more-raised'"
-                    [displayWith]="displayConceptFieldDisplay"
-
-                    >
+                    <mat-autocomplete #auto="matAutocomplete" [class]="'more-raised'"
+                        [displayWith]="displayConceptFieldDisplay">
                         <!-- @for(option of field.Reference; track $index){ -->
                         @for(option of fieldAutoCompleteObject[field.generalProperties.fieldApiName] | async; track
                         $index){
-                        <mat-option [value]="option"  
-                                   >
+                        <mat-option [value]="option">
 
                             <div class="ticket-like">
                                 <div class="text">
@@ -125,19 +124,16 @@
                                 </div>
                                 <div class="code" #cdRef>
                                     {{(option.reference || (option | splitHash: 0))}}
-                                   
-                             
 
-             
+
+
+
                                 </div>
-                                 <span
-                                   #sp="matMenuTrigger"
-                                   [matMenuTriggerFor]="mm"
-                                   (mouseover)="triggerForMatMenu(sp, option.reference)"
-                                  (mouseleave)="closeMenu(sp)"
-                                   >
+                                <span #sp="matMenuTrigger" [matMenuTriggerFor]="mm"
+                                    (mouseover)="triggerForMatMenu(sp, option.reference || option.split('$#$')[0])"
+                                    (mouseleave)="closeMenu(sp)">
                                     <mat-icon>info</mat-icon>
-                                 </span>
+                                </span>
 
                             </div>
 
@@ -445,6 +441,11 @@
                             [ngClass]="{'d-none': getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id}"
                             [attr.dependency-id]="getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id??'none'">
                             <mat-label>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}</mat-label>
+                            <mat-hint matTooltipPosition="above" matTooltipShowDelay="250"
+                                [matTooltip]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint">
+                                {{getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint}}
+                            </mat-hint>
+
                             @if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldType ==
                             "CodeableConceptField"){
 
@@ -755,7 +756,10 @@
                         [ngClass]="{'d-none': getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id}"
                         [attr.dependency-id]="getGroupField(field).groupFields[fieldKey].generalProperties.dependence_id??'none'">
                         @if(getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint){
-                        <mat-hint>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint}}</mat-hint>
+                        <mat-hint matTooltipPosition="above" matTooltipShowDelay="250"
+                            [matTooltip]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint">
+                            {{getGroupField(field).groupFields[fieldKey].generalProperties.fieldHint}}
+                        </mat-hint>
 
                         }
                         <mat-label>{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}</mat-label>
@@ -885,6 +889,22 @@
 
                         @else if (getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
                         getGroupField(field).groupFields[fieldKey].generalProperties.inputType ==
+                        'toggle') {
+
+                        <input type="text" matInput
+                            [formControlName]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName"
+                            style="display: none;"
+                            [placeholder]="getGroupField(field).groupFields[fieldKey].generalProperties.fieldPlaceholder??`${getGroupField(field).groupFields[fieldKey].generalProperties.fieldLabel??getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}`">
+                        <mat-slide-toggle
+                            formControlName="{{getGroupField(field).groupFields[fieldKey].generalProperties.fieldApiName}}"
+                            class="me-10">
+                            {{ getGroupField(field).groupFields[fieldKey].generalProperties.fieldName}}
+                        </mat-slide-toggle>
+
+                        }
+
+                        @else if (getGroupField(field).groupFields[fieldKey].generalProperties.inputType &&
+                        getGroupField(field).groupFields[fieldKey].generalProperties.inputType ==
                         'datetime-local') {
 
                         <mat-datepicker-toggle matSuffix [for]=" picker"></mat-datepicker-toggle>
@@ -951,16 +971,11 @@
     </mat-card>
 </div>
 }
-           <mat-menu
-             #mm="matMenu"
-             class="info-menu-panel"
-             (mouseenter)="cancelPendingMenuClose()"
-             (mouseleave)="closeMenu(lastHoveredTrigger)">
-                                           <app-detail-base [url]="toUseUrl" [exclude]="['meta', 'id', 'resourceType','requisition']"
-                                           
-                                           
-                                           ></app-detail-base>
-                                           
-                                        </mat-menu>
+<mat-menu #mm="matMenu" class="info-menu-panel" (mouseenter)="cancelPendingMenuClose()"
+    (mouseleave)="closeMenu(lastHoveredTrigger)">
+    <app-detail-base [url]="toUseUrl"
+        [exclude]="['meta', 'id', 'resourceType','requisition', 'extension']"></app-detail-base>
+
+</mat-menu>
 
 <!-- {{aForm.value|json}} -->

@@ -154,7 +154,7 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
           this.flattenBackboneFields(bucket, dottedKey, childValue, childConfig);
         } else {
           const kind = (childConfig as PropertyKind) || this.inferKind(childValue);
-          bucket[dottedKey] = this.stringifyValue(childValue, kind);
+          this.stringifyValue(childValue, kind) ? bucket[dottedKey] = this.stringifyValue(childValue, kind) : delete bucket[dottedKey];
         }
       });
     });
@@ -175,10 +175,23 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
         return String(value);
       case 'string[]':
         return this.ensureArray(value).join(', ');
+      case 'Ratio':
+        return this.stringifyRatio(value);
+      case 'Quantity':
+        return this.stringifyQuantity(value);
+      case 'Identifier':
+        if (typeof value === 'object') {
+          return value.value || '';
+        } else {
+          return String(value);
+        }
       default:
         return this.stringifyAnyValue(value);
     }
   }
+
+
+
 
   private stringifyAnyValue(value: any): string {
     if (value == null) return '';
@@ -209,6 +222,23 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     const unit = value.unit ?? value.code ?? value.numerator?.unit ?? '';
     if (magnitude === '' && unit === '') return '';
     return `${magnitude}${unit ? ` ${unit}` : ''}`.trim();
+  }
+
+  private stringifyRatio(value: any): string {
+    if (!value) return '';
+    const numeratorDesc = this.stringifyQuantity({
+      value: value.numerator?.value ?? value.numeratorValue,
+      unit: value.numerator?.unit ?? value.numeratorUnit
+    });
+    const denominatorDesc = this.stringifyQuantity({
+      value: value.denominator?.value ?? value.denominatorValue,
+      unit: value.denominator?.unit ?? value.denominatorUnit
+    });
+    if (!numeratorDesc && !denominatorDesc) return '';
+    if (numeratorDesc && denominatorDesc) {
+      return `${numeratorDesc} per ${denominatorDesc}`;
+    }
+    return numeratorDesc || denominatorDesc;
   }
 
   private isRangeLike(value: any): boolean {
@@ -250,7 +280,7 @@ export interface DetailsBuilderObject {
   resourceLabel?: string;
   resourceIcon: string;
   specialHeader: {
-    strongSectionKey: string;
+    strongSectionKey: string | [string, string];
     iconSectionKeys: string[];
     contentSectionKeys: string[];
   };

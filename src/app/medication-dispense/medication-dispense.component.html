@@ -1,0 +1,89 @@
+<mat-card class="p-20" style="width: max-content; max-width: 100%; box-sizing: border-box;">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title>Medication Dispenses</mat-card-title>
+                <mat-card-subtitle>Track dispensed medications per patient.</mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex">
+                @if (canAddDispense$ | async) {
+                <a mat-flat-button extended (click)="openDispenseDialog()">
+                    <mat-icon>local_pharmacy</mat-icon>
+                    New Dispense
+                </a>
+                }
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        <mat-divider></mat-divider>
+        <app-table-header [patientsTableFilterArray]="medDispenseTableFilterArray"
+            [patientsFiltersFormControlObject]="medDispenseFiltersFormControlObject">
+        </app-table-header>
+        @let dispenses = (tableDataLevel2 | async) ?? [];
+        @if (dispenses.length > 0) {
+        <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
+
+            <ng-container matColumnDef="whenHandedOver">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="whenHandedOver">When Dispensed</th>
+                <td mat-cell *matCellDef="let disp">
+                    {{ disp.whenHandedOver | date : 'medium' | na }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
+                <td mat-cell *matCellDef="let disp">
+                    @if (disp.status) {
+                    <div [appChips]="disp.status" [fontSize]="'14px'"></div>
+                    } @else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="medication">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="medication">Medication</th>
+                <td mat-cell *matCellDef="let disp">
+                    {{ formatMedication(disp) | na }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="subject">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="subject">Patient</th>
+                <td mat-cell *matCellDef="let disp">
+                    @if (disp.subject?.reference) {
+                    <span [appReferenceDisplay]="disp.subject.reference" InstantfetchAndRepace="true"></span>
+                    } @else {
+                    <span class="subtitle-text-color-2">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="quantity">Qty</th>
+                <td mat-cell *matCellDef="let disp">
+                    {{ formatQuantity(disp) }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let disp">
+                    <button mat-icon-button (click)="showRow(disp)">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        } @else {
+        <app-empty-state class="py-40" [icon]="'MEDICAL_SERVICES'" [title]="'No Medication Dispenses Found'"
+            [subtitle]="'Record a dispense to begin tracking inventory updates.'">
+        </app-empty-state>
+        }
+    </mat-card-content>
+</mat-card>

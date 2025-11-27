@@ -46,6 +46,7 @@ export class ResourceDataReviewComponent implements OnInit {
             } else {
                 // Fallback shallow mapping: copy primitive & object references by fieldApiName
                 this.submittedData = {};
+                alert(JSON.stringify(this.resource))
                 this.formFields.forEach(f => {
                     const k = f.generalProperties.fieldApiName;
                     (this.submittedData as any)[k] = (this.resource as any)[k];
@@ -210,7 +211,11 @@ export class ResourceDataReviewComponent implements OnInit {
     private setFieldValue(field: any, value: any) {
         if (field.generalProperties.isGroup && field.groupFields) {
             Object.keys(field.groupFields).forEach(k => {
-                if (value && value.hasOwnProperty(k)) field.groupFields[k].generalProperties.value = value[k];
+                const subfield = field.groupFields[k];
+                const apiName = subfield.generalProperties.fieldApiName;
+                if (value && value.hasOwnProperty(apiName)) {
+                    subfield.generalProperties.value = value[apiName];
+                }
             });
         } else {
             field.generalProperties.value = value;
@@ -228,5 +233,35 @@ export class ResourceDataReviewComponent implements OnInit {
     getSubfieldLabel(arrayItem: any, key: string): string {
         const gf = arrayItem.field?.groupFields?.[key];
         return gf?.generalProperties?.fieldLabel || gf?.generalProperties?.fieldName || key;
+    }
+
+    getGroupFieldSubfieldLabel(field: any, key: string): string {
+        const gf = field?.groupFields?.[key];
+        return gf?.generalProperties?.fieldLabel || gf?.generalProperties?.fieldName || key;
+    }
+
+    isGroupFieldSubfieldHidden(field: any, key: string): boolean {
+        const gf = field?.groupFields?.[key];
+        return gf?.generalProperties?.isHidden === true;
+    }
+
+    formatReviewValue(value: any, fallbackIndex: number = 1): string {
+        if (value === undefined || value === null || value === '') {
+            return '';
+        }
+        if (typeof value === 'string') {
+            const parts = value.split('$#$');
+            if (parts.length > fallbackIndex) {
+                return parts[fallbackIndex];
+            }
+            return parts[0];
+        }
+        if (typeof value === 'object') {
+            const display = value.display || value.text || value.name || value.value;
+            if (typeof display === 'string') {
+                return display;
+            }
+        }
+        return String(value);
     }
 }

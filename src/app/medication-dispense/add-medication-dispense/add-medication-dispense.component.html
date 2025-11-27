@@ -1,0 +1,101 @@
+<mat-card class="py-20">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100">
+            <div>
+                <mat-card-title>Record Medication Dispense</mat-card-title>
+            </div>
+        </div>
+    </mat-card-header>
+    <mat-card-content>
+        <!-- {{data.medicationReference | json}} -->
+        <!-- {{medicationReference | json}} -->
+        @if(!groupId){
+        <div class="py-15">
+            @if(this.medicationCodeableConcept || this.medicationReference){
+            <span class="subtitle-text-color-2" style="font-size: 1rem">Recording dispense for medication: </span>
+            <span>
+                @if(this.medicationCodeableConcept && this.medicationCodeableConcept.length > 0
+                && this.medicationCodeableConcept[0] !== null
+                ){
+
+                <strong>{{ this.medicationCodeableConcept[0] | codeableConcept2 | na | titlecase }}</strong>
+                }@else if(this.medicationReference){
+                <!-- {{medicationReference[0]?.reference}} -->
+                <strong><span [appReferenceDisplay]="medicationReference[0]?.reference"
+                        InstantfetchAndRepace="true"></span></strong>
+                }
+            </span>
+            @if(medicationRequestId[0]){ <button (click)="openSubstitutionForm(medicationRequestId[0] );" style="border: 1px solid var(--mat-sys-outline); padding: 1px;
+            padding-right: 12px; font: inherit; cursor: pointer;
+            background-color: var(--mat-sys-surface-variant);
+                border-radius: 4px; display: inline-flex; vertical-align: middle; justify-content: center; align-items: center;
+                " color="tertiary" class="ms-10">
+                <mat-icon class="me-8">swap_horiz</mat-icon> Substitute Medication
+            </button>}
+            <div class="gap py-7">
+                <!-- {{this.substitutionFormArray.value | json}} -->
+                <!-- {{medicationRequestId+'jju'}} -->
+                @if(medicationRequestId[0]){
+                @if(newMedicationCodeableConcept?.[medicationRequestId[0]] ||
+                newMedicationReference?.[medicationRequestId[0]]){
+                <span class="subtitle-text-color-2" style="font-size: 1rem">New
+                    <span><strong>Substituted</strong></span> medication to dispense: </span>
+                <!-- {{ newMedicationCodeableConcept | json}} -->
+                <!-- lll{{newMedicationReference[medicationRequestId[0]] | json}} -->
+                <span>
+                    @if(medicationRequestId && newMedicationCodeableConcept ?.[medicationRequestId[0]]){
+                    <strong>{{ newMedicationCodeableConcept[medicationRequestId[0] || ''] | codeableConcept2 | na |
+                        titlecase }}</strong>
+                    }@else if(newMedicationReference?.[medicationRequestId[0]]){
+                    <strong><span [appReferenceDisplay]="newMedicationReference[medicationRequestId[0]]?.reference"
+                            InstantfetchAndRepace="true"></span></strong>
+
+                    }
+                </span>
+                <button (click)="reverseSubstitution(medicationRequestId[0] );" style="border: 1px solid var(--mat-sys-outline); padding: 1px;
+            padding-right: 12px; font: inherit; cursor: pointer;
+            background-color: var(--mat-sys-surface-variant);
+                border-radius: 4px; display: inline-flex; vertical-align: middle; justify-content: center; align-items: center;
+                " color="tertiary" class="ms-10">
+                    <mat-icon class="me-8">swap_horiz</mat-icon> Reverse Substitution
+                </button>
+                }
+                }
+            </div>
+
+            }@else{
+            <span class="subtitle-text-color-2">No medication specified for this dispense.</span>
+            }
+        </div>
+        <div class="p-15">
+            @if(!medicationRequestId[0] || (medicationRequestId[0] && !medicationReference[0] &&
+            !newMedicationReference?.[medicationRequestId[0]!])){
+            <span class="py-15" style="text-align: center;">Please select a medication that matches the requested
+                drug</span>
+
+            @if(medicationRefenceFormField[0]){
+            <app-dynamic-forms-v2 [formFields]="medicationRefenceFormField[0]" [formMetaData]="{formName: '', formDescription: '', 
+                    showSubmitButton: false
+                }" #mrF>
+
+            </app-dynamic-forms-v2>
+            <!-- {{medicationReferenceFallBackForm.value | json}} -->
+            }
+            }
+
+        </div>
+        <!-- {{this.MedicationReferenceArray.value | json}} -->
+        <app-dynamic-forms-v2 #formComp [formMetaData]="{
+                formName: '', formDescription: '', showSubmitButton: false  
+        }" [formFields]="remainingDispenseFormFields[0]" #rf></app-dynamic-forms-v2>
+        }@else{
+        To be Implemented later
+        }
+    </mat-card-content>
+    <mat-card-actions align="end">
+        <button mat-flat-button color="primary" (click)="submitCombinedDispenseBundle()">Submit Dispense</button>
+        <button mat-button mat-dialog-close>Close</button>
+    </mat-card-actions>
+    <!-- {{medicationRequestId | json}}
+    {{combinedResource | json}} -->
+</mat-card>

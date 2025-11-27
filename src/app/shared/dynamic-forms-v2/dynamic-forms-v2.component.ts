@@ -58,7 +58,7 @@ export class DynamicFormsV2Component {
   // Define the formMetaData and formFields as inputs 
   @Input() formMetaData?: formMetaData;
   searchableObject: any = {}
-  realHourScroll: any = [];
+  realHourScroll: any[] = [];
   @Input() formFields!: FormFields[];
   @Input() resetOnSubmit: boolean = true;
   fb = inject(FormBuilder);
@@ -116,8 +116,23 @@ export class DynamicFormsV2Component {
       for (const field of this.formFields) {
         this.addFieldToForm(this.aForm, field as FormFields);
       };
+      this.recomputeRequiredFieldLabels();
     }
   }
+
+  get isSubmitDisabled(): boolean {
+    return this.aForm?.invalid ?? true;
+  }
+
+  get submitButtonTooltip(): string {
+    if (!this.isSubmitDisabled) {
+      return this.formMetaData?.submitText ? `Click to ${this.formMetaData.submitText?.toLowerCase()}` : 'Submit';
+    }
+    return this.requiredFieldLabels.length
+      ? `Complete required fields: ${this.requiredFieldLabels.join(', ')}`
+      : 'Complete required fields to enable submit';
+  }
+
   ngOnInit() {
     // Initialization logic if needed
     console.log('Form Metadata:', this.formMetaData);
@@ -137,6 +152,7 @@ export class DynamicFormsV2Component {
       for (const field of this.formFields) {
         this.addFieldToForm(this.aForm, field as FormFields);
       };
+      this.recomputeRequiredFieldLabels();
     }
     for (let m = 0; m < 61; m++) {
       this.minutes.push(m < 10 ? '0' + m : m);
@@ -406,7 +422,7 @@ export class DynamicFormsV2Component {
       }
       this.infoServ.show('No options returned from the server. Defaulting to "Others".', { title: 'Select Options', duration: 4000 });
       if (control && control.value !== 'Others') {
-        control.setValue('Others');
+        control.setValue('');
       }
       return ['Others'];
     };
@@ -470,11 +486,14 @@ export class DynamicFormsV2Component {
     return groups.some((group: any) => Array.isArray(group?.conceptProperties) && group.conceptProperties.length > 0);
   }
 
-  private transformRxNormToValueSet(data: any, url: string): string[] {
+  private transformRxNormToValueSet(data: any, url: string): (string | { code: string; display: string; system: string })[] {
     const results: string[] = [];
+    const ingredientNames = new Set<string>();
 
     // Extract type filter from URL if present
     const typeMatch = url.match(/type=([^&]+)/i);
+    const purposeMatch = url.match(/purpose=([^&]+)/i);
+    const purposeFilter = purposeMatch ? purposeMatch[1].toUpperCase() : null;
     const filterType = typeMatch ? typeMatch[1].toUpperCase() : null;
     // alert(JSON.stringify(filterType))
     const conceptGroups = data?.drugGroup?.conceptGroup;
@@ -494,18 +513,36 @@ export class DynamicFormsV2Component {
       properties.forEach((concept: any) => {
         const code = concept?.rxcui;
         const rawDisplay = (concept?.name ?? '').trim();
-        const display = rawDisplay.split('/')[0]?.trim();
+        if (!rawDisplay) {
+          return;
+        }
+        if (purposeFilter === 'INGREDIENT') {
+          rawDisplay.split('/').map((part: string) => part.trim()).filter((part: string) => part.length).forEach((name: string) => {
+            ingredientNames.add(name);
+          });
+          return;
+        }
+        const display = this.withBrandFirst(rawDisplay);
         if (!code || !display) {
           return;
         }
         const system = 'http://www.nlm.nih.gov/research/umls/rxnorm';
-        const fullText = rawDisplay || display;
+        const fullText = rawDisplay;
         // Append the original RxNorm term (after the third delimiter) so filtering
         // can still match against strength/dose text that was trimmed from display.
-        results.push(`${code}$#$${display}$#$${system}$#$${fullText}`);
+        results.push(`${code}$#$${display}$#$${system}`);
       });
     });
     console.log(results)
+    if (purposeFilter === 'INGREDIENT' && ingredientNames.size) {
+      const baseSystem = 'https://elikita-server.daalitech.com';
+      return Array.from(ingredientNames).map(name => ({
+        code: name,
+        display: name,
+        system: baseSystem
+      })).map(item => `${item.code}$#$${item.display}$#$${item.system}`);
+
+    }
     return results;
   }
   // Open Material dialog to collect a custom value when 'Others' is chosen
@@ -553,6 +590,19 @@ export class DynamicFormsV2Component {
       return conceptField.split('$#$')[1] || '';
     }
     return (conceptField as { display?: string }).display ?? '';
+  }
+
+  private withBrandFirst(rawDisplay: string): string {
+    const brandMatch = rawDisplay.match(/\s*\[([^\]]+)\]\s*$/);
+    if (!brandMatch) {
+      return rawDisplay;
+    }
+    const brand = brandMatch[1].trim();
+    const stripped = rawDisplay.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
+    if (!stripped) {
+      return brand;
+    }
+    return `${brand} - ${stripped}`;
   }
   getAFormArrayControl(fieldApiName: string): FormArray {
     // console.log(fieldApiName, this.aForm.value);
@@ -825,6 +875,39 @@ export class DynamicFormsV2Component {
 
   cancelPendingMenuClose(): void {
     clearTimeout(this.menuCloseTimer);
+  }
+  requiredFieldLabels: string[] = [];
+
+  private recomputeRequiredFieldLabels(): void {
+    this.requiredFieldLabels = this.extractRequiredFieldLabels(this.formFields ?? []);
+  }
+
+  private extractRequiredFieldLabels(fields: FormFields[]): string[] {
+    const labels = new Set<string>();
+    const processField = (field: FormFields) => {
+      if (this.fieldHasRequiredValidation(field)) {
+        labels.add(this.getFieldLabel(field));
+      }
+      if (field.generalProperties.isGroup && 'groupFields' in field) {
+        const group = field as GroupField;
+        Object.values(group.groupFields).forEach(processField);
+      }
+    };
+    fields.forEach(processField);
+    return Array.from(labels);
+  }
+
+  private fieldHasRequiredValidation(field: FormFields): boolean {
+    return (field.generalProperties.validations || []).some(validation => this.isRequiredValidation(validation));
+  }
+
+  private isRequiredValidation(validation: any): boolean {
+    const name = String(validation?.name ?? validation?.type ?? '').toLowerCase();
+    return name.includes('required');
+  }
+
+  private getFieldLabel(field: FormFields): string {
+    return field.generalProperties.fieldLabel || field.generalProperties.fieldName || field.generalProperties.fieldApiName;
   }
 }
 

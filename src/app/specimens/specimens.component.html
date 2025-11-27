@@ -25,6 +25,9 @@
   </mat-card-header>
 
   <mat-card-content class="mt-20">
+    <app-table-header [patientsTableFilterArray]="specimenTableFilterArray"
+      [patientsFiltersFormControlObject]="specimenFiltersFormControlObject">
+    </app-table-header>
     <mat-divider></mat-divider>
     @let specimens = (tableDataLevel2 | async) ?? [];
     @if (specimens.length > 0) {
@@ -99,10 +102,7 @@
       <tr mat-row *matRowDef="let row; columns: specimenDisplayedColumns;"></tr>
     </table>
     } @else {
-    <app-empty-state
-      class="py-40"
-      [icon]="'SCIENCE'"
-      [title]="'No Specimens Found'"
+    <app-empty-state class="py-40" [icon]="'SCIENCE'" [title]="'No Specimens Found'"
       [subtitle]="'No specimens are recorded for this patient yet.'">
     </app-empty-state>
     }

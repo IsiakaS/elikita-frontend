@@ -123,20 +123,25 @@ margin-right: 12px !important;
     }
 
 
-
     @if(observationCategory.value == 'laboratory'){
+
     <div class="exam-wrapper mat-mdc-card">
-        <div class="exam-title-subtitle py-15">
+        <div class="exam-title-subtitle p-15">
             <div class="exam-title">
                 Add Laboratory Results
             </div>
             <div class="subtitle subtitle-text-color-2 pt-5">
-
+                @if(!labFormFields){
                 Choose the name of laboratory tests from the suggested list or enter a new one.
+                }@else if(labFormFields){
+                Fill the laboratory result form below.
+                }
             </div>
         </div>
+        @if(observationCategory.value == 'laboratory' && !labFormFields){
         <div class="a-form ">
             <div class="laboratory-observation">
+                @if(false){
                 <mat-chip-listbox class="chip-list gap-15" (change)="setLabsName($event)">
                     @for(option of sampleLaboratoryObservations; track $index;){
                     <mat-chip-option value="{{option.display}}" #err class="me-15 mb-18">
@@ -149,6 +154,7 @@ margin-right: 12px !important;
                     </mat-chip-option>
                     }
                 </mat-chip-listbox>
+                }
                 <div class="mat-field pt-20" style="max-width: 615px;">
                     <label>
                         <span>
@@ -198,11 +204,13 @@ margin-right: 12px !important;
             </div>
 
         </div>
+        }
     </div>
 
     @if(labFormFields){
     <div class="mt-15">
-        <app-dynamic-forms-v2 [formFields]="labFormFields" [formMetaData]="labFormMetaData">
+        <app-dynamic-forms-v2 [formFields]="labFormFields" [formMetaData]="labFormMetaData"
+            (formSubmitted)="submitLabResult($event)">
 
         </app-dynamic-forms-v2>
     </div>

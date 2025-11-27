@@ -7,3 +7,8 @@
     color: light-dark(#721c24, #f8d7da);
     border: 1px solid light-dark(#f5c6cb, #6b2c2c);
 }
+
+tr td {
+    z-index: 999999999999999;
+    position: relative;
+}

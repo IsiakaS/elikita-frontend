@@ -211,6 +211,17 @@ export const capacityObject = {
     viewDispensed: ['pharmacy', 'doctor', 'nurse'],
 
   },
+  //medicatindispense here
+  medicationDispense: {
+    add: ['pharmacy'],
+    viewAll: ['admin', 'receptionist', 'doctor', 'nurse', 'lab', 'pharmacy', 'patient', 'cashier'],
+    viewSelf: ['patient', 'doctor', 'nurse', 'lab', 'pharmacy', 'admin', 'receptionist'],
+    update: ['pharmacy'],
+    delete: ['pharmacy'],
+    dispense: ['pharmacy'],
+    administer: ['nurse', 'doctor'],
+    viewDispensed: ['pharmacy', 'doctor', 'nurse'],
+  },
   specimen: {
     add: ['lab'],
     edit: ['lab'],
@@ -259,6 +270,7 @@ export const capacityObject = {
   observation: {
     add: ['doctor', 'nurse', 'lab'],
     viewAll: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    view: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
     viewSelf: ['patient', 'doctor', 'nurse', 'lab', 'admin', 'receptionist'],
     update: ['doctor', 'nurse', 'lab'],
     delete: ['admin'],
