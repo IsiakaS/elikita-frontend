@@ -1,0 +1,15 @@
+<section class="add-admission-location">
+  <h2>Add Admission Location</h2>
+  <p>Define reusable location metadata (wards, rooms, beds, etc.).</p>
+
+  <ng-container *ngIf="!loading; else loadingState">
+    <app-dynamic-forms-v2
+      [formMetaData]="formMetaData"
+      [formFields]="formFields">
+    </app-dynamic-forms-v2>
+  </ng-container>
+
+  <ng-template #loadingState>
+    <p>Loading location fields…</p>
+  </ng-template>
+</section>

@@ -1,0 +1,76 @@
+<section class="admission-location">
+  <header class="page-header">
+    <div>
+      <h2>Admission Locations</h2>
+      <p>Manage wards, rooms, beds, and any reusable admission spaces.</p>
+    </div>
+    <div class="actions">
+      <button type="button" routerLink="/app/admission-location/add">
+        + Add Location
+      </button>
+      <button type="button"
+              (click)="onExportLocations?.()"
+              [disabled]="!(canExportLocation$ | async)">
+        Export
+      </button>
+    </div>
+  </header>
+
+  <ng-container *ngIf="(tableDataLevel2 | async) as locations; else loadingState">
+    <section *ngIf="locations.length; else emptyState" class="table-wrapper">
+      <table class="location-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Physical Type</th>
+            <th>Part Of</th>
+            <th>Last Updated</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let location of locations"
+              (click)="showRow?.(location)">
+            <td>
+              <div class="primary-label">{{ location.name || 'Unnamed Location' }}</div>
+              <small class="secondary-label">{{ location.description || location.id }}</small>
+            </td>
+            <td>
+              <span class="chip"
+                    [class]="statusStyles?.[location.status || 'unknown']?.chipClass || 'chip--neutral'">
+                {{ (location.status || 'unknown') | titlecase }}
+              </span>
+            </td>
+            <td>
+              {{ location.physicalType?.text
+                || location.physicalType?.coding?.[0]?.display
+                || '—' }}
+            </td>
+            <td>{{ location.partOf?.display || location.partOf?.reference || '—' }}</td>
+            <td>{{ location.meta?.lastUpdated | date:'medium' }}</td>
+            <td class="actions-col">
+              <button type="button"
+                      (click)="showLocationDetails?.(location); $event.stopPropagation();">
+                Details
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <p>No admission locations captured yet.</p>
+        <button type="button" routerLink="/app/admission-location/add">
+          Create the first location
+        </button>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #loadingState>
+    <p>Loading admission locations…</p>
+  </ng-template>
+</section>

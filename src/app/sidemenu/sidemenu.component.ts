@@ -324,6 +324,11 @@ export class SidemenuComponent {
           icon: "inventory"
         },
         {
+          link: "/app/admission-location",
+          title: "Admission Locations",
+          icon: "location_city"
+        },
+        {
           title: "Lab Supplies",
           link: "/app/lab-supplies",
           icon: 'inventory'

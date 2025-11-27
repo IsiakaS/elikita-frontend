@@ -45,14 +45,12 @@ export class AppComponent {
   }
   ngOnInit() {
     // Developer mode: set user to doctor and route to a specific patient's summary
-    // const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/tests-requests';
-    //speimens
-    const target = 'app/medicine-stock';
+    const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/tests-requests';
     const current = this.auth.user.getValue();
-    if (!current || current.role !== 'pharmacy') {
+    if (!current || current.role !== 'doctor') {
       // Ensure login redirects to our target route
       this.auth.triedUrl = target;
-      this.auth.login('pharmacy123', 'pharmacy123');
+      this.auth.login('doctor123', 'doctor123');
     } else {
       // Already a doctor: navigate directly
       this.router.navigateByUrl(target);

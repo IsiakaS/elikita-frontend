@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
-import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest } from 'fhir/r4';
+import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest, Location } from 'fhir/r4';
 import { forkJoin, map, catchError, of, tap } from 'rxjs';
 import { StateService } from '../shared/state.service';
 
@@ -22,6 +22,10 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
     null;
 
   return forkJoin({
+    locations: http.get<Bundle<Location>>(`${baseUrl}/Location?_count=199`).pipe(
+      map(bundleToResources),
+      catchError(() => of([]))
+    ),
     specimens: http.get<Bundle<Specimen>>(`${baseUrl}/Specimen?_count=199`).pipe(
       map(bundleToResources),
       catchError(() => of([]))
@@ -43,7 +47,14 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
       catchError(() => of([]))
     )
   }).pipe(
-    tap(({ specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests }) => {
+    tap(({ locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests }) => {
+      stateService.orgWideResources.locations?.next(
+        locations.map(loc => ({
+          referenceId: loc.id ? `Location/${loc.id}` : null,
+          savedStatus: 'saved',
+          actualResource: loc
+        }))
+      );
       stateService.orgWideResources.specimens.next(
         specimens.map(specimen => ({
           referenceId: specimen.id ? `Specimen/${specimen.id}` : null,

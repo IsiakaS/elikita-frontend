@@ -168,6 +168,14 @@ export const capacityObject = {
     'delete': ['admin', 'receptionist'],
 
   },
+  location: {
+    add: ['admin'],
+    update: ['admin'],
+    viewAll: ['admin', 'doctor', 'nurse'],
+    viewSelf: ['admin', 'doctor', 'nurse'],
+    delete: ['admin'],
+    export: ['admin']
+  },
   practitioner: {
 
   },

@@ -596,5 +596,14 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
     return { success: true, resource: obs };
   }
 
+  ngOnInit(){
+    this.orgWideResources.locations = new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: any
+    }>>([]);
+  }
+
+  
 }
 

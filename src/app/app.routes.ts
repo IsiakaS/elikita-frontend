@@ -75,6 +75,8 @@ import { patientRegistrationCenterResolver } from './patient-registration-center
 import { PatientRegistrationApprovedComponent } from './patient-registration-center/patient-registration-approved.component';
 import { PatientRegistrationDeceasedComponent } from './patient-registration-center/patient-registration-deceased.component';
 import { appWrapperDataResolver } from './app-wrapper/app-wrapper-data.resolver';
+import { AdmissionLocationComponent } from './admission-location/admission-location.component';
+import { AddAdmissionLocationComponent } from './admission-location/add-admission-location.component';
 
 export const routes: Routes = [
 
@@ -306,6 +308,14 @@ export const routes: Routes = [
                 path: "admission",
                 component: AdmissionComponent,
                 // resolve: { admission: admissionResolver }
+            },
+            {
+                path: "admission-location",
+                component: AdmissionLocationComponent
+            },
+            {
+                path: "admission-location/add",
+                component: AddAdmissionLocationComponent
             },
             {
                 path: "claims",

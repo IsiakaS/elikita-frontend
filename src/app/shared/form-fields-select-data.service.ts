@@ -116,6 +116,11 @@ export class FormFieldsSelectDataService {
 
 
     },
+    'location': {
+      'status': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/location-status&_format=json',
+      'physicalType': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/location-physical-type&_format=json',
+      'partOf': `${this.backendApiEndPoint}/Location?_format=json&_count=500`
+    },
     'observation': {
       practitioner: "/encounter/encounter_participant.json",
       category: "https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/observation-category&_format=json",
@@ -181,8 +186,12 @@ export class FormFieldsSelectDataService {
   baseFunctionToRetrieveValueset(value: any) {
     console.log(value);
     return value.expansion.contains.map((item: any) => {
-
-      return `${item.code}$#$${item.display}$#$${item.system}`;
+      return{
+        code: item.code,
+        display: item.display,
+        system: item.system
+      }
+      // return `${item.code}$#$${item.display}$#$${item.system}`;
     });
   }
 
@@ -359,6 +368,24 @@ export class FormFieldsSelectDataService {
 
   // statusReason, vaccineCode, informationSource, site, route, reason
   transformValues = {
+    //   'location': {
+    //   'status': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/location-status&_format=json',
+    //   'physicalType': 'https://tx.fhir.org/r4/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/location-physical-type&_format=json',
+    //   'partOf': `${this.backendApiEndPoint}/Location?_format=json&_count=500`
+    // },
+    'location': {
+      // 'status': this.baseFunctionToRetrieveValueset,
+       'physicalType': this.baseFunctionToRetrieveValueset,
+      'partOf': (value: Bundle<Location>) => {
+        return value.entry?.map((e: BundleEntry<Location>) => {
+          const display = e.resource?.name || 'Unnamed Location';
+          const reference = "Location/" + e.resource?.id;
+          return reference + "$#$" + display;
+        })
+      }
+
+
+    },
     'referral': {
       'organization': (value: Bundle<HealthcareService>) => {
         return value.entry?.map((e: BundleEntry<HealthcareService>) => {
@@ -875,7 +902,7 @@ export class FormFieldsSelectDataService {
       // 'medication': "/dummy.json",
       // 'subject': "http://hapi.fhir.org/baseR5/Patient?_format=json",
       // "performer": "http://hapi.fhir.org/baseR5/Practitioner?_format=json",
-      // "request": "h
+      // "request": "https://server.fire.ly/r5/MedicationRequest?_format=json"
 
       'status': (value: any) => {
         return value.expansion.contains.map((item: any) => {
