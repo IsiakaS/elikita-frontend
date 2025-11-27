@@ -430,10 +430,10 @@ export class DummyMedicationRequestDetailsComponent {
                     write: 'doctor, nurse'
                   },
 
-                  inputType: "datetimelocal",
+                  // inputType: "IndividualReferenceField",
                   isArray: true,
                   isGroup: false,
-                  fieldType: 'CodeableConceptField',
+                  fieldType: 'IndividualReferenceField',
                 },
                 data: g.receiver,
 

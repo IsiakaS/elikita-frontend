@@ -242,16 +242,20 @@ export class SidemenuComponent {
           link: "/app/dashboard",
           icon: "dashboard"
         },
- {
-        link: "/app/patients",
-        title: "Patients",
-        icon: "people"
-      },
+        {
+          link: "/app/patients",
+          title: "Patients",
+          icon: "people"
+        },
         {
           link: "/app/medicine-requests",
           title: "Medicine Requests",
           icon: "local_pharmacy"
-
+        },
+        {
+          title: "Medication Dispenses",
+          link: "/app/medication-dispense",
+          icon: "medical_services"
         },
         //medicine stock
         {
@@ -505,11 +509,11 @@ export class SidemenuComponent {
           link: "/app/dashboard",
           icon: 'dashboard'
         },
-         {
-        link: "/app/patients",
-        title: "Patients",
-        icon: "people"
-      },
+        {
+          link: "/app/patients",
+          title: "Patients",
+          icon: "people"
+        },
         {
           link: "/app/tests-requests",
           title: "Tests Request",

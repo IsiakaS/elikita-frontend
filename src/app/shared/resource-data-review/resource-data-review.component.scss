@@ -28,6 +28,46 @@
         font-weight: 600;
         // color: var(--mat-sys-on-surface-variant);
     }
+
+    &.group-field {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+.group-subfields {
+    width: 100%;
+    display: grid;
+    gap: 6px;
+    padding: 12px 12px 0 1rem;
+    box-sizing: border-box;
+    padding-left: 1rem;
+    border-left: 2px solid var(--mat-sys-outlines)
+}
+
+.group-subfield {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    width: 100%;
+    flex-wrap: wrap;
+
+    .subfield-label {
+        font-size: 0.85rem;
+        color: var(--mat-sys-on-surface-variant);
+        flex: 1;
+        min-width: 0;
+    }
+
+    .subfield-value {
+        font-weight: 500;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-word;
+        flex: 1;
+    }
 }
 
 .array-item {

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CodeableConcept } from 'fhir/r5';
+import { CodeableConcept } from 'fhir/r4';
 
 @Pipe({
   name: 'codeableConcept2'

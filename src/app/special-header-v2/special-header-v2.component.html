@@ -8,19 +8,29 @@
     <div class="words g-just-flex flex-column" style="align-items: flex-start; font-size: 1.1rem;">
         <strong>
             <em>
-        {{refinedResourceData?.[specialHeader.strongSectionKey] | titlecase | na}}
+                @if((specialHeader.strongSectionKey?.[0]+"").length > 2){
+                <!-- {{specialHeader.strongSectionKey[1]+"fff"}} -->
+                {{(refinedResourceData?.[specialHeader.strongSectionKey[0]]??refinedResourceData?.[specialHeader.strongSectionKey[1]])
+                |
+                titlecase | na}}
 
+
+                }@else{
+                {{refinedResourceData?.[specialHeader.strongSectionKey+""] | titlecase | na}}
+
+
+                }
 
             </em>
 
         </strong>
 
-        <div class="g-just-flex gap-8 flex-wrap" style="flex-wrap: wrap;">
+        <div class="g-just-flex gap-8 flex-wrap pt-4" style="flex-wrap: wrap;">
             @for(baseKey of specialHeader.iconSectionKeys; track $index;){
             @if(refinedResourceData?.[baseKey]){
-                <div [appChips]="refinedResourceData?.[baseKey]" fontSize="14px">
+            <div [appChips]="refinedResourceData?.[baseKey]" fontSize="14px">
 
-                </div>
+            </div>
 
             <!-- <div #sc style="align-items: center;"
                 [attr.class]="'small-chips'+' '+'status-'+statusStyles[resourceObject[baseKey.key]]?.['color']+' g-just-flex gap-8'">
@@ -35,7 +45,7 @@
             </div> -->
             }}
 
+        </div>
     </div>
-</div>
 </div>
 }

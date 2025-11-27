@@ -55,11 +55,12 @@
     <mat-card-content class="my-12">
         <mat-divider></mat-divider>
         @if((this.tableDataLevel2 | async) && (this.tableDataLevel2 | async)?.length > 0) {
+        @if(!forCheckSheet){
         <app-table-header [patientsTableFilterArray]="  labRequestsTableFilterArray"
             [patientsFiltersFormControlObject]=" labRequestsFiltersFormControlObject">
 
         </app-table-header>
-
+        }
 
         <table mat-table matSort [dataSource]="tableDataSource" class="mat-elevation-z8 demo-table">
 
@@ -90,7 +91,7 @@
 
                     </div>
 
-                    </td>
+                </td>
             </ng-container>
 
 
@@ -223,7 +224,7 @@
 
                             </div>
                             @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
-                                @if(false){
+                            @if(false){
                             <div class="bottom subtitle-text-color-2 link-group-icon">
                                 @if((element.medication.reference | fetchFromReference : 'code': 'coding': 0 : 'display'
                                 )| async){
@@ -241,13 +242,13 @@
 
 
                             </div>
-                        }
+                            }
                             }
                         </div>
                         <div>
                             @if(false){
                             @if(isLinkObj['medication'] && isLinkObj['medication'].get(i)) {
-                                
+
                             <div (click)="alltds(td)">
 
 
@@ -268,7 +269,7 @@
                                 </mat-expansion-panel>
                             </div>
                             }
-                        }
+                            }
                         </div>
                     </div>
 
@@ -347,7 +348,7 @@
                                 Details
                             </a>
                         </a>
-                        <a mat-menu-item>
+                        <!-- <a mat-menu-item>
                             <a mat-button (click)="showSpecimenForThisTest()">
                                 Specimen
                             </a>
@@ -366,7 +367,7 @@
                             <a mat-button>
                                 Generate Order
                             </a>
-                        </a>
+                        </a> -->
 
                     </mat-menu>
                     <a [mat-menu-trigger-for]="mm">
@@ -387,15 +388,12 @@
             <tr mat-header-row *matHeaderRowDef="labRequestsDisplayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns:labRequestsDisplayedColumns; let dataIndex = dataIndex;"></tr>
         </table>
-    }@else {
-        <app-empty-state
-        [icon]="'MEDICAL_SERVICES'"
-        [title]="'Lab Requests Not Available'"
-        [subtitle]="'No lab requests have been made for this patient yet.'"
-        >
+        }@else {
+        <app-empty-state [icon]="'MEDICAL_SERVICES'" [title]="'Lab Requests Not Available'"
+            [subtitle]="'No lab requests have been made for this patient yet.'">
 
         </app-empty-state>
-    }
+        }
     </mat-card-content>
 </mat-card>
 

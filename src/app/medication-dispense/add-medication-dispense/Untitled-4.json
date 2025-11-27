@@ -1,0 +1,13 @@
+{
+    "resourceType": "Bundle",
+    "type": "transaction",
+    "entry": [
+        {
+            "resource": {
+                ....
+            },
+            "request": {
+                "method": "POST",
+                "url": "Medication"
+            }
+        },

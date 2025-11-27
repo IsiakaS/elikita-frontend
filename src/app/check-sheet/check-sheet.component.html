@@ -362,17 +362,18 @@
 
                         <ng-container matColumnDef="severity">
                             <th mat-header-cell *matHeaderCellDef> Severity </th>
-                            <td mat-cell *matCellDef="let r">{{ r.severity }}</td>
+                            <td mat-cell *matCellDef="let r">{{ r.severity | codeableConcept2 | na}}</td>
                         </ng-container>
 
                         <ng-container matColumnDef="verification">
                             <th mat-header-cell *matHeaderCellDef> Verification </th>
-                            <td mat-cell *matCellDef="let r">{{ r.verification | titlecase }}</td>
+                            <td mat-cell *matCellDef="let r">{{ r.verification | codeableConcept2 | na | titlecase }}
+                            </td>
                         </ng-container>
 
                         <ng-container matColumnDef="onset">
                             <th mat-header-cell *matHeaderCellDef> Onset </th>
-                            <td mat-cell *matCellDef="let r">{{ r.onset }}</td>
+                            <td mat-cell *matCellDef="let r">{{ r.onset | date : 'shortDate' | na }}</td>
                         </ng-container>
 
                         <ng-container matColumnDef="actions">
@@ -408,8 +409,11 @@
                     </mat-panel-title>
 
                 </mat-expansion-panel-header>
+                <app-lab-requests [labRequestTableFilters]="labRequestFilters"
+                    [labRequestTableColumns]="['status', 'code', 'request', 'action']" [forCheckSheet]="true">
+                </app-lab-requests>
 
-                <div class="g-just-flex gap-30 flex-wrap justify-content-start">
+                <!-- <div class="g-just-flex gap-30 flex-wrap justify-content-start">
                     @for(eachlab of
                     labRequestAndValue;
                     track $index;){ <div class=" field-group" style="border-left: 2px solid var(--mat-sys-primary);
@@ -436,7 +440,7 @@
                             <mat-icon>add</mat-icon>
                             Request Another Lab Test</button>
                     </div>
-                </div>
+                </div> -->
                 <!--Add a Lab test request button-->
 
             </mat-expansion-panel>

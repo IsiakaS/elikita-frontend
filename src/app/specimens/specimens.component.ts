@@ -34,6 +34,8 @@ import { SuccessMessageComponent } from '../shared/success-message/success-messa
 import { Router } from '@angular/router';
 import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
 import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { TableHeaderComponent } from '../table-header/table-header.component';
 
 
 @Component({
@@ -57,12 +59,21 @@ import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component'
     ChipsDirective,
     ReferenceDisplayDirective,
     NaPipe,
-    EmptyStateComponent
+    EmptyStateComponent,
+    TableHeaderComponent
   ],
   templateUrl: './specimens.component.html',
   styleUrls: ['../medicine-requests/medicine-requests.component.scss', './specimens.component.scss']
 })
 export class SpecimensComponent {
+  specimenTableFilterArray = new Map<string, string[]>(
+    [
+      ['status', ['received', 'available', 'unavailable', 'cancelled']],
+      ['type', ['Blood', 'Urine', 'Swab', 'Biopsy']]
+    ]
+  );
+  specimenFiltersFormControlObject: Record<string, FormGroup> = {};
+  private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   encounterService = inject(EncounterServiceService);
   private stateService = inject(StateService);
@@ -99,6 +110,11 @@ export class SpecimensComponent {
     ]
   };
   ngOnInit(): void {
+    this.specimenTableFilterArray.forEach((values, key) => {
+      const group = this.fb.group({});
+      values.forEach(value => group.addControl(value, new FormControl(false)));
+      this.specimenFiltersFormControlObject[key] = group;
+    });
     const resolvedPatientId = this.stateService.currentPatientIdFromResolver.getValue();
     const encounterPatientId = this.stateService.currentEncounter.getValue()?.patientId ?? null;
     const canViewAllSpecimens = this.auth.can('specimen', 'viewAll');
@@ -137,80 +153,80 @@ export class SpecimensComponent {
   // private errorService = inject(ErrorService);
   // private stateService = inject(StateService);
   onAddSpecimen(patientId?: string, serviceRequestId?: string) {
-     const dialogRef = this.dialog.open(AddSpecimenComponent, {
-       maxHeight: '90vh',
-       maxWidth: '650px',
-       autoFocus: false,
-       data: { patientId, serviceRequestId }
-     });
- 
-     dialogRef.afterClosed().subscribe((result) => {
-       if (!result || !result.values || (Array.isArray(result.values) && result.values.length === 0)) {
-         this.errorService.openandCloseError('No Specimen was created as the form was closed without submission.');
-         return;
-       }
- 
-       let values = result.values;
-       if (!Array.isArray(values)) {
-         values = [values];
-       }
- 
-       const practitionerId = this.authService.user.getValue()?.['userId'];
-       const practitionerRef = practitionerId ? `Practitioner/${practitionerId}` : null;
- 
-       const specimenResources = values.map((val: any) => {
-         const resource: any = {
-           ...this.fhirTransformService.transformValues('Specimen', val),
-           resourceType: 'Specimen'
-         };
-         if (practitionerRef) {
-           resource.collection = {
-             ...(resource.collection || {}),
-             collector: { reference: practitionerRef }
-           };
-         }
-         resource.status = resource.status?.toLowerCase();
-         return resource;
-       });
- 
-       const bundle: Bundle<any> = {
-         resourceType: 'Bundle',
-         type: 'transaction',
-         entry: specimenResources.map((resource: any) => ({
-           resource,
-           request: { method: 'POST', url: 'Specimen' }
-         }))
-       };
- 
-       this.fhirResourceService.postBundle(bundle).subscribe({
-         next: (response) => {
-           const persistedResources =
-             response?.bundle?.entry?.map((entry: any) => entry.resource).filter(Boolean) ?? specimenResources;
- 
-           persistedResources.forEach((resource: any) => {
-             this.stateService.persistOrgWideResource(resource, 'saved');
-             if (patientId) {
-               this.stateService.persistPatientResource(resource, 'saved');
-             }
-           });
- 
-           this.snackBar.openFromComponent(SuccessMessageComponent, {
-             data: { message: 'Specimen record(s) created successfully.' },
-             duration: 3000
-           });
-         },
-         error: () => {
-           this.errorService.openandCloseError('Error creating specimen record(s). Please try again later.');
-         }
-       });
-     });
-   }
+    const dialogRef = this.dialog.open(AddSpecimenComponent, {
+      maxHeight: '90vh',
+      maxWidth: '650px',
+      autoFocus: false,
+      data: { patientId, serviceRequestId }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result || !result.values || (Array.isArray(result.values) && result.values.length === 0)) {
+        this.errorService.openandCloseError('No Specimen was created as the form was closed without submission.');
+        return;
+      }
+
+      let values = result.values;
+      if (!Array.isArray(values)) {
+        values = [values];
+      }
+
+      const practitionerId = this.authService.user.getValue()?.['userId'];
+      const practitionerRef = practitionerId ? `Practitioner/${practitionerId}` : null;
+
+      const specimenResources = values.map((val: any) => {
+        const resource: any = {
+          ...this.fhirTransformService.transformValues('Specimen', val),
+          resourceType: 'Specimen'
+        };
+        if (practitionerRef) {
+          resource.collection = {
+            ...(resource.collection || {}),
+            collector: { reference: practitionerRef }
+          };
+        }
+        resource.status = resource.status?.toLowerCase();
+        return resource;
+      });
+
+      const bundle: Bundle<any> = {
+        resourceType: 'Bundle',
+        type: 'transaction',
+        entry: specimenResources.map((resource: any) => ({
+          resource,
+          request: { method: 'POST', url: 'Specimen' }
+        }))
+      };
+
+      this.fhirResourceService.postBundle(bundle).subscribe({
+        next: (response) => {
+          const persistedResources =
+            response?.bundle?.entry?.map((entry: any) => entry.resource).filter(Boolean) ?? specimenResources;
+
+          persistedResources.forEach((resource: any) => {
+            this.stateService.persistOrgWideResource(resource, 'saved');
+            if (patientId) {
+              this.stateService.persistPatientResource(resource, 'saved');
+            }
+          });
+
+          this.snackBar.openFromComponent(SuccessMessageComponent, {
+            data: { message: 'Specimen record(s) created successfully.' },
+            duration: 3000
+          });
+        },
+        error: () => {
+          this.errorService.openandCloseError('Error creating specimen record(s). Please try again later.');
+        }
+      });
+    });
+  }
 
 
 
-    
-    // this.encounterService.addSpecimen(this.patientId || undefined);
-  
+
+  // this.encounterService.addSpecimen(this.patientId || undefined);
+
   showRow(specimen: any) {
     this.dialog.open(DetailzViewzComponent, {
       maxHeight: '93vh',

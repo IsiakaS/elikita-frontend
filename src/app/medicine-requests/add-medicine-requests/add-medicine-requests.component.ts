@@ -27,7 +27,7 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
 
 @Component({
   selector: 'app-add-medicine-requests',
-  imports: [...commonImports, CommonModule, 
+  imports: [...commonImports, CommonModule,
     ResourceDataReviewComponent,
     MatSelectModule, DynamicFormsV2Component],
   templateUrl: './add-medicine-requests.component.html',
@@ -47,13 +47,13 @@ export class AddMedicineRequestsComponent {
 
   ]
 
-constructor(
-  public loadingRef: MatDialogRef<LoaderComponent>,
-  @Optional() public dialogRef: MatDialogRef<AddMedicineRequestsComponent>,
-  @Inject(backendEndPointToken) public backendEndPoint: string) { }
-http = inject(HttpClient);
+  constructor(
+    public loadingRef: MatDialogRef<LoaderComponent>,
+    @Optional() public dialogRef: MatDialogRef<AddMedicineRequestsComponent>,
+    @Inject(backendEndPointToken) public backendEndPoint: string) { }
+  http = inject(HttpClient);
 
- private fb = inject(FormBuilder);
+  private fb = inject(FormBuilder);
 
   // Root form with a form array that mirrors fields in this.formFields
   requestForm: FormGroup = this.fb.group({
@@ -99,33 +99,33 @@ http = inject(HttpClient);
     if (!group) return;
     group.patchValue(updated);
   }
-stateService = inject(StateService);
-// loadingRef = MatDialogRef<LoaderComponent>
-// constructor() {}
-// loadingRef2 = this.dialog.open(LoaderComponent);
+  stateService = inject(StateService);
+  // loadingRef = MatDialogRef<LoaderComponent>
+  // constructor() {}
+  // loadingRef2 = this.dialog.open(LoaderComponent);
 
   ngOnInit() {
 
- this.formMetaData = <formMetaData>{
-          formName: 'Medication Request / Prescription',
-          formDescription: "Use this form to record a medication request or prescription for the patient.",
-          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
-            ? 'Add' : 'Submit'}  Medication Request`,
+    this.formMetaData = <formMetaData>{
+      formName: 'Medication Request / Prescription',
+      formDescription: "Use this form to record a medication request or prescription for the patient.",
+      submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+        ? 'Add' : 'Submit'}  Medication Request`,
 
-        };
+    };
 
-    
+
     this.isMultiple.valueChanges.subscribe((e: boolean | null) => {
       if (e !== null) {
         this.isChosenOption = true;
       }
-       this.formMetaData = <formMetaData>{
-          formName: 'Medication Request / Prescription',
-          formDescription: "Use this form to record a medication request or prescription for the patient.",
-          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
-            ? 'Add' : 'Submit'}  Medication Request`,
+      this.formMetaData = <formMetaData>{
+        formName: 'Medication Request / Prescription',
+        formDescription: "Use this form to record a medication request or prescription for the patient.",
+        submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+          ? 'Add' : 'Submit'}  Medication Request`,
 
-        };
+      };
     })
     forkJoin({
       medication: this.formFieldsDataService.getFormFieldSelectData('medication', 'medication').pipe(
@@ -141,7 +141,7 @@ stateService = inject(StateService);
       performerType: this.formFieldsDataService.getFormFieldSelectData('medication', 'performerType'),
       reason: this.formFieldsDataService.getFormFieldSelectData('medication', 'reason'),
       CondInStock: this.http.get<any>(`${this.backendEndPoint}/Condition?patient=${this.stateService.currentEncounter.getValue()?.patientId}&_count=200`),
-      MedInStock: this.http.get<any>(`${this.backendEndPoint}/Medication?_count=199`)
+      MedInStock: this.http.get<any>(`${this.backendEndPoint}/Medication?_count=1000`)
 
     }).subscribe({
       next: (g: any) => {
@@ -153,7 +153,7 @@ stateService = inject(StateService);
         //   autoFocus: false,
         //   data: {
 
-       
+
         this.formFields = <FormFields[]>[
           {
 
@@ -203,7 +203,7 @@ stateService = inject(StateService);
               fieldApiName: 'priority',
               fieldName: 'Priority ',
               fieldLabel: 'Priority ',
-             
+
               auth: {
                 read: 'all',
                 write: 'doctor, nurse'
@@ -220,18 +220,20 @@ stateService = inject(StateService);
             generalProperties: {
 
               fieldApiName: 'medicationCodeableConcept',
-              fieldName: 'Medication / Drug',
-              fieldLabel: 'Medication / Drug',
+              fieldName: 'Medicine Not In Stock',
+              fieldLabel: 'Medicine Not In Stock',
+
               auth: {
                 read: 'all',
                 write: 'doctor, nurse'
               },
 
-allowedOthers: true,
-              moreHint: "Search and choose a medication from the list",
+              allowedOthers: true,
+              moreHint: "Search and choose a medication not in Pharmacy stock",
+              fieldHint: "If the medicine is not in Pharmacy stock, select here",
 
 
-              fieldType: 'CodeableConceptField',
+              fieldType: 'CodeableConceptFieldFromBackEnd',
               isArray: false,
               isGroup: false
             },
@@ -249,7 +251,7 @@ allowedOthers: true,
                 read: 'all',
                 write: 'doctor, nurse'
               },
-allowedOthers: true,
+              allowedOthers: true,
 
               fieldType: 'CodeableConceptField',
               isArray: false,
@@ -306,21 +308,22 @@ allowedOthers: true,
 
         ]
 
-        if(g.CondInStock && g.CondInStock.entry && g.CondInStock.entry.length > 0
+        if (g.CondInStock && g.CondInStock.entry && g.CondInStock.entry.length > 0
           && g.CondInStock.entry.some((e: any) => e.resource.asserter?.reference !== `Patient/${this.stateService.currentEncounter.getValue()?.patientId}
           && (e.resource.code?.text || e.resource.code?.coding?.[0]?.display) &&
           e.encounter?.reference === Encounter/${this.stateService.currentEncounter.getValue()?.['id']}
           `)
 
-        ){
-        // if (res.entry && res.entry.length > 0) {
-          this.formFields?.splice(6, 0, {
+        ) {
+          // if (res.entry && res.entry.length > 0) {
+          this.formFields?.splice(4, 0, {
 
             generalProperties: {
               fieldApiName: 'reasonReference',
               fieldName: 'Medication Reason from Patient Conditions',
               fieldLabel: 'Medication Reason from Patient Conditions',
               moreHint: "Select reason for the medication from patient's existing conditions",
+              fieldHint: "If the reason for medication is from patient's existing conditions, select here",
               auth: {
                 read: 'all',
                 write: 'doctor, nurse'
@@ -330,46 +333,47 @@ allowedOthers: true,
               isGroup: false
             },
             data: g.CondInStock.entry.filter((e: any) => e.resource.asserter?.reference !== `Patient/${this.stateService.currentEncounter.getValue()?.patientId}`)
-            .map((e: any) => { return { reference: e.resource.id, display: e.resource.code?.text || e.resource.code?.coding?.[0]?.display  || "unknown diagnosis"}})
+              .map((e: any) => { return { reference: e.resource.id, display: e.resource.code?.text || e.resource.code?.coding?.[0]?.display || "unknown diagnosis" } })
           });
-        
+
 
         }
 
-        if(g.MedInStock && g.MedInStock.entry && g.MedInStock.entry.length > 0){
-        // if (res.entry && res.entry.length > 0) {
+        if (g.MedInStock && g.MedInStock.entry && g.MedInStock.entry.length > 0) {
+          // if (res.entry && res.entry.length > 0) {
           {
             console.log('MedInStock', g.MedInStock);
-        // if (res.entry && res.entry.length > 0) {
-          this.formFields?.splice(5, 0, {
+            // if (res.entry && res.entry.length > 0) {
+            this.formFields?.splice(3, 0, {
 
-            generalProperties: {
-              fieldApiName: 'medicationReference',
-              fieldName: 'Medication from Stock',
-              fieldLabel: 'Medication from Stock',
-              moreHint: "Select medication from facility stock",
-              auth: {
-                read: 'all',
-                write: 'doctor, nurse'
+              generalProperties: {
+                fieldApiName: 'medicationReference',
+                fieldName: 'Medication from Stock',
+                fieldLabel: 'Medication from Stock',
+                moreHint: "Select medication from Pharmacy stock",
+                fieldHint: "If the medicine is available in Pharmacy stock, select here",
+                auth: {
+                  read: 'all',
+                  write: 'doctor, nurse'
+                },
+                fieldType: 'IndividualReferenceField',
+                isArray: false,
+                isGroup: false
               },
-              fieldType: 'IndividualReferenceField',
-              isArray: false,
-              isGroup: false
-            },
-            data: g.MedInStock.entry.map((e: any) => { return { reference: e.resource.id, display: e.resource.code?.text || e.resource.code?.coding?.[0]?.display}})
-          });
-        
+              data: g.MedInStock.entry.map((e: any) => { return { reference: 'Medication/' + e.resource.id, display: e.resource.code?.text || e.resource.code?.coding?.[0]?.display } })
+            });
+
+
+          }
 
         }
-      
-        }
-      
-      
-      
-      
-        },
 
-        // this.medicineForms.push({ formMetaData: this.formMetaData, formFields: [...this.formFields] });
+
+
+
+      },
+
+      // this.medicineForms.push({ formMetaData: this.formMetaData, formFields: [...this.formFields] });
 
 
 
@@ -407,7 +411,7 @@ allowedOthers: true,
     //         },
     //         data: res.entry.map((e: any) => { return { reference: e.resource.id, display: e.resource.code?.text || e.resource.code?.coding?.[0]?.display}})
     //       });
-        
+
 
     //     }}})
 
@@ -444,13 +448,13 @@ allowedOthers: true,
   processValues(values: any) {
     if (!values) return;
 
-    if(!(values.medicationReference || values.medicationCodeableConcept) ||
+    if (!(values.medicationReference || values.medicationCodeableConcept) ||
       values.intent == '' || !values.intent ||
       values.status == '' || !values.status
 
-    ){
+    ) {
       this.errorService.openandCloseError('Status, Intent and Medication fields are required.');
-    
+
       return;
     }
 
@@ -461,7 +465,7 @@ allowedOthers: true,
       }
     }
     //vallidationbefore `pushing
-    
+
     this.items.push(this.buildItemGroup(values));
   }
 

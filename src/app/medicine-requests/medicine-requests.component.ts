@@ -1,10 +1,11 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, Input } from '@angular/core';
 import { tablePropInt } from '../shared/table-interface';
 import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { PatientDetailsKeyService } from '../patient-sidedetails/patient-details-key.service';
 import { ErrorService } from '../shared/error.service';
 import { commonImports } from '../shared/table-interface';
@@ -12,7 +13,7 @@ import { UtilityService } from '../shared/utility.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
 import { CodeableConcept2Pipe } from '../shared/codeable-concept2.pipe';
-import { Bundle, Medication, MedicationRequest, Resource } from 'fhir/r5';
+import { Bundle, MedicationRequest, Reference, Resource } from 'fhir/r4';
 import { CodeableRef2Pipe } from '../shared/codeable-ref2.pipe';
 import { References2Pipe } from '../shared/references2.pipe';
 import { LinkInReferencesService } from '../shared/link-in-references.service';
@@ -29,20 +30,23 @@ import {
   IndividualReferenceField, ReferenceFieldArray,
   SingleCodeField
 } from '../shared/dynamic-forms.interface2';
-import { FormFieldsSelectDataService } from '../shared/form-fields-select-data.service';
+import { MedicineAdministrationDialogService } from './medicine-administration-dialog.service';
 import { AuthService, capacityObject } from '../shared/auth/auth.service';
 import { EncounterServiceService } from '../patient-wrapper/encounter-service.service';
 import { StateService } from '../shared/state.service';
 import { EmptyStateComponent } from "../shared/empty-state/empty-state.component";
 import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
-import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
+import { DetailzViewzComponent, DetailActionButton } from '../detailz-viewz/detailz-viewz.component';
 
+import { ResourceSortService } from '../shared/resource-sort.service';
+import { MedicineRequestsDialogService } from './medicine-requests-dialog.service';
+import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 @Component({
   selector: 'app-medicine-requests',
   imports: [...commonImports,
-    CommonModule,
+    CommonModule, ReferenceDisplayDirective,
     JsonPipe, CodeableConcept2Pipe, CodeableRef2Pipe, References2Pipe, fetchFromReferencePipe,
     MatProgressSpinnerModule, DetailBaseComponent, EmptyStateComponent],
   templateUrl: './medicine-requests.component.html',
@@ -61,15 +65,30 @@ export class MedicineRequestsComponent implements tablePropInt {
   tableFilterFormControlObject: { [key: string]: FormGroup<any>; } | any = {};
   patientName!: Observable<string | null>;
   patientId!: string | null;
+  useOrgWideMedicationRequests = false;
+  medicationRequestSource?: BehaviorSubject<any>;
   tableColumns!: string[];
+  private readonly baseTableColumns = [
+    'groupIdentifier',
+    'status',
+    'subject',
+    'medication',
+    'action'
+  ];
+  @Input() set medicineRequestTableColumns(columns: string[] | undefined) {
+    this.tableColumns = columns?.length ? [...columns] : [...this.baseTableColumns];
+  }
+
+
   http: HttpClient = inject(HttpClient);
   // utilityService = inject(UtilityService)
   patientOpenAndClose: PatientDetailsKeyService = inject(PatientDetailsKeyService);
+  resourceSortService = inject(ResourceSortService);
   getPatientName(): void {
     if (!this.getPatientId()) return;
     this.patientName = this.utilityService.getPatientName(this.getPatientId)
   }
-stateService = inject(StateService);
+  stateService = inject(StateService);
   getPatientId(): string | null {
     return this.patientId = this.route.parent?.snapshot.params['id'] || this.utilityService.getPatientIdFromRoute();
   }
@@ -80,9 +99,9 @@ stateService = inject(StateService);
   }
   isLinkObj: { [key: string]: Map<any, any> } = {}
   subscribeToResolver(): void {
-    this.stateService.PatientResources.medicationRequests.//asObservable().pipe().subscribe((medReqs) => {
-    subscribe((allData: any) => {
-      this.immutableLevelTableData = allData.map((e:any, index:number) => {
+    const source = this.medicationRequestSource ?? this.stateService.PatientResources.medicationRequests;
+    source.subscribe((allData: any) => {
+      const mappedResources = allData.map((e: any, index: number) => {
         e.resource = e.actualResource as MedicationRequest;
         for (const [key, value] of Object.entries(e.resource as MedicationRequest)) {
           console.log(value.reference);
@@ -97,6 +116,7 @@ stateService = inject(StateService);
         }
         return e.resource as MedicationRequest
       });
+      this.immutableLevelTableData = this.resourceSortService.sortResources(mappedResources, ['authoredOn', 'authoredDateTime', 'authored'], 'desc');
       const sortedAccRequisition: { [key: string]: MedicationRequest[] } = {}
       this.immutableLevelTableData?.forEach((e: MedicationRequest) => {
 
@@ -121,7 +141,8 @@ stateService = inject(StateService);
       // this.references = new Map(allData['patMed']['references']);
       // console.log(this.references);
       console.log(this.immutableLevelTableData);
-      this.tableDataLevel2.next(this.immutableLevelTableData);
+      this.rawMedicationRequests = this.immutableLevelTableData;
+      this.pushFilteredMedicationRequests();
     })
   }
   sortedWithRequisition: { [key: string]: MedicationRequest[] } = {};
@@ -132,12 +153,6 @@ stateService = inject(StateService);
   encounterService = inject(EncounterServiceService);
   capacityObject = capacityObject;
   ngOnInit() {
-
-//retun early ithere is no patient id
-if(this.stateService.currentPatientIdFromResolver.getValue() === null){
-  this.errorService.openandCloseError("No patient selected. Please select a patient to view medication requests.");
-  return;
-}
 
     this.auth.user.subscribe((user) => {
       this.user = user;
@@ -162,12 +177,31 @@ if(this.stateService.currentPatientIdFromResolver.getValue() === null){
       'subject',
       'medication',
       'action',
-      'groupReport',
+      // 'groupReport',
 
     ]
     this.getPatientId();
     this.getPatientName();
     this.connectTableDataSource();
+    const resolvedPatientId = this.stateService.currentPatientIdFromResolver.getValue();
+    const encounterPatientId = this.stateService.currentEncounter.getValue()?.patientId ?? null;
+    const canViewAllMedicationRequests = this.auth.can('medicationRequest', 'viewAll');
+
+    if (!resolvedPatientId && !encounterPatientId && !canViewAllMedicationRequests) {
+      this.errorService.openandCloseError("No patient selected. Please select a patient to view medication requests.");
+      return;
+    }
+
+    this.useOrgWideMedicationRequests = !resolvedPatientId && !encounterPatientId && canViewAllMedicationRequests;
+    if (this.useOrgWideMedicationRequests) {
+      this.patientId = null;
+    } else {
+      this.patientId = resolvedPatientId ?? encounterPatientId;
+    }
+
+    this.medicationRequestSource = this.useOrgWideMedicationRequests
+      ? this.stateService.orgWideResources.medicationRequests
+      : this.stateService.PatientResources.medicationRequests;
     this.subscribeToResolver();
 
     for (const [key, value] of this.tableFilter) {
@@ -179,21 +213,90 @@ if(this.stateService.currentPatientIdFromResolver.getValue() === null){
   }
   dialog: MatDialog = inject(MatDialog);
   errorService: ErrorService = inject(ErrorService);
-  showRow(row: any): void {
-    this.dialog.open(DetailzViewzComponent, {
+  private snackBar = inject(MatSnackBar);
+  showRow(row: MedicationRequest): void {
+    const dialogRef = this.dialog.open(DetailzViewzComponent, {
       maxHeight: '93vh',
       maxWidth: '90vh',
       data: {
-        resourceData:row,
-        detailsBuilderObject: this.detailsBuilder
+        resourceData: row,
+        detailsBuilderObject: this.detailsBuilder,
+        actionButtons: this.buildMedicationRequestActions()
       }
-    })
+    });
+
+    const sub = dialogRef.componentInstance?.actionInvoked.subscribe(({ key }) => {
+      this.handleDetailAction(key, row);
+    });
+
+    dialogRef.afterClosed().subscribe(() => sub?.unsubscribe());
   }
+
+  private buildMedicationRequestActions(): DetailActionButton[] {
+    return [
+      {
+        key: 'changeStatus',
+        label: 'Change Status',
+        icon: 'sync',
+        color: 'warn',
+        capabilities: [{ resource: 'medicationRequest', action: 'update' }]
+      },
+      {
+        key: 'recordDispense',
+        label: 'Dispense',
+        icon: 'local_pharmacy',
+        color: 'accent',
+        capabilities: [{ resource: 'medicationRequest', action: 'dispense' }]
+      },
+      {
+        key: 'recordAdministration',
+        label: 'Administer',
+        icon: 'vaccines',
+        color: 'primary',
+        capabilities: [{ resource: 'medicationRequest', action: 'administer' }]
+      }
+    ];
+  }
+
+  private handleDetailAction(actionKey: string, row: MedicationRequest): void {
+    switch (actionKey) {
+      case 'changeStatus':
+        this.promptStatusChange(row);
+        break;
+      case 'recordDispense':
+        const medicationRef = row.medicationReference as Reference;
+        const medicationReferenceValue = medicationRef?.reference
+          ? { reference: medicationRef.reference, display: medicationRef?.display }
+          : null;
+        //alert(JSON.stringify(medicationReferenceValue));
+        const medicationCodeableConcept = row.medicationCodeableConcept ?? null;
+        const subjectReference = (row.subject as Reference) ?? null;
+        this.medicineRequestsDialogService.openDispenseDialog(
+          row.id ?? null,
+          medicationReferenceValue,
+          medicationCodeableConcept,
+          subjectReference,
+          row
+        );
+        break;
+      case 'recordAdministration':
+        this.administer(row);
+        break;
+      default:
+        break;
+    }
+  }
+
+  private promptStatusChange(row: MedicationRequest): void {
+    const label = row.id ?? 'medication request';
+    this.snackBar.open(`Change status clicked for ${label}`, 'Dismiss', { duration: 2500 });
+  }
+
   detailsBuilder: DetailsBuilderObject = {
     resourceName: 'Medication Request',
     resourceIcon: 'prescriptions',
     specialHeader: {
-      strongSectionKey: 'medicationCodeableConcept',
+      strongSectionKey: ['medicationCodeableConcept', 'medicationReference'],
       iconSectionKeys: ['status', 'intent'],
       contentSectionKeys: ['subject', 'authoredOn']
     },
@@ -241,176 +344,47 @@ if(this.stateService.currentPatientIdFromResolver.getValue() === null){
       })
   }
 
-  formFieldsDataService = inject(FormFieldsSelectDataService);
+  medicineRequestsDialogService = inject(MedicineRequestsDialogService);
+  medicineAdministrationDialogService = inject(MedicineAdministrationDialogService);
   administer(medication: MedicationRequest) {
-    // 'status': "http://hapi.fhir.org/baseR5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/medication-admin-status&_format=json",
-    //   'medication': "/dummy.json",
-    //     'subject': "http://hapi.fhir.org/baseR5/Patient?_format=json",
-    //       "performer": "http://hapi.fhir.org/baseR5/Practitioner?_format=json",
-    //         "request": "h
-
-    // console.log(this.allMedications, , medicine);
-
-
-    forkJoin({
-      status: this.formFieldsDataService.getFormFieldSelectData('medication_administration', 'status'),
-      subject: this.formFieldsDataService.getFormFieldSelectData('medication_administration', 'subject'),
-      performer: this.formFieldsDataService.getFormFieldSelectData('medication_administration', 'performer'),
-      medication: this.formFieldsDataService.getFormFieldSelectData('medication_administration', 'medication')
-      // bodySite: this.formFieldsDataService.getFormFieldSelectData('specimen', 'bodySite'),
-      // code: this.formFieldsDataService.getFormFieldSelectData('serviceRequest', 'code'),
-      // performerType: this.formFieldsDataService.getFormFieldSelectData('serviceRequest', 'performerType'),
-      // priority: this.formFieldsDataService.getFormFieldSelectData('serviceRequest', 'priority'),
-    }).pipe().subscribe({
-      next: (g: any) => {
-        this.dialog.open(DynamicFormsV2Component, {
-          maxWidth: '900px',
-          maxHeight: "90vh",
-
-          data: {
-
-            formMetaData: <formMetaData>{
-              formName: 'Medication Administration',
-              formDescription: "Use this form to record a medicine administration.",
-              submitText: 'Confirm Medicine Administration',
-            },
-            formFields: <FormFields[]>[
-
-              {
-
-                generalProperties: {
-
-                  fieldApiName: 'occurenceDateTime',
-                  fieldName: 'When this administration ocurred',
-                  fieldLabel: 'When this administration ocurred',
-
-                  auth: {
-                    read: 'all',
-                    write: 'doctor, nurse'
-                  },
-                  value: new Date().toISOString(),
-                  inputType: "datetime-local",
-                  isArray: false,
-                  isGroup: false
-                },
-
-
-              },
-              {
-
-                generalProperties: {
-
-                  fieldApiName: 'recorded',
-                  fieldName: 'When this administration is recorded',
-                  fieldLabel: 'When this administration is recorded',
-
-                  auth: {
-                    read: 'all',
-                    write: 'doctor, nurse'
-                  },
-                  value: new Date().toISOString(),
-                  inputType: "datetime-local",
-                  isArray: false,
-                  isGroup: false
-                },
-
-
-              },
-
-
-
-
-
-              {
-
-                generalProperties: {
-
-                  fieldApiName: 'actor',
-                  fieldName: 'Practitioners Who Administered the Medicine',
-                  fieldLabel: 'Practitioners Who Administered the Medicine',
-
-                  auth: {
-                    read: 'all',
-                    write: 'doctor, nurse'
-                  },
-
-
-                  isArray: true,
-                  isGroup: false,
-                  fieldType: 'IndividualReferenceField',
-                },
-                data: g.performer,
-
-
-              },
-
-
-
-              {
-
-                generalProperties: {
-
-                  fieldApiName: 'note',
-                  fieldName: 'Note About the Administration',
-                  fieldLabel: 'Note About the Administration',
-
-                  auth: {
-                    read: 'all',
-                    write: 'doctor, nurse'
-                  },
-
-                  inputType: "textarea",
-                  isArray: false,
-                  isGroup: false
-                },
-
-
-              },
-
-              // {
-
-              //   generalProperties: {
-
-              //     fieldApiName: 'Order Details',
-              //     fieldName: 'Purchase Information',
-              //     fieldLabel: 'Order Information',
-
-              //     auth: {
-              //       read: 'all',
-              //       write: 'doctor, nurse'
-              //     },
-              //     fieldType: "ReferenceField",
-
-
-              //     isArray: false,
-              //     isGroup: true,
-              //   },
-
-              //   keys: ['medicine_ref', 'quantity_sold'],
-              //   groupFields: {
-              //     'medicine_ref': {
-
-              //     },
-              //     'quantity_sold': {
-
-              //     }
-
-              //   }
-
-
-              // },
-            ]
-          }
-        })
-      },
-
-      error: (err) => {
-        this.errorService.openandCloseError("Error ocurred while preparing fields dropdowns for the form")
-        console.log(err);
-      }
-    })
+    this.medicineAdministrationDialogService.openAdministrationDialog(medication);
   }
 
+  @Input() set medicineRequestTableFilters(filters: Array<{ field: string; values?: any[] }> | undefined) {
+    this.appliedMedicationRequestFilters = (filters || []).filter(Boolean);
+    this.pushFilteredMedicationRequests();
+  }
+  private appliedMedicationRequestFilters: Array<{ field: string; values?: any[] }> = [];
+  private rawMedicationRequests: MedicationRequest[] = [];
 
+  private pushFilteredMedicationRequests() {
+    const filtered = this.applyMedicationRequestFilters(this.rawMedicationRequests);
+    this.tableDataLevel2.next(filtered);
+  }
 
+  private applyMedicationRequestFilters(items: MedicationRequest[]): MedicationRequest[] {
+    if (!this.appliedMedicationRequestFilters.length) return items;
+    return items.filter((item) =>
+      this.appliedMedicationRequestFilters.every((filter) => {
+        const value = this.getNestedFieldValue(item, filter.field);
+        if (!filter.values?.length) return true;
+        return filter.values.includes(value);
+      })
+    );
+  }
+
+  private getNestedFieldValue(obj: any, path: string): any {
+    return path.split('.').reduce((curr, segment) => (curr ? curr[segment] : undefined), obj);
+  }
+
+  // private readonly baseTableColumns = [
+  //   'groupIdentifier',
+  //   'status',
+  //   'subject',
+  //   'medication',
+  //   'action'
+  // ];
+  // @Input() set medicineRequestTableColumns(columns: string[] | undefined) {
+  //   this.tableColumns = columns?.length ? [...columns] : [...this.baseTableColumns];
+  // }
 }

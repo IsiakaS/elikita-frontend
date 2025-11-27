@@ -75,6 +75,7 @@ import { patientRegistrationCenterResolver } from './patient-registration-center
 import { PatientRegistrationApprovedComponent } from './patient-registration-center/patient-registration-approved.component';
 import { PatientRegistrationDeceasedComponent } from './patient-registration-center/patient-registration-deceased.component';
 import { appWrapperDataResolver } from './app-wrapper/app-wrapper-data.resolver';
+import { MedicationDispenseComponent } from './medication-dispense/medication-dispense.component';
 
 export const routes: Routes = [
 
@@ -392,8 +393,15 @@ export const routes: Routes = [
                 path: "tests-requests",
                 component: LabRequestsComponent,
                 resolve: { labRequests: labRequestsResolver }
-
-
+            },
+            {
+                path: "medication-dispense",
+                component: MedicationDispenseComponent,
+                data: {
+                    title: "Medication Dispenses",
+                    breadCrumbTitle: "Medication Dispenses",
+                    breadCrumbIcon: "medical_services"
+                }
             },
 
             {

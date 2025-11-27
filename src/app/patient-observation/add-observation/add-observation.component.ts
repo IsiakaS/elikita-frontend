@@ -10,8 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { HttpClient } from '@angular/common/http';
-import { catchError, forkJoin, map, Observable, of } from 'rxjs';
-import { Observation } from 'fhir/r5';
+import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { Observation, ServiceRequest } from 'fhir/r4';
 import { SplitHashPipe } from "../../shared/split-hash.pipe";
 import { AsyncPipe, JsonPipe, TitleCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,6 +28,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SuccessMessageComponent } from '../../shared/success-message/success-message.component';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
+import { FhirResourceTransformService } from '../../shared/fhir-resource-transform.service';
 
 @Component({
   selector: 'app-add-observation',
@@ -108,16 +109,29 @@ export class AddObservationComponent {
 
 
 
-    this.labsName.valueChanges.subscribe(value => {
+    this.labsName.valueChanges.subscribe((value: any) => {
       console.log(value);
-      this.addLab(value || '', this.sampleLaboratoryObservations.find((item: any) => {
-        console.log(value?.split('$#$')[1]);
+      this.addLab(value.display || value || '', this.sampleLaboratoryObservations.find((item: any) => {
+        if (typeof value == 'object') {
+          return false;
+        }
+        console.log(value?.split('$#$')?.[1]);
         //  ( && value?.split('$#$').length > 0 ? value?.split('$#$')[1].trim().toLowerCase() : value?.trim().toLowerCase()))
         return item.display.trim().toLowerCase() ===
-          (value?.split('$#$').length && value?.split('$#$').length > 1 ? value?.split('$#$')[1].trim().toLowerCase() : value?.trim().toLowerCase())
+          (value?.split('$#$')?.length && value?.split('$#$')?.length > 1 ? value?.split('$#$')?.[1]?.trim().toLowerCase() : value?.trim().toLowerCase())
       }
       )?.unit || '')
     });
+
+    if (this.data && this.data?.serviceRequest &&
+      this.data.observationCategoryValue === 'laboratory'
+    ) {
+      if (this.data.serviceRequest.code) {
+        this.labsName.setValue(this.data.serviceRequest.code?.coding?.[0] ||
+          this.data.serviceRequest.code?.text || ''
+        );
+      }
+    }
 
     this.observationNameChosen.valueChanges.subscribe((value: any) => {
 
@@ -256,7 +270,8 @@ export class AddObservationComponent {
   @Input() observationCategoryValue = "";
 
   observationCategory = new FormControl("");
-
+  serviceRequest?: ServiceRequest;
+  dialogPatientId?: string | null;
 
   formFields: any;
   toPassIntoDynamicForms: any;
@@ -316,6 +331,7 @@ export class AddObservationComponent {
     @Inject(backendEndPointToken) public backendEndPoint: string
   ) {
     // alert(Object.keys(data || {}).join(','));
+    // alert(JSON.stringify(data));
     if (data && data.observationCategoryValue) {
       this.observationCategory.setValue(data.observationCategoryValue);
       this.observationCategoryValue = data.observationCategoryValue;
@@ -331,6 +347,12 @@ export class AddObservationComponent {
 
     }
     console.log(data);
+    if (data?.serviceRequest) {
+      this.serviceRequest = data.serviceRequest;
+    }
+    if (data?.patientId) {
+      this.dialogPatientId = data.patientId;
+    }
     //  data: {
     //         formFields: [[
     //           'category', {
@@ -441,7 +463,45 @@ export class AddObservationComponent {
       }
     });
   }
+  observation_status = [
+    "registered",
+    "preliminary",
+    "final",
+    "amended",
+    "corrected",
+    "cancelled",
+    "entered-in-error",
+    "unknown"
+  ]
 
+  observation_units = [
+    "kg",     // kilograms
+    "g",      // grams
+    "mg",     // milligrams
+    "ug",     // micrograms
+    "L",      // liters
+    "mL",     // milliliters
+    "cm",     // centimeters
+    "mm",     // millimeters
+    "m",      // meters
+    "mmHg",   // millimeters of mercury (blood pressure)
+    "bpm",    // beats per minute (heart rate)
+    "/min",   // per minute (respiration rate)
+    "°C",     // degrees Celsius (body temperature)
+    "%",      // percent (e.g., oxygen saturation)
+    "mol/L",  // moles per liter (common for electrolytes)
+    "mmol/L", // millimoles per liter (common for glucose, cholesterol)
+    "mg/dL",  // milligrams per deciliter
+    "ng/mL",  // nanograms per milliliter
+    "U/L",    // units per liter (e.g., liver enzymes)
+    "IU/L",   // international units per liter
+    "mEq/L",  // milliequivalents per liter
+    "cm[H2O]",// centimeters of water (respiratory pressure)
+    "s",      // seconds
+    "min",    // minutes
+    "h",      // hours
+    "d"       // days
+  ]
   addLab(display: string, unit: string) {
     this.labFormMetaData.formName = `Add Laboratory Result For  ${display}`;
     forkJoin({
@@ -452,13 +512,57 @@ export class AddObservationComponent {
 
       this.labFormFields = <FormFields[]>[
 
-
+        <SingleCodeField>{
+          generalProperties: {
+            fieldApiName: 'status',
+            fieldName: 'Observation Status',
+            fieldLabel: 'Observation Status',
+            fieldType: 'SingleCodeField',
+            isArray: false,
+            isGroup: false,
+            value: 'final',
+            validations: [{ type: 'default', name: 'required' }]
+          },
+          data: ['preliminary', 'final']
+        },
 
         <GroupField>{
 
 
           groupFields: {
+            'result_type': <SingleCodeField>{
 
+              generalProperties: {
+
+                fieldApiName: 'result_type',
+                fieldName: 'Type of Result',
+                fieldLabel: 'Type of Result',
+                // value: category === "category3" ? 'Text' : '',
+                controllingField: [{
+                  isAControlField: true,
+                  dependentFieldVisibilityTriggerValue: 'Text',
+                  controlledFieldDependencyId: "result_type.text"
+
+                },
+                {
+                  isAControlField: true,
+                  dependentFieldVisibilityTriggerValue: 'Number',
+                  controlledFieldDependencyId: "result_type.number2"
+
+                },
+
+                {
+                  isAControlField: true,
+                  controlledFieldDependencyId: "result_type.number",
+                  dependentFieldVisibilityTriggerValue: 'Number'
+                }],
+                fieldType: 'SingleCodeField',
+                isArray: false,
+                isGroup: false
+              },
+              data: ['Number', 'Text']
+
+            },
             'result_value': <IndividualField>{
               generalProperties: {
 
@@ -466,7 +570,7 @@ export class AddObservationComponent {
                 fieldName: 'Result Value',
                 fieldLabel: 'Result Value',
                 inputType: 'number',
-
+                dependence_id: 'result_type.number',
                 fieldType: 'IndividualField',
                 isArray: false,
                 isGroup: false
@@ -475,7 +579,21 @@ export class AddObservationComponent {
 
             },
 
+            'result_value_text': <IndividualField>{
+              generalProperties: {
 
+                fieldApiName: 'result_value',
+                fieldName: 'Result ',
+                fieldLabel: 'Result ',
+                inputType: 'textarea',
+                dependence_id: 'result_type.text',
+                fieldType: 'IndividualField',
+                isArray: false,
+                isGroup: false
+              },
+
+
+            },
 
             'result_unit': <IndividualField>{
 
@@ -485,14 +603,12 @@ export class AddObservationComponent {
                 fieldName: 'Unit',
                 fieldLabel: 'Unit',
                 fieldHint: 'Pick from suggested units or enter your own',
-
+                dependence_id: 'result_type.number2',
                 fieldType: 'SingleCodeField',
                 isArray: false,
-                isGroup: false,
-                value: unit,
-
+                isGroup: false
               },
-              data: this.ecServ.observation_units
+              data: this.observation_units
 
             },
 
@@ -504,8 +620,8 @@ export class AddObservationComponent {
           generalProperties: {
 
             fieldApiName: 'value',
-            fieldName: 'Test Results',
-            fieldLabel: 'Test Results',
+            fieldName: 'Result',//category === "category3" ? 'Observation Results' : 'Observation / Test Results',
+            fieldLabel: 'Result',//category === "category3" ? 'Observation Results' : 'Observation / Test Results',
             fieldType: 'SingleCodeField',
             isArray: false,
             isGroup: true
@@ -513,7 +629,6 @@ export class AddObservationComponent {
 
 
         },
-
 
         <IndividualField>{
           generalProperties: {
@@ -696,7 +811,9 @@ export class AddObservationComponent {
     const nowIso = new Date().toISOString();
     const status = (evt?.status || 'preliminary').toString().trim().toLowerCase();
     const categoryCC = this.toCodeableConcept(evt?.category);
-    const codeCC = this.toCodeableConcept(evt?.name);
+    const codeCC = this.toCodeableConcept(evt?.name || this.labsName.value);
+    const encounterRef = this.stateService.getCurrentEncounterReference();
+    const performer = this.stateService.getPractitionerReference(this.auth.user?.getValue()?.['userId']);
 
     const obs: any = {
       resourceType: 'Observation',
@@ -704,8 +821,35 @@ export class AddObservationComponent {
       effectiveDateTime: nowIso
     };
 
-    if (categoryCC) obs.category = [categoryCC];
-    if (codeCC) obs.code = codeCC;
+    const categoryConcept = categoryCC || this.getDefaultCategoryConcept();
+    if (categoryConcept) {
+      obs.category = [categoryConcept];
+    }
+
+    const preferredCode = this.getPreferredObservationCode(codeCC);
+    if (preferredCode) {
+      obs.code = preferredCode;
+    }
+
+    if (this.serviceRequest?.id) {
+      obs.basedOn = [{ reference: `ServiceRequest/${this.serviceRequest.id}` }];
+
+    }
+
+    const subjectReference = this.resolveSubjectReference();
+    if (subjectReference) {
+      obs.subject = subjectReference;
+    }
+
+    if (encounterRef) obs.encounter = encounterRef;
+    if (performer) obs.performer = [performer];
+
+    if (obs.code && obs.code.coding) {
+      const systemUri = obs.code.coding[0].system;
+      if (systemUri && !systemUri.startsWith('http')) {
+        obs.code.coding[0].system = `http://${systemUri}`;
+      }
+    }
 
     // Map value group -> valueQuantity or valueString
     const v = evt?.value || {};
@@ -739,7 +883,7 @@ export class AddObservationComponent {
 
     // Subject, encounter, performer from state/auth
     const patientRef = this.stateService.getPatientReference();
-    const encounterRef = this.stateService.getCurrentEncounterReference();
+    // const encounterRef = this.stateService.getCurrentEncounterReference();
     const performerRef = this.stateService.getPractitionerReference(this.auth.user?.getValue()?.['userId']);
 
     if (patientRef) obs.subject = patientRef;
@@ -747,6 +891,186 @@ export class AddObservationComponent {
     if (performerRef) obs.performer = [performerRef];
 
     return obs;
+  }
+
+  private getPreferredObservationCode(formCode: any): any | null {
+    return this.serviceRequest?.code ?? formCode;
+  }
+
+  private getDefaultCategoryConcept(): any | null {
+    if (this.observationCategory.value === 'laboratory') {
+      return {
+        coding: [{
+          system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+          code: 'laboratory',
+          display: 'Laboratory'
+        }]
+      };
+    }
+    return null;
+  }
+
+  private resolveSubjectReference(): any | null {
+    if (this.data?.subject) return this.data.subject;
+    if (this.serviceRequest?.subject) return this.serviceRequest.subject;
+    if (this.dialogPatientId) {
+      return { reference: `Patient/${this.dialogPatientId}` };
+    }
+    return this.stateService.getPatientReference();
+  }
+  fhirresourceTransformService = inject(FhirResourceTransformService);
+  submitLabResult(e: any) {
+    // validate -- no status
+
+
+    const nowIso = new Date().toISOString();
+    const category = [{
+      coding: [{
+        system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+        code: 'laboratory',
+        display: 'Laboratory'
+      }]
+    }];
+    // const categoryCC = this.toCodeableConcept();
+    const serviceRequestData: ServiceRequest = this.data?.serviceRequest;
+    const code = serviceRequestData?.code;
+    const encounter = serviceRequestData?.encounter;
+    const subject = serviceRequestData?.subject;
+    const basedOn = serviceRequestData ? [{
+      reference: `ServiceRequest/${serviceRequestData.id}`
+    }] : undefined;
+
+
+    const performer = this.stateService.getPractitionerReference(this.auth.user?.getValue()?.['userId']);
+
+    const values: any = {
+      ...this.fhirresourceTransformService.transformValues('Observation', e),
+      code, encounter, subject, basedOn, effectiveDateTime: new Date().toISOString(),
+      category, performer: performer ? [performer] : undefined,
+      status: e.status || 'final',
+      resourceType: 'Observation'
+    };
+    if (values.value) {
+      if (values.value.result_type === 'Number') {
+        //validate
+        if (isNaN(Number(values.value.result_value))) {
+          this.errorService.openandCloseError('Please provide a valid numeric value for the result.');
+          return;
+        }
+        //unit
+        if (!values.value.result_unit) {
+          this.errorService.openandCloseError('Please provide a unit for the numeric result.');
+          return;
+        }
+        values.valueQuantity = {
+          value: Number(values.value.result_value),
+          unit: values.value.result_unit || undefined,
+          system: 'http://unitsofmeasure.org',
+
+        };
+
+      } else {
+        //text
+        if (!values.value.result_value || String(values.value.result_value).trim() === '') {
+          this.errorService.openandCloseError('Please provide a valid text value for the result.');
+          return;
+        }
+        values.valueString = String(values.value.result_value).trim();
+      }
+
+    }
+
+    if (values.attachment) {
+      //       {
+      //     "fileLink": "https://elikita2026kraiyxw7s2ywg.blob.core.windows.net/profile/1764175497915_PGD.pdf",
+      //     "uploadFileSize": 515567,
+      //     "uploadFileName": "PGD.pdf",
+      //     "uploadFileType": "application/pdf",
+      //     "azureBlobName": "1764175497915_PGD.pdf",
+      //     "uploadDate": "2025-11-26T16:45:02.231Z"
+      // }
+      values.extension = [
+        {
+          url: 'http://example.org/fhir/StructureDefinition/observation-attachment',
+          valueAttachment: {
+            contentType: values.attachment[0].uploadFileType || values.attachment[0].contentType || 'application/octet-stream',
+            // data: values.attachment[0].data, // base64
+            url: values.attachment[0].fileLink,
+          }
+        }
+      ]
+    }
+    delete values?.attachment; delete values?.value
+
+
+
+    console.log(values);
+
+    this.http.post(`${this.backendEndPoint}/Observation`, values, {
+      headers: { 'Content-Type': 'application/fhir+json', 'Accept': 'application/fhir+json', 'Prefer': 'return=representation' }
+    }).pipe(
+      switchMap((resp: any) => {
+        if (values.basedOn?.length === 0) {
+          return of(resp);
+        }
+        if (values.status !== 'final') {
+          return of(resp);
+        }
+        return this.changeLabRequetStatusToCompleted(values.basedOn?.[0])
+          .pipe(map((resp2: any) => {
+            return of(resp);
+          }))
+      })
+    ).subscribe({
+      next: (resp: any) => {
+        const saved = resp?.resourceType === 'OperationOutcome' ? values : (resp || values);
+        // Persist in state as saved if id present, else unsaved
+        this.stateService.persistLocalResource(saved, saved?.id ? 'saved' : 'unsaved');
+
+        // success snackbar
+        this.sn.openFromComponent(SuccessMessageComponent, {
+          data: 'Lab Results saved successfully!',
+          duration: 3000,
+        });
+        this.dref?.close(saved);
+      },
+      error: (err) => {
+        console.error('Failed to post observation:', err);
+        // Persist locally as unsaved
+        // this.stateService.persistLocalResource(observation, 'unsaved');
+        this.errorService.openandCloseError('Failed to post observation');
+
+        // Stored locally.');
+      }
+    });
+
+  }
+  private changeLabRequetStatusToCompleted(basedOn?: { reference?: string }) {
+    const serviceRequestId = this.extractServiceRequestId(basedOn?.reference);
+    if (!serviceRequestId) {
+      return of(null);
+    }
+    return this.http.patch(`${this.backendEndPoint}/ServiceRequest/${serviceRequestId}`, [
+      { op: 'replace', path: '/status', value: 'completed' }
+    ], {
+      headers: {
+        'Content-Type': 'application/json-patch+json',
+        'Accept': 'application/fhir+json',
+        'Prefer': 'return=representation'
+      }
+    }).pipe(
+      catchError((err) => {
+        console.error('Failed to update ServiceRequest status', err);
+        this.errorService.openandCloseError('Unable to mark the lab request as completed.');
+        return of(null);
+      })
+    );
+  }
+
+  private extractServiceRequestId(reference?: string): string | null {
+    if (!reference) return null;
+    const parts = reference.split('/');
+    return parts.length > 1 ? parts[parts.length - 1] : null;
   }
 
   // Open a reusable dialog to show object details as key/value

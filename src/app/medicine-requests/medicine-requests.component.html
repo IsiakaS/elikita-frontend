@@ -77,14 +77,14 @@
                             </span>
                         </a> -->
                         <a>
-                            <a (click)="encounterService.addObservation(patientId || '')">
+                            <!-- <a (click)="encounterService.addObservation(patientId || '')">
                                 <mat-icon class="">
                                     assignment
                                 </mat-icon>
                                 <span>
                                     Generate Order
                                 </span>
-                            </a>
+                            </a> -->
                         </a>
 
                     </mat-menu>
@@ -152,7 +152,15 @@
                         </div>
                     </div>
                     }@else{
-                    @if(element.medicationCodeableConcept){
+                    @if(element.medicationReference){
+
+                    <div [appReferenceDisplay]="element.medicationReference.reference??element.medicationReference"
+                        [InstantfetchAndRepace]="true">
+
+                    </div>
+
+                    }
+                    @else if(element.medicationCodeableConcept){
                     <!-- //replace all above with medicationCodeableConcept instead of medication -->
 
                     <div class="g-just-flex gap-0 my-12 link-group"
@@ -193,7 +201,9 @@
                         </div>
                     </div>
 
-                    }@else {
+                    }
+
+                    @else {
                     <span class="subtitle-text-color-2">N/A</span>
                     }
 
@@ -259,9 +269,12 @@
                     <!--mat-menu for report and generating order -->
                     <a mat-button [matMenuTriggerFor]="groupMenu">Group Actions</a>
                     <mat-menu #groupMenu="matMenu">
-                        <button mat-menu-item>
-                            <mat-icon>edit</mat-icon>
-                            Enter Diagnostic Report
+                        <button mat-menu-item
+                            (click)="medicineRequestsDialogService.openDispenseDialog(element.id, element.medicationReference ?? null, element.medicationCodeableConcept ?? null,element.subject, element, element.groupIdentifier?.value)">
+                            <mat-icon>vaccines</mat-icon>
+                            Dispense Medication
+
+
                         </button>
                         <button mat-menu-item>
                             <mat-icon>assignment</mat-icon>
@@ -378,15 +391,13 @@
 
 
             <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
-            <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: tableColumns" >
+            <tr mat-row *matRowDef="let row; let dataIndex = dataIndex; columns: tableColumns">
             </tr>
         </table>
-    }@else {
-        <app-empty-state
-        [title]="'No Medication Requests Found'"
-        [subtitle]="'No medication requests have been made for this patient yet.'"
-        [icon]="'PILLS'"
-        ></app-empty-state>
-    }
+        }@else {
+        <app-empty-state [title]="'No Medication Requests Found'"
+            [subtitle]="'No medication requests have been made for this patient yet.'"
+            [icon]="'PILLS'"></app-empty-state>
+        }
     </mat-card-content>
 </mat-card>

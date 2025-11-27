@@ -17,7 +17,7 @@ export class ReferenceDisplayService {
     readonly refDisplays$ = new BehaviorSubject<Record<string, string>>({});
 
     // Ensure display is available (fetch if needed)
-    ensure(ref: string, options?: { instantReplace?: boolean; keepReference?: boolean }): Observable<string> {
+    ensure(ref: string, options?: { instantReplace?: boolean; keepReference?: boolean, displayPresent?: string | null }): Observable<string> {
         if (!ref) return of('');
         const cached = this.cache[ref];
         if (cached) return of(this.applyDisplayFormatting(ref, cached, options));
@@ -27,7 +27,18 @@ export class ReferenceDisplayService {
             this.updateCache(ref, ref);
             return of(this.applyDisplayFormatting(ref, ref, options));
         }
+        if (options?.displayPresent && options.displayPresent?.trim()?.length > 0) {
+            return of(options.displayPresent).pipe(
+                tap((display) => this.updateCache(ref, display)),
+                map((display) => this.applyDisplayFormatting(ref, display, options)),
+                catchError(() => {
+                    const fallback = `${type}/${id}`;
 
+                    this.updateCache(ref, fallback);
+                    return of(this.applyDisplayFormatting(ref, fallback, options));
+                })
+            )
+        }
         return this.http.get<any>(`${this.backend}/${type}/${id}`, {
             // Skip global loader for this quick lookup
             context: new HttpContext().set(LoadingUIEnabled, false)

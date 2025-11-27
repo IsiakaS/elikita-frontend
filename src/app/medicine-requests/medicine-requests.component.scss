@@ -146,3 +146,7 @@ td>.link-group-icon {
     border-left-width: var(--mat-table-row-item-outline-width, 1px);
     border-left-style: solid;
 }
+
+.mat-mdc-card-subtitle {
+    max-width: 500px;
+}
