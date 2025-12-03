@@ -333,6 +333,11 @@ export class SidemenuComponent {
           icon: "location_city"
         },
         {
+          link: "/app/service-codes/add",
+          title: "Service Request Codes",
+          icon: "science"
+        },
+        {
           title: "Lab Supplies",
           link: "/app/lab-supplies",
           icon: 'inventory'

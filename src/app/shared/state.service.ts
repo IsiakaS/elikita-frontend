@@ -11,11 +11,11 @@ export class StateService {
 
   constructor() { }
 
-  currentEncounter: BehaviorSubject<null | {
+  currentEncounter: BehaviorSubject<null | Encounter &{
     status: Encounter['status'],
     patientId: string,
     [key: string]: any
-  }> = new BehaviorSubject<null | {
+  }> = new BehaviorSubject<null | Encounter & {
     status: Encounter['status'],
     patientId: string,
     [key: string]: any
@@ -170,12 +170,15 @@ export class StateService {
   private encounterChecklistCompleted = new BehaviorSubject<boolean>(false);
   encounterChecklistCompleted$ = this.encounterChecklistCompleted.asObservable();
 
-  setCurrentEncounter(encounter: null | {
+  setCurrentEncounter(encounter: null | Encounter & {
     status: Encounter['status'],
+    patientId: string,
+
     [key: string]: any
   }) {
-    (this.currentEncounter as BehaviorSubject<null | {
+    (this.currentEncounter as BehaviorSubject<null | Encounter & {
       status: Encounter['status'],
+      patientId: string,
       [key: string]: any
     }>).next(encounter);
 

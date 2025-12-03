@@ -110,7 +110,7 @@ export class PatientWrapperComponent {
             this.stateService.setCurrentEncounter(null)
           }else{
             this.stateService.setCurrentEncounter({
-              ...this.stateService.currentEncounter?.getValue(),
+              ...this.stateService.currentEncounter.getValue()!,
               status: (status as Encounter['status']),
             });
           }
