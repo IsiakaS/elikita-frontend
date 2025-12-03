@@ -188,7 +188,7 @@ export const patientsRecordResolver: ResolveFn<any> = (route, state) => {
         actualResource: serviceRequest
       }))
     );
-//medicationRequest
+    //medicationRequest
     stateService.PatientResources.medicationRequests.next(
       (MedicationRequest || []).reverse().map((medRequest: any) => ({
         referenceId: medRequest.id ? `MedicationRequest/${medRequest.id}` : null,

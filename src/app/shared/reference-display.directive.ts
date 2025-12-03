@@ -61,7 +61,7 @@ export class ReferenceDisplayDirective implements OnChanges {
         const hostText = (this.el.nativeElement.textContent || '').trim();
         if (this.showRawRef && (!hostText || hostText.length === 0) && this.ref) {
             //show text with a visible icon at the beginning
-            this.r2.setProperty(this.el.nativeElement, 'textContent', "👁 " + this.ref);
+            this.r2.setProperty(this.el.nativeElement, 'textContent', this.ref);
         }
 
         // Instant fetch & replace (no hover)

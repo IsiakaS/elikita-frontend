@@ -4,7 +4,7 @@
 
     top: 0px;
     // border-left: 7px solid var(--mat-sys-surface);
-    left: calc(100% + 5px);
+    left: calc(100% - 45px);
     width: 35px;
     max-height: 50px;
     border-top-right-radius: 4px;
@@ -24,7 +24,10 @@
     max-width: 100%;
 }
 
+.time-entry-item>.mat-mdc-form-field {
+    padding-right: 45px;
 
+}
 
 .task-details {
     border: 1px solid var(--mat-sys-outline);
@@ -169,4 +172,8 @@
         background-color: var(--mat-sys-error-container);
         color: var(--mat-sys-on-error-container);
     }
+}
+
+tr td:last-child {
+    z-index: 99999999999999;
 }

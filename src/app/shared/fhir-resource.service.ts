@@ -26,8 +26,8 @@ export class FhirResourceService {
 
     postResource(resourceType: string, values: any, opts?: PostOpts): Observable<{ saved: boolean; resource: Resource }> {
         const resource = this.util.buildFhirResource(resourceType, values, opts) as Resource;
-        return this.http.post<Resource>(this.baseUrl, resource, {
-            headers: { 'Content-Type': 'application/fhir+json', Accept: 'application/fhir+json' }
+        return this.http.post<Resource>(this.baseUrl + "/" + resourceType, resource, {
+            headers: { 'Content-Type': 'application/fhir+json', Accept: 'application/fhir+json', Prefer: 'return=representation' }
         }).pipe(
             map((resp) => {
                 const finalRes = { ...resource, ...resp };
@@ -45,12 +45,16 @@ export class FhirResourceService {
 
     postBundle(bundle: Bundle): Observable<{ saved: boolean; bundle: Bundle }> {
         return this.http.post<Bundle>(this.baseUrl, bundle, {
-            headers: { 'Content-Type': 'application/fhir+json', Accept: 'application/fhir+json' }
+            headers: { 'Content-Type': 'application/fhir+json', Accept: 'application/fhir+json', Prefer: 'return=representation' }
         }).pipe(
             map(resp => {
                 this.state.processBundleTransaction(resp);
                 return { saved: true, bundle: resp };
             }),
+            catchError((err: any) => {
+                console.error('POST bundle failed:', err);
+                throw err;
+            })
             // catchError(err => {
             //     console.error('POST bundle failed:', err);
             //     // Fallback: process original bundle locally as unsaved

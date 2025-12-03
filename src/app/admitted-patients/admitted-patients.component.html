@@ -1,0 +1,197 @@
+<mat-card style="width: max-content; max-width: 100%;">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Patients
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Active patients registration data (non-deceased)
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex" style="flex-wrap: wrap;">
+                <a mat-flat-button class="secondary-button small-button">
+                    <mat-icon>file_upload</mat-icon> Import
+                </a>
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+                <a mat-flat-button class="">
+                    <mat-icon>add</mat-icon>
+                    Add Patients
+                </a>
+
+
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        @if(tableDataSource.data && tableDataSource.data.length > 0){
+        <mat-divider></mat-divider>
+        @if(tableHeaderMappedFilterArray && tableHeaderMappedFilterArray.size || 0 > 0 ) {
+        <app-table-header [patientsTableFilterArray]="tableHeaderMappedFilterArray!"
+            [patientsFiltersFormControlObject]="tableHeaderFiltersFormControlObject">
+
+        </app-table-header>
+        }
+        <!-- {{tableDataSource.data | json }} -->
+
+        <table mat-table matSort [dataSource]="tableDataSource.data" class="mat-elevation-z8 demo-table">
+            <!-- Name Column -->
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="name" sortActionDescription="Sort by Name">
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let element" [title]="element.patientDetails.name | patientName" #nameCell>
+                    <div class="stacked-cell">
+                        <div class="primary-line">
+                            {{element.patientDetails.name | patientName}}
+                        </div>
+
+                        <div class="secondary-line" [title]="element.patientDetails.birthDate | patientAge:false">
+                            {{element.patientDetails.birthDate | patientAge:false}}.
+                            {{element.patientDetails.gender | titlecase}}
+                        </div>
+                    </div>
+
+                </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by contacts">
+                    Contacts
+                </th>
+                <td mat-cell *matCellDef="let element" #phoneCell>
+                    <div class="stacked-cell">
+                        <div class="primary-line" [title]="element.patientDetails.telecom | patientContacts:'phone':1">
+                            {{element.patientDetails.telecom | patientContacts:'phone':1}}
+                        </div>
+                        <div class="secondary-line"
+                            [title]="element.patientDetails.telecom | patientContacts:'email':1">
+                            {{element.patientDetails.telecom | patientContacts:'email':1}}
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="gender">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by gender">
+                    Gender
+                </th>
+                <td mat-cell *matCellDef="let element" #genderCell>{{element.patientDetails.gender | titlecase}}</td>
+            </ng-container>
+            <ng-container matColumnDef="age">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by age">
+                    Age / DOB
+                </th>
+                <td mat-cell *matCellDef="let element" #ageCell>
+                    <div class="stacked-cell">
+                        <div class="primary-line" [title]="element.patientDetails.birthDate | patientAge:false">
+                            {{element.patientDetails.birthDate | patientAge:false}}
+                        </div>
+                        <div class="secondary-line" [title]="element.patientDetails.birthDate | date:'MMM d, yyyy'">
+                            {{element.patientDetails.birthDate | date:'MMM d, yyyy'}}
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="address">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by adress">
+                    Address
+                </th>
+                <td mat-cell *matCellDef="let element" #addressCell>{{element.patientDetails.address | patientAddress}}
+                </td>
+            </ng-container>
+
+            <!-- Location Column (Ward/Room + Bed) -->
+            <ng-container matColumnDef="location">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by location">
+                    Location
+                </th>
+                <td mat-cell *matCellDef="let element" #locationCell>
+                    <div class="stacked-cell">
+                        @if(element.currentWard || element.currentRoom) {
+                        <div class="primary-line"
+                            [title]="(element.currentWard || 'N/A') + ' - ' + (element.currentRoom || 'N/A')">
+                            {{element.currentWard || 'N/A'}} - {{element.currentRoom || 'N/A'}}
+                        </div>
+                        }
+                        @if(element.currentBed) {
+                        <div class="secondary-line" [title]="element.currentBed">
+                            Bed: {{element.currentBed}}
+                        </div>
+                        }
+                        @if(!element.currentWard && !element.currentRoom && !element.currentBed) {
+                        <span class="text-muted">No location</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Admitted Date Column -->
+            <ng-container matColumnDef="admittedDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by admitted date">
+                    Admitted Date
+                </th>
+                <td mat-cell *matCellDef="let element" #admittedDateCell>
+                    <div class="stacked-cell">
+                        @if(element.admittedDate) {
+                        <div class="primary-line" [title]="element.admittedDate | date:'MMM d, yyyy'">
+                            {{element.admittedDate | date:'MMM d, yyyy'}}
+                        </div>
+                        <div class="secondary-line" [title]="element.admittedDate | date:'h:mm a'">
+                            {{element.admittedDate | date:'h:mm a'}}
+                        </div>
+                        } @else {
+                        <span class="text-muted">N/A</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>
+                    Actions
+                </th>
+                <td mat-cell *matCellDef="let element" class="action-column" #actionCell>
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="showAdmissionDetails(element)">
+                            <mat-icon>visibility</mat-icon>
+                            <span>View Details</span>
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>edit</mat-icon>
+                            <span>Update Location</span>
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>logout</mat-icon>
+                            <span>Discharge</span>
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" matHeaderRowDefSticky="true">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="navigateToTasks($event.target, row)"
+                style="cursor: pointer;"></tr>
+        </table>
+
+        <!-- No Data State -->
+        }@else{
+        <app-empty-state [icon]="'HOSPITAL_BED'"
+            [subtitle]="'No active patients found. Try adjusting your filters or add a new patient.'"
+            [title]="'No Patients'">
+        </app-empty-state>
+        }
+
+    </mat-card-content>
+</mat-card>

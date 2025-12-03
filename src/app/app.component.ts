@@ -45,7 +45,7 @@ export class AppComponent {
   }
   ngOnInit() {
     // Developer mode: set user to doctor and route to a specific patient's summary
-    const target = '/app/patients/b47fc122-f4d9-4970-81c7-97badc18e311/tests-requests';
+    const target = '/app/admitted-patients/b47fc122-f4d9-4970-81c7-97badc18e311';
     // const target = '/app/admission-location/add';
     //speimens
     // const target = 'app/medicine-stock';

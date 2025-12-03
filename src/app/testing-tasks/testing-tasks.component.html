@@ -155,14 +155,14 @@
     </div>
 
 
-    <form class="overall-tasks-form" [formGroup]="overallTasksForm">
+    <form class="overall-tasks-form" [formGroup]="overallTasksForm" style="width: 650px; max-width: 100%;">
 
         <div class="form-array" [formArrayName]="'tasksForm'">
-            @for (taski of taskFormArray.controls; track $index;) {
+            @for (taski of taskFormArray.controls; track $index; let taskIndex = $index) {
 
             <div class="task-form">
-                <div class="task-label mb-15">Task {{ $index + 1 }}</div>
-                <div class="task-item" [formGroupName]="$index">
+                <div class="task-label mb-15">Task {{ taskIndex + 1 }}</div>
+                <div class="task-item" [formGroupName]="taskIndex">
 
                     @for(eachField of formFields; track $index){
 
@@ -183,18 +183,61 @@
                     </mat-form-field>
                     }
                     @case ('taskFocus') {
+                    <!-- Hidden field to store the task focus value -->
+                    <input type="hidden" [formControlName]="'taskFocus'" />
 
-                    <mat-form-field appearance="outline" class="me-30 mb-10" floatLabel="always">
-                        <mat-label>Task Focus</mat-label>
-                        <mat-select [formControlName]="'taskFocus'">
-                            @for(option of eachField.data; track $index){
-                            <mat-option [value]="option">
-                                {{ option }}
-                            </mat-option>
-                            }
+                    <!-- Button to add specific task/service request -->
+                    <div class="add-specific-task-section mb-30 p-12" style="display: flex; 
+                        border: 1px solid var(--mat-sys-outline);
+                        border-radius: 5px;
+                        width: 450px; box-sizing: border-box;
+                        flex-direction: column; gap: 8px; max-width: 100%;">
+                        <div class="section-label" style="font-size: 16px; font-weight: 500;">
+                            Add Specific Task
+                        </div>
+                        <div class="section-hint subtitle-text-color-2 small-subtitle" style="margin-bottom: 8px;">
+                            What exactly is to be done?
+                            Choose to select from existing service requests or add a new one
+                        </div>
+                        <div [matMenuTriggerFor]="taskDetailsMenu" style="max-width: 100%;
+                        position: relative;
+                        width: max-content;">
+                            <button type="button" mat-stroked-button style="max-width: 100%;
+                        width: max-content;
+                        justify-content: space-between;
+                        
+                            overflow: hidden;text-overflow:ellipsis; white-space: nowrap;
+                            text-align: left; display: flex; padding-left: 6px;
+                            border-bottom-right-radius: 0px; border-top-right-radius:0px;
+                            ">
+                                <span class="g-just-flex gap-8" style="align-items: center;">
+                                    <mat-icon>add_circle_outline</mat-icon>
+                                    <span>Add Lab Test / Procedure</span>
+                                </span>
+                            </button>
+                            <button mat-stroked-button style="
+                            position: absolute;height:100%; left: calc(100% + 3px);
+                            top: 0px; min-width:0px; padding: 0px !important;
+                            padding-left:12px !important;
+                            border-top-left-radius: 0px; border-bottom-left-radius:0px;
+                            
+                            ">
+                                <mat-icon>arrow_drop_down</mat-icon>
+                            </button>
 
-                        </mat-select>
-                    </mat-form-field>
+                        </div>
+
+                        <mat-menu #taskDetailsMenu="matMenu">
+                            <button mat-menu-item (click)="openSelectExistingServiceRequest(taskIndex)">
+                                <mat-icon>list_alt</mat-icon>
+                                <span>Select from Existing Orders</span>
+                            </button>
+                            <button mat-menu-item (click)="openAddNewServiceRequest(taskIndex)">
+                                <mat-icon>note_add</mat-icon>
+                                <span>Create New Order</span>
+                            </button>
+                        </mat-menu>
+                    </div>
                     }
 
                     @case('taskRecurrenceDateAndTime'){
@@ -244,38 +287,7 @@
                     </mat-form-field>
                     }
                     }
-                    @case('oneTimeTime'){
 
-                    <!-- {{taski.get(['recurrencePattern'])?.value}}{{ ' One Time'}} -->
-                    @if(taski.get(['recurrencePattern'])?.value.trim() === 'One Time'
-                    ) {
-
-
-                    @if(taski.get(['isOneTimeInstead'])?.value === true) {
-                    <ng-container [ngTemplateOutlet]="oneTimeTime"
-                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
-                    }
-                    @else if (taski.get(['isAnyTimeInstead'])?.value === true) {
-                    <ng-container [ngTemplateOutlet]="anyTime"
-                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
-                    }
-                    @else if (taski.get(['isTimeRangeInstead'])?.value === true) {
-                    <ng-container [ngTemplateOutlet]="timeRange"
-                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
-
-                    }
-                    @else {
-
-                    <ng-container [ngTemplateOutlet]="timeperiod"
-                        [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
-                    }
-
-
-
-
-                    }
-
-                    }
 
                     @case ('daysOfWeek') {
                     @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
@@ -397,7 +409,7 @@
 
                     }
 
-                    @case('startTime'){
+                    <!-- @case('startTime'){
                     @if(taski.get(['recurrencePattern'])?.value.trim() === 'Weekly'
                     || taski.get(['recurrencePattern'])?.value.trim() === 'Daily'
                     || taski.get(['recurrencePattern'])?.value.trim() === 'Monthly'
@@ -425,19 +437,114 @@
                         [ngTemplateOutletContext]=" { taski: taski }"></ng-container>
                     }
                     }
+                    } -->
+
+                    @case('oneTimeTime'){
+
+                    <!-- Multiple Time Entries Support - Available for all recurrence patterns -->
+                    @if(taski.get(['recurrencePattern'])?.value &&
+                    taski.get(['recurrencePattern'])?.value.trim() !== '') {
+
+                    <!-- Multiple Time Entries Support -->
+
+                    <div class="time-entries-wrapper">
+                        <div class="form-title mb-1 g-just-flex gap-15 justify-content-start">
+                            <mat-icon>schedule</mat-icon>
+                            <span>Task Time(s)</span>
+                        </div>
+                        <div class="subtitle mb-18 subtitle-text-color-2 small-subtitle mb-8">
+                            Set specific time(s) for this task. You can add multiple times if the task needs to be done
+                            multiple times a day.
+                        </div>
+
+                        <!-- Loop through time entries -->
+                        @for(timeEntry of getTimeEntriesArray(taskIndex).controls; track $index; let timeIndex = $index)
+                        {
+                        @let timeEntryGroup = getTimeEntriesArray(taskIndex).at(timeIndex);
+
+                        <div class="time-entry-item mb-20" style="border: 1px solid var(--mat-sys-outline-variant); border-radius: 8px; padding: 15px; position: relative;
+                            
+                            max-width: 100%;
+    width: max-content;">
+
+                            @if(getTimeEntriesArray(taskIndex).length > 1) {
+                            <div class="time-entry-label mb-10" style="font-weight: 500;">Time {{ timeIndex + 1 }}</div>
+                            }
+
+                            @if(timeEntryGroup.get(['isOneTimeInstead'])?.value === true) {
+                            <ng-container [ngTemplateOutlet]="oneTimeTime"
+                                [ngTemplateOutletContext]=" { timeEntryGroup: timeEntryGroup }"></ng-container>
+                            }
+                            @else if (timeEntryGroup.get(['isAnyTimeInstead'])?.value === true &&
+                            canUseAnyTime(taskIndex))
+                            {
+                            <ng-container [ngTemplateOutlet]="anyTime"
+                                [ngTemplateOutletContext]=" { timeEntryGroup: timeEntryGroup }"></ng-container>
+                            }
+                            @else if (timeEntryGroup.get(['isTimeRangeInstead'])?.value === true) {
+                            <ng-container [ngTemplateOutlet]="timeRange"
+                                [ngTemplateOutletContext]=" { timeEntryGroup: timeEntryGroup }"></ng-container>
+                            }
+                            @else {
+                            <ng-container [ngTemplateOutlet]="timeperiod"
+                                [ngTemplateOutletContext]=" { timeEntryGroup: timeEntryGroup }"></ng-container>
+                            }
+
+                            <!-- Delete Time Entry Button (only show if more than one time entry) -->
+                            @if(getTimeEntriesArray(taskIndex).length > 1) {
+                            <button type="button" mat-icon-button (click)="removeTimeEntry(taskIndex, timeIndex)"
+                                style="position: absolute; top: 8px; right: 8px; color: var(--mat-sys-error);"
+                                matTooltip="Remove this time" class="delete-time-button">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                            }
+                        </div>
+                        }
+
+                        <!-- Add More Time Button -->
+                        <button type="button" mat-stroked-button (click)="addTimeEntry(taskIndex)"
+                            class="add-time-button mb-20" style="width: 100%; max-width: 520px;">
+                            <mat-icon>add</mat-icon>
+                            Add Another Time for This Task
+                        </button>
+                    </div>
+
+                    }
+
+                    }
+                    }
+                    }
+
                     }
 
 
                     }
                     }
 
+                    <!-- Task Duration Field -->
+                    @if(taski.get(['recurrencePattern'])?.value &&
+                    taski.get(['recurrencePattern'])?.value.trim() !== '') {
+                    <div class="duration-wrapper mt-20 mb-20">
+                        <div class="form-title mb-1 g-just-flex gap-15 justify-content-start">
+                            <mat-icon>hourglass_empty</mat-icon>
+                            <span>Expected Duration</span>
+                        </div>
+                        <div class="subtitle mb-18 subtitle-text-color-2 small-subtitle mb-8">
+                            How long will this task take to complete?
+                        </div>
+                        <div [formGroup]="$any(taski)">
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>Duration</mat-label>
+                                <input matInput formControlName="taskDuration"
+                                    placeholder="e.g., 15 minutes, 1 hour, 30 mins" />
+                                <mat-icon matPrefix>timer</mat-icon>
+                                <mat-hint>Enter the expected time to complete this task</mat-hint>
+                            </mat-form-field>
+                        </div>
+                    </div>
                     }
 
-
-                    }
-                    }
-
-                    <button class="delete-task-button" mat-icon-button (click)="taskFormArray.removeAt($index)"
+                    <button class="delete-task-button" mat-icon-button (click)="taskFormArray.removeAt(taskIndex)"
                         aria-label="Remove Task">
                         <mat-icon>delete</mat-icon>
                     </button>
@@ -459,14 +566,14 @@
 
 
     }
-    @if(data){
+    <!-- @if(data){ -->
     <div class="my-12" style="display: flex; justify-content: flex-end; width: 100%;">
         <button mat-flat-button (click)="saveTasks()">Save Tasks</button>
     </div>
 
-    }
-    <ng-template #timeRange let-taski="taski">
-        <div class="mat-mdc-form-field group g-just-flex me-30 mb-20" style="height: max-content;
+    <!-- } -->
+    <ng-template #timeRange let-timeEntryGroup="timeEntryGroup">
+        <div class="mat-mdc-form-field group g-just-flex me-30 mb-20" [formGroup]="timeEntryGroup" style="height: max-content;
                     position: relative; 
                     display: block; width: 520px; max-width: 100%; padding: 10px;
                     ">
@@ -478,16 +585,19 @@
             <mat-form-field appearance="outline" class="me-30 mb-20" floatLabel="always">
                 <mat-label>From</mat-label>
 
-                <input matInput [matTimepicker]="pickeri1" id="from" #from>
+                <input matInput [matTimepicker]="pickeri1" id="from" #fromTime
+                    (ngModelChange)="updateTimeRangeFrom(timeEntryGroup, $event)"
+                    [ngModel]="getTimeRangeFrom(timeEntryGroup)" [ngModelOptions]="{standalone: true}">
                 <mat-timepicker-toggle matIconSuffix [for]="pickeri1" />
                 <mat-timepicker #pickeri1 />
             </mat-form-field>
             <mat-form-field appearance="outline" class="" floatLabel="always">
                 <mat-label>To</mat-label>
-                <input matInput [matTimepicker]="pickeri2" id="to" #to>
+                <input matInput [matTimepicker]="pickeri2" id="to" #toTime
+                    (ngModelChange)="updateTimeRangeTo(timeEntryGroup, $event)"
+                    [ngModel]="getTimeRangeTo(timeEntryGroup)" [ngModelOptions]="{standalone: true}">
                 <mat-timepicker-toggle matIconSuffix [for]="pickeri2" />
                 <mat-timepicker #pickeri2 />
-
             </mat-form-field>
             <div class="select-button pos-abs g-just-flex" [mat-menu-trigger-for]="mom1">
 
@@ -496,34 +606,29 @@
             </div>
             <mat-menu name="timeAlternative" id="timeAlternative" #mom1="matMenu">
 
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isOneTimeInstead')">
                     Set A Specific Time Instead
                 </div>
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isPeriodInstead')">
                     Set A Time Period instead
                 </div>
-                <div mat-menu-item value="period" (click)="
-                setToAnyTime(taski, 'isAnyTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isAnyTimeInstead')">
                     Set to Any Time
 
                 </div>
             </mat-menu>
         </div>
 
-        <input type="text" formControlName="oneTimeTime" matInput style="display: none;"
-            value="{{from.value}} - {{to.value}}" placeholder="Set Time or Period For This Task">
-
-
     </ng-template>
 
-    <ng-template #timeperiod let-taski="taski">
-        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+    <ng-template #timeperiod let-timeEntryGroup="timeEntryGroup">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" [formGroup]="timeEntryGroup" style="height: max-content;
                     position: relative;
                     ">
             <mat-form-field appearance="outline" class="" floatLabel="always">
                 <mat-label>Set A Period For This Task</mat-label>
 
-                <mat-select formControlName="oneTimeTime" placeholder="Set  Period For This Task">
+                <mat-select formControlName="timeValue" placeholder="Set  Period For This Task">
                     <mat-option value="morning">Morning (6 AM - 12 PM)</mat-option>
                     <mat-option value="afternoon">Afternoon (12 PM - 6 PM)</mat-option>
                     <mat-option value="evening">Evening (6 PM - 9 PM)</mat-option>
@@ -539,14 +644,13 @@
             </div>
             <mat-menu name="timeAlternative" id="timeAlternative" #mom2="matMenu">
 
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isOneTimeInstead')">
                     Set A Specific Time Instead
                 </div>
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isTimeRangeInstead')">
                     Set a Time Range instead
                 </div>
-                <div mat-menu-item value="period" (click)="
-                setToAnyTime(taski, 'isAnyTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isAnyTimeInstead')">
                     Set to Any Time
 
                 </div>
@@ -555,13 +659,13 @@
 
     </ng-template>
 
-    <ng-template #oneTimeTime let-taski="taski">
-        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+    <ng-template #oneTimeTime let-timeEntryGroup="timeEntryGroup">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" [formGroup]="timeEntryGroup" style="height: max-content;
                     position: relative;
                     ">
             <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label>Set Time For This Task</mat-label>
-                <input matInput [formControlName]="'oneTimeTime'" placeholder="Set Time or Period For This Task"
+                <input matInput formControlName="timeValue" placeholder="Set Time or Period For This Task"
                     [matTimepicker]="picker">
                 <mat-timepicker-toggle matIconPrefix [for]="picker" />
                 <mat-timepicker #picker />
@@ -575,14 +679,13 @@
             </div>
             <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
 
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isPeriodInstead')">
                     Set A Time Period instead
                 </div>
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isTimeRangeInstead')">
                     Set a Time Range instead
                 </div>
-                <div mat-menu-item value="period" (click)="
-                setToAnyTime(taski, 'isAnyTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isAnyTimeInstead')">
                     Set to Any Time
 
                 </div>
@@ -591,14 +694,13 @@
 
     </ng-template>
 
-    <ng-template #anyTime let-taski="taski">
-        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" style="height: max-content;
+    <ng-template #anyTime let-timeEntryGroup="timeEntryGroup">
+        <div class="mat-mdc-form-field g-just-flex me-30 mb-20" [formGroup]="timeEntryGroup" style="height: max-content;
                     position: relative;
                     ">
             <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label>Set Time For This Task</mat-label>
-                <input matInput [formControlName]="'oneTimeTime'" placeholder="Set Time or Period For This Task"
-                    value="Any Time During The Day" [disabled]="true">
+                <input matInput formControlName="timeValue" placeholder="Set Time or Period For This Task">
                 <!-- <mat-timepicker-toggle matIconPrefix [for]="picker" />
                 <mat-timepicker #picker /> -->
 
@@ -611,16 +713,21 @@
             </div>
             <mat-menu name="timeAlternative" id="timeAlternative" #mom3="matMenu">
 
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isPeriodInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isPeriodInstead')">
                     Set A Time Period instead
                 </div>
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isTimeRangeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isTimeRangeInstead')">
                     Set a Time Range instead
                 </div>
-                <div mat-menu-item value="period" (click)="setToAnyTime(taski, 'isOneTimeInstead')">
+                <div mat-menu-item value="period" (click)="setTimeMode(timeEntryGroup, 'isOneTimeInstead')">
                     Set A Specific Time Instead
                 </div>
             </mat-menu>
         </div>
 
     </ng-template>
+
+    <p>
+        {{overallTasksForm?.value | json}}
+    </p>
+    {{taskSubmissionResult?(taskSubmissionResult | json):'any'}}

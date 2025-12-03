@@ -132,6 +132,9 @@ export class ReferenceDisplayService {
                     ''
                 );
             }
+            case 'location':
+                return res?.name || res?.id || '';
+                break;
             default:
                 return res?.id || '';
         }

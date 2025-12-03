@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnInit, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { DetailsBuilderService, DetailsBuilderObject } from './details-builder.service';
 import { Resource } from 'fhir/r4b';
- import { JsonPipe, TitleCasePipe } from '@angular/common';
+import { JsonPipe, TitleCasePipe } from '@angular/common';
 // import { Component, EventEmitter, inject, Inject, Input, Optional, Output, resource } from '@angular/core';
 import { MatCard, MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
@@ -33,6 +33,7 @@ import { RESOURCE_PROPERTY_TYPES } from '../shared/fhir-resource-transform.servi
 import { NaPipe } from "../shared/na.pipe";
 import { SpecialHeaderV2Component } from '../special-header-v2/special-header-v2.component';
 import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
+import { IsoDateFormatterPipe } from "../shared/pipes/iso-date-formatter.pipe";
 
 export const RESOURCE_KEY_LABELS: Record<string, Record<string, string>> = {
   MedicationRequest: {
@@ -158,6 +159,42 @@ export const RESOURCE_KEY_LABELS: Record<string, Record<string, string>> = {
     dosage: 'Dosage',
     reasonCode: 'Reason',
     note: 'Notes'
+  },
+  Location: {
+    status: 'Status',
+    operationalStatus: 'Ocuppied?',
+    name: 'Location Name',
+    alias: 'Also Known As',
+    description: 'Description',
+    mode: 'Mode',
+    type: 'Location Type',
+    physicalType: 'Physical Type',
+    partOf: 'Part Of (Parent Location)',
+    telecom: 'Contact Information',
+    address: 'Address',
+    'address.line': 'Street Address',
+    'address.city': 'City',
+    'address.state': 'State/Province',
+    'address.country': 'Country',
+    'address.postalCode': 'Postal Code',
+    position: 'Geographic Position',
+    'position.longitude': 'Longitude',
+    'position.latitude': 'Latitude',
+    'position.altitude': 'Altitude',
+    managingOrganization: 'Managing Organization',
+    endpoint: 'Technical Endpoints',
+    hoursOfOperation: 'Hours of Operation',
+    'hoursOfOperation.daysOfWeek': 'Days of Week',
+    'hoursOfOperation.allDay': 'All Day',
+    'hoursOfOperation.openingTime': 'Opening Time',
+    'hoursOfOperation.closingTime': 'Closing Time',
+    availabilityExceptions: 'Availability Exceptions',
+    identifier: 'Identifier',
+    meta: 'Metadata',
+    'meta.lastUpdated': 'Last Updated',
+    'meta.versionId': 'Version ID',
+    'meta.source': 'Source',
+    'meta.profile': 'Profile'
   }
 };
 
@@ -175,9 +212,9 @@ export interface DetailActionButton {
     JsonPipe, SpecialHeaderV2Component, ReferenceDisplayDirective,
     TitleCasePipe, MatIconModule, MatDividerModule, TabledOptionComponent,
     DetailsCardzComponent,
-    DetailBaseComponent, ...commonImports, fetchFromReferencePipe, CodeableReferenceDisplayComponent, SpecialHeaderComponent, ReferenceDisplayComponent, NaPipe],
+    DetailBaseComponent, ...commonImports, fetchFromReferencePipe, CodeableReferenceDisplayComponent, SpecialHeaderComponent, ReferenceDisplayComponent, NaPipe, IsoDateFormatterPipe],
   templateUrl: './detailz-viewz.component.html',
-  styleUrls: ['../cardz-details-check/cardz-details-check.component.scss','./detailz-viewz.component.scss']   
+  styleUrls: ['../cardz-details-check/cardz-details-check.component.scss', './detailz-viewz.component.scss']
 })
 export class DetailzViewzComponent implements OnInit {
   resourceKeyLabels = RESOURCE_KEY_LABELS;
@@ -232,7 +269,18 @@ export class DetailzViewzComponent implements OnInit {
       return;
     }
     const { resourceType, ...payload } = this.resourceData as Resource & Record<string, any>;
+    const preparedPayload = { ...payload };
+    if (this.detailsBuilderObject?.otherKeys?.length) {
+
+      this.detailsBuilderObject.otherKeys.forEach(newKey => {
+
+        if (!(newKey in preparedPayload)) {
+          payload[newKey] = null;
+        }
+      });
+    }
     const refined = this.detailsBuilderService.stringifyResource(resourceType, payload);
+
     this.refinedResourceData = this.applyDisplayFilters(refined);
   }
 
@@ -273,7 +321,10 @@ export class DetailzViewzComponent implements OnInit {
     const typeMap = this.keyVsResourceType[this.resourceData?.resourceType || ''];
     return (typeMap?.[field] === 'Reference');
   }
-
+  isReferenceFiedArray(field: string): boolean {
+    const typeMap = this.keyVsResourceType[this.resourceData?.resourceType || ''];
+    return (typeMap?.[field] === 'Reference[]');
+  }
   getReferenceValue(field: string): any {
     const value = (this.resourceData as any)?.[field];
     if (value?.reference) {

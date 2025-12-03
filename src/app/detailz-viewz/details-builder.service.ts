@@ -34,6 +34,19 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     if (!('resourceData' in changes) || !this.resourceData?.resourceType) return;
 
     const { resourceType, ...payload } = this.resourceData as Resource & Record<string, any>;
+    //get additional keys from detailsBuilderObject if any
+    // get additional keys from detailsBuilderObject if any
+    const preparedPayload = { ...payload };
+    if (this.detailsBuilderObject?.otherKeys?.length) {
+
+      this.detailsBuilderObject.otherKeys.forEach(newKey => {
+
+        if (!(newKey in preparedPayload)) {
+          payload[newKey] = null;
+        }
+      });
+    }
+
     this.refinedResourceData = this.stringifyResource(
       resourceType,
       payload,
@@ -112,17 +125,49 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     const result: Record<string, string> = {};
 
     Object.entries(data || {}).forEach(([key, value]) => {
-      const configEntry = typeMap[key];
-      if (isBackboneProperty(configEntry)) {
-        result[key] = this.stringifyBackboneValue(value);
-        this.flattenBackboneFields(result, key, value, configEntry);
-        return;
+      console.log('Key-Value Pair:', key, value);
+      if (!value) {
+        alert(key);
+        //try getting vaue from nested fields with the dotted
+        //at this point there is no inference from type map
+        // let value = "";
+        const paths = key.split('.');
+        let nestedValue: any = data;
+        for (const path of paths) {
+          if (nestedValue && path in nestedValue) {
+            nestedValue = nestedValue[path];
+          }
+          else {
+            nestedValue = null;
+            break;
+          }
+        }
+        if (nestedValue != null) {
+          value = nestedValue;
+        }
+        result[key] = this.stringifyAnyValue(nestedValue)
+
+
+
+
+
+
+
+      } else {
+        const configEntry = typeMap[key];
+        if (isBackboneProperty(configEntry)) {
+          result[key] = this.stringifyBackboneValue(value);
+          this.flattenBackboneFields(result, key, value, configEntry);
+          return;
+        }
+        const kind = (configEntry as PropertyKind) || this.inferKind(value);
+
+        result[key] = this.stringifyValue(value, kind);
       }
-      const kind = (configEntry as PropertyKind) || this.inferKind(value);
-      result[key] = this.stringifyValue(value, kind);
     });
 
     return result;
+
   }
 
   private stringifyBackboneValue(value: any): string {
@@ -185,6 +230,10 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
         } else {
           return String(value);
         }
+      case 'Address':
+        return this.stringifyAddress(value);
+      // case 'Address[]':
+      //   return this.ensureArray(value).map(v => this.stringifyAddress(v)).filter(Boolean).join(' | ');
       default:
         return this.stringifyAnyValue(value);
     }
@@ -202,6 +251,7 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
       if (this.isQuantityLike(value)) return this.stringifyQuantity(value);
       if (this.isRangeLike(value)) return this.stringifyRange(value);
       if (this.isPeriodLike(value)) return this.stringifyPeriod(value);
+      if (this.isAddressLike(value)) return this.stringifyAddress(value);
       if (value.reference || value.display) return this.stringifyReference(value);
       try {
         return JSON.stringify(value);
@@ -211,6 +261,69 @@ export class DetailsBuilderService extends FhirResourceTransformService implemen
     }
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
     return String(value);
+  }
+
+  /**
+   * Check if value looks like a FHIR Address
+   */
+  private isAddressLike(value: any): boolean {
+    return typeof value === 'object' && value !== null &&
+      ('line' in value || 'city' in value || 'state' in value ||
+        'country' in value || 'postalCode' in value || 'district' in value);
+  }
+
+  /**
+   * Stringify FHIR Address into human-readable format
+   * Example output: "123 Main St, Apt 4B, Springfield, IL 62701, USA"
+   */
+  private stringifyAddress(address: any): string {
+    if (!address) return '';
+    if (typeof address === 'string') return address;
+
+    const parts: string[] = [];
+
+    // Add address lines (can be array)
+    if (address.line) {
+      const lines = Array.isArray(address.line) ? address.line : [address.line];
+      const lineStr = lines.filter(Boolean).join(', ');
+      if (lineStr) parts.push(lineStr);
+    }
+
+    // Add city
+    if (address.city) {
+      parts.push(address.city);
+    }
+
+    // Add district (if exists)
+    if (address.district) {
+      parts.push(address.district);
+    }
+
+    // Add state
+    if (address.state) {
+      parts.push(address.state);
+    }
+
+    // Add postal code
+    if (address.postalCode) {
+      parts.push(address.postalCode);
+    }
+
+    // Add country
+    if (address.country) {
+      parts.push(address.country);
+    }
+
+    // Add use/type prefix if present
+    let result = parts.filter(Boolean).join(', ');
+
+    if (address.use) {
+      result = `[${address.use}] ${result}`;
+    } else if (address.type) {
+      result = `[${address.type}] ${result}`;
+    }
+
+    return result || '';
   }
 
   private isQuantityLike(value: any): boolean {

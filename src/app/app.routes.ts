@@ -78,6 +78,7 @@ import { appWrapperDataResolver } from './app-wrapper/app-wrapper-data.resolver'
 import { AdmissionLocationComponent } from './admission-location/admission-location.component';
 import { AddAdmissionLocationComponent } from './admission-location/add-admission-location.component';
 import { MedicationDispenseComponent } from './medication-dispense/medication-dispense.component';
+import { AdmittedPatientsComponent } from './admitted-patients/admitted-patients.component';
 import { AddServiceRequestCodesComponent } from './add-service-request-codes/add-service-request-codes.component';
 
 export const routes: Routes = [
@@ -431,7 +432,7 @@ export const routes: Routes = [
 
             },
             {
-                component: PatientsComponent,
+                component: AdmittedPatientsComponent,
                 path: "admitted-patients",
                 resolve: { patientsRegistrationData: patientsResolver }
 

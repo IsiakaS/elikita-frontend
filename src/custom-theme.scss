@@ -1255,15 +1255,42 @@ html[color-scheme='light'] {
     }
   }
 }
-.info-menu-panel{
-    position: fixed !important;
-    z-index: 100 !important;
-    top: 0px !important;
-    left: 0px !important;
-    max-width: 300px !important;
+
+.info-menu-panel {
+  position: fixed !important;
+  z-index: 100 !important;
+  top: 0px !important;
+  left: 0px !important;
+  max-width: 300px !important;
 }
-.more-raised{
+
+.more-raised {
   z-index: 9999999999999 !important;
   // position: fixed !important;
   background-color: #B71C1C;
+}
+
+.add-admission-location {
+  .mat-mdc-card-title {
+    font-size: 1.2rem;
+    line-height: 1.25rem !important;
+  }
+
+  .mat-mdc-card-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .mat-mdc-card-content:last-child {
+    padding-bottom: 6px !important;
+
+    form.mt-20 {
+      margin-top: 6px !important;
+    }
+
+    form.p-20 {
+      padding: 0px !important;
+      padding-top: 9px !important;
+      padding-bottom: 6px !important;
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
-import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest, Location, MedicationRequest } from 'fhir/r4';
+import { Bundle, BundleEntry, Specimen, Medication, MedicationDispense, MedicationAdministration, ServiceRequest, Location, MedicationRequest, Patient, Encounter } from 'fhir/r4';
 import { forkJoin, map, catchError, of, tap } from 'rxjs';
 import { StateService } from '../shared/state.service';
 
@@ -15,17 +15,18 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
   const stateService = inject(StateService);
 
   // Patient is optional; keep existing resolver signature but don’t block execution
-  const patientId =
-    stateService.currentPatientIdFromResolver.getValue() ??
-    route.parent?.params['id'] ??
-    route.params['id'] ??
-    null;
+
 
   return forkJoin({
+    patient: http.get<Bundle<Patient>>(`${baseUrl}/Patient?_count=199`).pipe(
+      map(bundleToResources),
+      catchError(() => of([]))
+    ),
     locations: http.get<Bundle<Location>>(`${baseUrl}/Location?_count=199`).pipe(
       map(bundleToResources),
       catchError(() => of([]))
     ),
+
     specimens: http.get<Bundle<Specimen>>(`${baseUrl}/Specimen?_count=199`).pipe(
       map(bundleToResources),
       catchError(() => of([]))
@@ -49,9 +50,27 @@ export const appWrapperDataResolver: ResolveFn<boolean> = (route) => {
     serviceRequests: http.get<Bundle<ServiceRequest>>(`${baseUrl}/ServiceRequest?_count=199`).pipe(
       map(bundleToResources),
       catchError(() => of([]))
-    )
+    ),
+    encounters: http.get<Bundle<Encounter>>(`${baseUrl}/Encounter?_count=199`).pipe(
+      map(bundleToResources),
+      catchError(() => of([]))
+    ),
   }).pipe(
-    tap(({ locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests, medicationRequests }) => {
+    tap(({ patient, locations, specimens, medications, medicationDispenses, medicationAdministrations, serviceRequests, medicationRequests, encounters }) => {
+      stateService.orgWideResources.patient.next(
+        patient.map(pat => ({
+          referenceId: pat.id ? `Patient/${pat.id}` : null,
+          savedStatus: 'saved',
+          actualResource: pat
+        }))
+      );
+      stateService.orgWideResources.encounters.next(
+        encounters.map(enc => ({
+          referenceId: enc.id ? `Encounter/${enc.id}` : null,
+          savedStatus: 'saved',
+          actualResource: enc
+        }))
+      );
       stateService.orgWideResources.locations.next(
         locations.map(loc => ({
           referenceId: loc.id ? `Location/${loc.id}` : null,

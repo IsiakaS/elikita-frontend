@@ -28,6 +28,7 @@ export type PropertyKind =
     'Ratio' |
     'Quantity' |
     'Identifier' |
+    'Address' |
     'primitive';
 
 export interface BackboneProperty {
@@ -189,7 +190,13 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
         serviceType: 'CodeableConcept[]'
     },
     Location: {
-        type: 'CodeableConcept[]'
+        type: 'CodeableConcept[]',
+        physicalType: 'CodeableConcept',
+        name: 'string',
+        status: 'string',
+        address: 'Address',
+        partOf: 'Reference'
+
     },
     Practitioner: {
         qualification: 'CodeableConcept[]'
@@ -286,6 +293,7 @@ export const RESOURCE_PROPERTY_TYPES: ResourcePropertyRegistry = {
             factor: 'primitive'
         }, true)
     },
+
     Slot: {
         serviceType: 'CodeableConcept[]'
     },
@@ -389,6 +397,7 @@ export class FhirResourceTransformService {
             case 'string': return value;
             case 'string[]': return this.ensureArray(value);
             case 'Ratio': return this.toRatio(value);
+            case 'Address': return this.toAddress(value);
             //case 'BackboneElement':
             default: //return value;
                 break
@@ -399,6 +408,8 @@ export class FhirResourceTransformService {
             return value;
         }
     }
+
+
 
     public ensureArray(v: any): any[] {
         return Array.isArray(v) ? v : (v == null ? [] : [v]);
@@ -411,6 +422,29 @@ export class FhirResourceTransformService {
 
     private normalizeUnit(unit: string | undefined): string | undefined {
         return unit?.toString().trim() || undefined;
+    }
+
+    //   keys: ['line', 'city', 'state', 'country', 'postalCode'],
+    public toAddress(raw: {
+        line?: string[] | string,
+        city?: string,
+        state?: string,
+        country?: string,
+        postalCode?: string
+        [key: string]: any
+    } | string): any {
+        if (!raw) return raw;
+        //string case
+        if (typeof raw === 'string') {
+            return { text: raw };
+        }
+        return {
+            line: Array.isArray(raw.line) ? raw.line : raw.line ? [raw.line] : undefined,
+            city: raw.city,
+            state: raw.state,
+            country: raw.country,
+            postalCode: raw.postalCode
+        };
     }
 
     public toRatio(raw: {

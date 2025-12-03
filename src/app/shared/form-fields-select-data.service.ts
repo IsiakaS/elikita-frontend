@@ -110,13 +110,13 @@ export class FormFieldsSelectDataService {
 
     'admission': {
       // 'location': "https://hapi.fhir.org/baseR5/Location?_format=json",
-      'location': "/fhir_location_bundle_100.json",
+      'location': `${this.backendApiEndPoint}/Location?_format=json&_count=1000`,
       'admitSource': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/encounter-admit-source&_format=json",
       'carePlanStatus': "https://tx.fhir.org/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/request-status&_format=json",
       'carePlanIntent': "https://server.fire.ly/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/care-plan-intent&_format=json",
-      'ward': "/fhir_location_bundle_100.json",
-      'room': "/fhir_location_bundle_100.json",
-      'bed': "/fhir_location_bundle_100.json",
+      // 'ward': `${this.backendApiEndPoint}/Location?_format=json&_count=1000`,
+      // 'room': `${this.backendApiEndPoint}/Location?_format=json&_count=1000`,
+      // 'bed': `${this.backendApiEndPoint}/Location?_format=json&_count=1000`,
       //careplansUBJECT: "",
       //taskintent, task priority, task status, task code
       'taskIntent': "https://server.fire.ly/r5/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/task-intent&_format=json",
@@ -196,7 +196,7 @@ export class FormFieldsSelectDataService {
   baseFunctionToRetrieveValueset(value: any) {
     console.log(value);
     return value.expansion.contains.map((item: any) => {
-      return{
+      return {
         code: item.code,
         display: item.display,
         system: item.system
@@ -385,7 +385,7 @@ export class FormFieldsSelectDataService {
     // },
     'location': {
       // 'status': this.baseFunctionToRetrieveValueset,
-       'physicalType': this.baseFunctionToRetrieveValueset,
+      'physicalType': this.baseFunctionToRetrieveValueset,
       'partOf': (value: Bundle<Location>) => {
         return value.entry?.map((e: BundleEntry<Location>) => {
           const display = e.resource?.name || 'Unnamed Location';
@@ -593,55 +593,56 @@ export class FormFieldsSelectDataService {
 
     },
     admission: {
-      ward: (value: Bundle<Location>) => {
-        return value.entry?.filter((entry: BundleEntry<Location>) => {
-          // alert(this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase());
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('ward');
-        }).map((entry: BundleEntry<Location>) => {
-          // alert(entry.resource?.name || 'Unnamed Location');
-          const rd = {
-            reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
-            display: entry.resource?.name || 'Unnamed Location'
-          };
-          return `${rd.reference}$#$${rd.display}$#$${entry.resource?.partOf?.display || ''}`;
+      // ward: (value: Bundle<Location>) => {
+      //   return value.entry?.filter((entry: BundleEntry<Location>) => {
+      //     // alert(this.retrieveCodeabeConcept(entry.resource?.form).toLowerCase());
+      //     return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('ward');
+      //   }).map((entry: BundleEntry<Location>) => {
+      //     // alert(entry.resource?.name || 'Unnamed Location');
+      //     const rd = {
+      //       reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
+      //       display: entry.resource?.name || 'Unnamed Location'
+      //     };
+      //     return `${rd.reference}$#$${rd.display}$#$${entry.resource?.partOf?.display || ''}`;
 
-        }) || []
-      },
+      //   }) || []
+      // },
 
-      room: (value: Bundle<Location>) => {
-        return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('room');
-        }).map((entry: BundleEntry<Location>) => {
-          const rd = {
-            reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
-            display: entry.resource?.name || 'Unnamed Location',
-            partOf: entry.resource?.partOf?.display || ''
-          };
-          return `${rd.reference}$#$${rd.display}$#$${rd.partOf}`;
+      // room: (value: Bundle<Location>) => {
+      //   return value.entry?.filter((entry: BundleEntry<Location>) => {
+      //     return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('room');
+      //   }).map((entry: BundleEntry<Location>) => {
+      //     const rd = {
+      //       reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
+      //       display: entry.resource?.name || 'Unnamed Location',
+      //       partOf: entry.resource?.partOf?.display || ''
+      //     };
+      //     return `${rd.reference}$#$${rd.display}$#$${rd.partOf}`;
 
-        }) || []
-      },
+      //   }) || []
+      // },
 
-      bed: (value: Bundle<Location>) => {
-        return value.entry?.filter((entry: BundleEntry<Location>) => {
-          return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('bed');
-        }).map((entry: BundleEntry<Location>) => {
-          const rd = {
-            reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
-            display: entry.resource?.name || 'Unnamed Location',
-            partOf: entry.resource?.partOf?.display || ''
-          };
-          return `${rd.reference}$#$${rd.display}$#$${rd.partOf}`;
-        }) || []
-      },
+      // bed: (value: Bundle<Location>) => {
+      //   return value.entry?.filter((entry: BundleEntry<Location>) => {
+      //     return this.retrieveCodeabeConcept((entry.resource as any)?.form).toLowerCase().includes('bed');
+      //   }).map((entry: BundleEntry<Location>) => {
+      //     const rd = {
+      //       reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
+      //       display: entry.resource?.name || 'Unnamed Location',
+      //       partOf: entry.resource?.partOf?.display || ''
+      //     };
+      //     return `${rd.reference}$#$${rd.display}$#$${rd.partOf}`;
+      //   }) || []
+      // },
 
 
       location: (value: Bundle<Location>) => {
         return value.entry?.map((entry: BundleEntry<Location>) => {
-          return {
-            reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
-            display: entry.resource?.name || 'Unnamed Location'
-          }
+          // return {
+          //   reference: `Location/${entry.resource?.identifier?.[0]?.value}`,
+          //   display: entry.resource?.name || 'Unnamed Location'
+          // }
+          return entry.resource
         }) || []
       },
       admitSource: (value: ValueSet) => {
