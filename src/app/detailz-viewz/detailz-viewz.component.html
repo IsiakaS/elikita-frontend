@@ -96,16 +96,38 @@
                                             <div #sc class="value-with-icon">
                                                 @if(isReferenceField(field)){
                                                 <span [appReferenceDisplay]="refinedResourceData?.[field]"
-                                                    InstantfetchAndRepace="true"></span>
-                                                } @else {
-                                                {{refinedResourceData?.[field] | titlecase | na}}
+                                                    InstantfetchAndRepace="true" [keepReference]="false"></span>
+                                                } @else if(isReferenceFiedArray(field)){
+                                                @for (item of refinedResourceData?.[field].split(", "); track $index) {
+                                                <span [appReferenceDisplay]="item" InstantfetchAndRepace="true"
+                                                    [keepReference]="false"></span>
+                                                }
+                                                }@else {
+                                                @if(refinedResourceData?.[field]){
+                                                @for(eV of (refinedResourceData?.[field] |
+                                                isoDateFormatter).split('$#$'); track
+                                                $index; let first = $first){
+                                                @if(first){
+                                                <div class="top ">
+                                                    {{eV | titlecase}}
+                                                </div>
+                                                }@else{
+                                                <div class="bottom subtitle-text-color-2 small-subtitle">
+                                                    {{eV }}
+                                                </div>
+                                                }
+                                                }
+
+                                                }@else{
+                                                {{'' | na}}
+                                                }
                                                 }
                                             </div>
                                         </div>
                                         <div class="field-title">
 
-                                            {{(resourceKeyLabels[resourceData!.resourceType][field]??field) |
-                                            titlecase}}
+                                            {{(resourceKeyLabels[resourceData!.resourceType]?.[field]??field) |
+                                            titlecase | na}}
                                         </div>
                                     </div>
                                     }}

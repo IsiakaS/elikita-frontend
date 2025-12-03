@@ -1,85 +1,144 @@
-<section class="admission-location">
-  <header class="page-header">
-    <div>
-      <h2>Admission Locations</h2>
-      <p>Manage wards, rooms, beds, and any reusable admission spaces.</p>
+<mat-card>
+  <mat-card-header>
+    <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+      <div class="left">
+        <mat-card-title>Admission Locations</mat-card-title>
+        <mat-card-subtitle>
+          Manage wards, rooms, beds, and other physical locations used for patient admission.
+        </mat-card-subtitle>
+      </div>
+      <div class="right gap-10 g-just-flex">
+        @if (canExportLocation) {
+        <a mat-flat-button extended class="secondary-button small-button" (click)="onExportLocations()">
+          <mat-icon>file_download</mat-icon>
+          Export
+        </a>
+        }
+        @if (canAddLocation) {
+        <a mat-flat-button (click)="onAddAdmissionLocation()">
+          <mat-icon>add</mat-icon>
+          Add Admission Location
+        </a>
+        }
+      </div>
     </div>
-    <div class="actions">
-      <button mat-raised-button color="primary" routerLink="/app/admission-location/add">
-        + Add Location
-      </button>
-      <button mat-stroked-button
-              color="accent"
-              (click)="onExportLocations()"
-              [disabled]="!(canExportLocation$ | async)">
-        Export
-      </button>
+  </mat-card-header>
+
+  <mat-card-content class="my-12">
+    <mat-divider></mat-divider>
+
+    <app-table-header [patientsTableFilterArray]="locationTableFilterArray"
+      [patientsFiltersFormControlObject]="locationFiltersFormControlObject">
+    </app-table-header>
+
+    <div class="my-15">
+      <div class="rounded-buttons-group">
+        <button (click)="setPhysicalTypeFilter('ward')" title="Wards"
+          [ngClass]="{'selected': physicalTypeFilter.value === 'ward'}">
+          Wards
+        </button>
+        <button (click)="setPhysicalTypeFilter('room')" title="Rooms"
+          [ngClass]="{'selected': physicalTypeFilter.value === 'room'}">
+          Rooms
+        </button>
+        <button (click)="setPhysicalTypeFilter('bed')" title="Beds"
+          [ngClass]="{'selected': physicalTypeFilter.value === 'bed'}">
+          Beds
+        </button>
+        <button (click)="setPhysicalTypeFilter('all')" title="All"
+          [ngClass]="{'selected': physicalTypeFilter.value === 'all'}">
+          All
+        </button>
+      </div>
     </div>
-  </header>
 
-  <ng-container *ngIf="(tableDataLevel2 | async) as locations">
-    <section *ngIf="locations.length; else emptyState" class="table-wrapper">
-      <table mat-table [dataSource]="tableDataSource" class="mat-elevation-z1">
+    <div class="table-or-empty" style="background-color: var(--mat-sys-surface)">
+      @if ((tableDataLevel2 | async)?.length) {
+      <table style="min-width: 630px; width: unset" mat-table matSort [dataSource]="tableDataSource"
+        class="mat-elevation-z8 demo-table">
 
+        <!-- Name Column with Parent -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let location" (click)="showRow(location)">
-            <div class="primary-label">{{ location.name || 'Unnamed Location' }}</div>
-            <small class="secondary-label">{{ location.description || location.id }}</small>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Name</th>
+          <td mat-cell *matCellDef="let location" style="padding-top: 8px; padding-bottom: 8px;">
+            <div class="top">
+              <span class="restrict-length">{{ location.name | na | titlecase }}</span>
+            </div>
+            @if (location.partOf?.reference) {
+            <div class="subtitle-text-color-2 small-subtitle">
+              <span [appReferenceDisplay]="location.partOf.reference" InstantfetchAndRepace="true"></span>
+            </div>
+            }
           </td>
         </ng-container>
 
+        <!-- Status Column -->
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
           <td mat-cell *matCellDef="let location">
-            <span [appChips]="location.status || 'unknown'"></span>
+            @if (location.status) {
+            <div [appChips]="location.status" [fontSize]="'14px'"></div>
+            } @else {
+            <span class="subtitle-text-color-2">N/A</span>
+            }
           </td>
         </ng-container>
 
+        <!-- Physical Type Column -->
         <ng-container matColumnDef="physicalType">
-          <th mat-header-cell *matHeaderCellDef>Physical Type</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="physicalType">Type</th>
           <td mat-cell *matCellDef="let location">
-            {{ location.physicalType?.text
-              || location.physicalType?.coding?.[0]?.display
-              || '—' }}
+            {{ location.physicalType | codeableConcept2 | na | titlecase }}
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="partOf">
-          <th mat-header-cell *matHeaderCellDef>Part Of</th>
-          <td mat-cell *matCellDef="let location">
-            {{ location.partOf?.display || location.partOf?.reference || '—' }}
+        <!-- Last Updated Column -->
+        <ng-container matColumnDef="meta">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="meta">Last Updated</th>
+          <td mat-cell *matCellDef="let location" style="padding-top: 4px; padding-bottom: 4px;">
+            <span class="restrict-length">{{ location.meta?.lastUpdated | date: 'mediumDate' | na }}</span>
+            <br>
+            <span class="restrict-length subtitle-text-color-2 small-subtitle">
+              {{ location.meta?.lastUpdated | date: 'shortTime' | na }}
+            </span>
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="lastUpdated">
-          <th mat-header-cell *matHeaderCellDef>Last Updated</th>
-          <td mat-cell *matCellDef="let location">
-            {{ location.meta?.lastUpdated | date:'medium' }}
-          </td>
-        </ng-container>
-
+        <!-- Actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
-          <td mat-cell *matCellDef="let location" class="actions-col">
-            <button mat-button color="primary"
-                    (click)="showLocationDetails(location); $event.stopPropagation();">
-              Details
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let location">
+            <button mat-icon-button [matMenuTriggerFor]="locationMenu">
+              <mat-icon>more_vert</mat-icon>
             </button>
+            <mat-menu #locationMenu="matMenu">
+              <button mat-menu-item (click)="showLocationDetails(location); $event.stopPropagation()">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item (click)="$event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="$event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" matHeaderRowDefSticky="true"></tr>
+        <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns: displayedColumns;" style="cursor: pointer;">
+        </tr>
       </table>
-    </section>
-
-    <ng-template #emptyState>
-      <app-empty-state
-        icon="location_city"
-        title="No Admission Locations Found"
-        subtitle="There are no admission locations captured yet."
-      ></app-empty-state>
-    </ng-template>
-  </ng-container>
-</section>
+      } @else {
+      <div class="g-just-flex flex-column align-items-center py-40" style="text-align:center;">
+        <app-empty-state [icon]="'LOCATION_CITY'" [title]="'No Locations Found'"
+          [subtitle]="'No admission locations are registered yet.'">
+        </app-empty-state>
+      </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

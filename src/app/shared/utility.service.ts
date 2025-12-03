@@ -6,7 +6,8 @@ import { map } from 'rxjs';
 import { FormFields } from './dynamic-forms.interface2';
 import { Bundle, BundleEntry, FhirResource, Observation, Resource, CodeableConcept } from 'fhir/r4';
 import { backendEndPointToken } from '../app.config';
-import { Coding } from 'fhir/r5';
+import { Coding } from 'fhir/r4';
+import { GroupField, IndividualField } from '../shared/dynamic-forms.interface2';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,82 @@ import { Coding } from 'fhir/r5';
 export class UtilityService {
 
   constructor() { }
+  commonFormFields: Record<string, FormFields> = {
+    'address': <GroupField>{
+      generalProperties: {
+        fieldApiName: 'address',
+        fieldName: 'Address',
+        fieldLabel: 'Address',
+        fieldType: 'IndividualField',
+        auth: { read: 'all', write: 'doctor, nurse, admin' },
+        isArray: false,
+        isGroup: true
+      },
+      keys: ['line', 'city', 'state', 'country', 'postalCode'],
+      groupFields: {
+        line: <IndividualField>{
+          generalProperties: {
+            fieldApiName: 'line',
+            fieldName: 'Address Line',
+            fieldLabel: 'Address Line',
+            fieldType: 'IndividualField',
+            inputType: 'text',
+            isArray: true,
+            isGroup: false
+          },
+          data: ''
+        },
+        city: <IndividualField>{
+          generalProperties: {
+            fieldApiName: 'city',
+            fieldName: 'City',
+            fieldLabel: 'City',
+            fieldType: 'IndividualField',
+            inputType: 'text',
+            isArray: false,
+            isGroup: false
+          },
+          data: ''
+        },
+        state: <IndividualField>{
+          generalProperties: {
+            fieldApiName: 'state',
+            fieldName: 'State/Province',
+            fieldLabel: 'State/Province',
+            fieldType: 'IndividualField',
+            inputType: 'text',
+            isArray: false,
+            isGroup: false
+          },
+          data: ''
+        },
+        country: <IndividualField>{
+          generalProperties: {
+            fieldApiName: 'country',
+            fieldName: 'Country',
+            fieldLabel: 'Country',
+            fieldType: 'IndividualField',
+            inputType: 'text',
+            isArray: false,
+            isGroup: false
+          },
+          data: ''
+        },
+        postalCode: <IndividualField>{
+          generalProperties: {
+            fieldApiName: 'postalCode',
+            fieldName: 'Postal Code',
+            fieldLabel: 'Postal Code',
+            fieldType: 'IndividualField',
+            inputType: 'text',
+            isArray: false,
+            isGroup: false
+          },
+          data: ''
+        }
+      }
+    },
+  };
   http = inject(HttpClient);
   route = inject(ActivatedRoute);
   getPatientName(patientId: any): Observable<string | null> {
@@ -374,6 +451,7 @@ export class UtilityService {
 
       // CodeableConcept mapping
       if (codeFields.has(key) || this.looksLikeCode(val, key)) {
+        // alert('codeable concept:' + key + ' val:' + val);
         out[key] = this.toCodeableConcept(val);
         continue;
       }
@@ -384,6 +462,10 @@ export class UtilityService {
         continue;
       }
 
+      if (key.toLowerCase().trim() == 'resourcetype') {
+        out[key] = val;
+      }
+
       // Simple pass-through
       out[key] = val;
     }
@@ -392,7 +474,7 @@ export class UtilityService {
     if (opts?.defaultStatus && !out.status) {
       out.status = opts.defaultStatus;
     }
-
+    // alert(JSON.stringify(out));
     return out;
   }
 
@@ -401,6 +483,8 @@ export class UtilityService {
   private looksLikeCode(val: any, key: string): boolean {
     if (typeof val === 'string' && val.includes('$#$')) return true;
     if (Array.isArray(val) && val.every(v => typeof v === 'string' && v.includes('$#$'))) return true;
+    // Exclude 'resourceType' from being treated as a code field
+    if (key.toLowerCase() === 'resourcetype') return false;
     return /(code|category|priority|severity|class|type)$/i.test(key);
   }
 
@@ -619,7 +703,7 @@ export class UtilityService {
     return requisition?.value || null;
   }
 
-retrieveResourceFromEntry(entry: BundleEntry<FhirResource> | FhirResource): FhirResource {
+  retrieveResourceFromEntry(entry: BundleEntry<FhirResource> | FhirResource): FhirResource {
     if ('resource' in entry) {
       return entry.resource as FhirResource;
     }
@@ -627,10 +711,10 @@ retrieveResourceFromEntry(entry: BundleEntry<FhirResource> | FhirResource): Fhir
     return entry as FhirResource;
   }
   backendApiEndpoint = inject(backendEndPointToken);
-getResourceData(resourceType: string): Observable<FhirResource[]> {
+  getResourceData(resourceType: string): Observable<FhirResource[]> {
     const url = `${this.backendApiEndpoint}/${resourceType}?_count=1000`;
     return this.http.get<Bundle>(url).pipe(
-      map((response:Bundle) =>  response?.entry?.map((resourceEntry:BundleEntry<FhirResource>) => this.retrieveResourceFromEntry(resourceEntry) || []) || [])
+      map((response: Bundle) => response?.entry?.map((resourceEntry: BundleEntry<FhirResource>) => this.retrieveResourceFromEntry(resourceEntry) || []) || [])
     );
   }
 

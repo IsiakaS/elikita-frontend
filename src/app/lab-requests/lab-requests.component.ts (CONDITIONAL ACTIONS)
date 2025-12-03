@@ -1,0 +1,75 @@
+showLabRequestDetails(serviceRequest: any): void {
+  // ✅ Dynamically generate actions based on current status
+  const customActions = this.getActionsForStatus(serviceRequest.status);
+
+  const labRequestDetailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Lab Request',
+    resourceIcon: 'science',
+    specialHeader: {
+      strongSectionKey: 'code',
+      iconSectionKeys: ['status'],
+      contentSectionKeys: ['subject', 'authoredOn']
+    },
+    groups: [
+      { groupName: 'Request Info', groupIcon: 'info', groupKeys: ['status', 'code'] }
+    ],
+    customActions
+  };
+
+  const dialogRef = this.dialog.open(DetailzViewzComponent, {
+    maxHeight: '93vh',
+    maxWidth: '800px',
+    data: {
+      resourceData: serviceRequest,
+      detailsBuilderObject: labRequestDetailsBuilder,
+      excludeKeys: this.computeEmptyKeys(serviceRequest)
+    }
+  });
+
+  dialogRef.componentInstance.customActionClicked?.subscribe((action: string) => {
+    this.handleAction(action, serviceRequest);
+    dialogRef.close();
+  });
+}
+
+// ✅ Status-based action configuration
+private getActionsForStatus(status: string): Array<any> {
+  const actionsMap: Record<string, Array<any>> = {
+    'draft': [
+      { label: 'Submit Request', icon: 'send', color: 'primary', action: 'submit' },
+      { label: 'Cancel Draft', icon: 'delete', color: 'warn', action: 'delete-draft' }
+    ],
+    'active': [
+      { label: 'Collect Specimen', icon: 'water_drop', color: 'primary', action: 'collect-specimen' },
+      { label: 'Cancel Request', icon: 'cancel', color: 'warn', action: 'cancel-request', requireConfirmation: true }
+    ],
+    'completed': [
+      { label: 'View Results', icon: 'visibility', color: 'accent', action: 'view-results' },
+      { label: 'Download Report', icon: 'download', color: 'primary', action: 'download-report' }
+    ],
+    'revoked': [
+      { label: 'View History', icon: 'history', color: 'primary', action: 'view-history' }
+    ]
+  };
+
+  return actionsMap[status] || [];
+}
+
+private handleAction(action: string, serviceRequest: any): void {
+  const actionHandlers: Record<string, () => void> = {
+    'submit': () => this.submitRequest(serviceRequest),
+    'delete-draft': () => this.deleteDraft(serviceRequest),
+    'collect-specimen': () => this.collectSpecimen(serviceRequest),
+    'cancel-request': () => this.cancelLabRequest(serviceRequest),
+    'view-results': () => this.viewLabResults(serviceRequest),
+    'download-report': () => this.downloadReport(serviceRequest),
+    'view-history': () => this.viewHistory(serviceRequest)
+  };
+
+  const handler = actionHandlers[action];
+  if (handler) {
+    handler();
+  } else {
+    console.warn('No handler for action:', action);
+  }
+}

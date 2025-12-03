@@ -12,7 +12,14 @@
             </span>
             }
             <span class="breadcrumb-item">
-                {{ crumb.pathTitle }}
+                <!-- {{ crumb.pathTitle }} -->
+                @if(crumb.pathTitle | isFhirReference ){
+                <span [appReferenceDisplay]="'Patient/'+crumb.pathTitle" InstantfetchAndRepace="true">
+                </span>
+                }@else {
+                <span>{{ crumb.pathTitle }}</span>
+                }
+
             </span>
         </a>
         @if(!last){

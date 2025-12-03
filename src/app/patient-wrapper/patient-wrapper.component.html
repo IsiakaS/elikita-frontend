@@ -5,7 +5,8 @@
         </app-patient-sidedetails>
     </mat-drawer> -->
 @if((auth.user | async)?.role == 'doctor' || (auth.user | async)?.role == 'nurse' ){
-@if(!isPatientAdmitted){
+<!-- @if(!(isPatientAdmitted$ | async)){ -->
+@if(true){
 <div style="width: 100%; padding: 0px 20px; box-sizing: border-box;">
     <div class="" style="display: flex; width: 100%;
         box-sizing: border-box;
@@ -23,7 +24,9 @@
                 <a [routerLink]="[link]" routerLinkActive="router-link-active" mat-tab-link (click)="activeLink = link"
                     [active]="activeLink == link"> @if(link === 'tests-requests'){
                     {{'Lab Requests' | titlecase}}
-                        }@else{{{link | titlecase}}} </a>
+                    }@else{
+                    {{link | titlecase}}
+                    } </a>
                 }
 
             </nav>
@@ -117,14 +120,25 @@
 
 <ng-template #topactions>
     <div class="top-actions-links-wrapper">
+
         <!-- <a mat-flat-button 
         [routerLink]="['/app/patients', patientId, 'admission', {action: 'add'}]"
             class="top-actions-link" routerLinkActive="router-link-active"> -->
-        <a mat-flat-button role="button" (click)="admissionService.addAddmissionForm()" class="top-actions-link">
+        <a mat-flat-button role="button" [disabled]="(isPatientAdmitted$ | async)"
+            (click)="admissionService.addAddmissionForm()" class="top-actions-link">
+            <mat-icon>bed</mat-icon>
+            <span> Admit Patient</span>
+            @if((isPatientAdmitted$ | async)) {
+            <span matBadge="Admitted" matBadgeColor="primary" matBadgeSize="small" style="margin-left: 8px;"></span>
+            }
+        </a>
+        <!-- <a mat-flat-button role="button" [disabled]="(isPatientAdmitted$ | async)"
+            (click)="admissionService.addAddmissionForm()" class="top-actions-link">
             <mat-icon>bed</mat-icon>
             <span> Admit Patient</span>
 
-        </a>
+        </a> -->
+
         <a mat-flat-button role="button" class="top-actions-link" (click)="showBooking();">
             <mat-icon>chat</mat-icon>
             <span> Consult</span>
@@ -155,7 +169,7 @@
 </app-patient-admission-wrapper>
 }
 }@else {
-     <router-outlet>
+<router-outlet>
 
-                    </router-outlet>
+</router-outlet>
 }

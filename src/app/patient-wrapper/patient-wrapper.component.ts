@@ -1,5 +1,5 @@
 import { AsyncPipe, TitleCasePipe } from '@angular/common';
-import { Component, Inject, inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,6 +35,7 @@ import { CheckSheetComponent } from '../check-sheet/check-sheet.component';
 import { StateService } from '../shared/state.service';
 import { backendEndPointToken } from '../app.config';
 import { Bundle, Encounter } from 'fhir/r4';
+import { MatBadgeModule } from '@angular/material/badge';
 import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
@@ -42,7 +43,8 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   selector: 'app-patient-wrapper',
   imports: [MatTabsModule,
     MatButtonModule,
-    PatientSidedetailsComponent, MatSidenavModule, PatientAdmissionWrapperComponent,
+    PatientSidedetailsComponent, MatBadgeModule,
+    MatSidenavModule, PatientAdmissionWrapperComponent,
     SidemenuComponent, DashboardsWrapperComponent, TopbreadcrumbComponent, TopProfileComponent,
     RouterOutlet, TitleCasePipe, RouterLink, RouterLinkActive, MatIconModule, MatButtonModule, MatMenuModule,
 
@@ -51,7 +53,7 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   templateUrl: './patient-wrapper.component.html',
   styleUrl: './patient-wrapper.component.scss'
 })
-export class PatientWrapperComponent {
+export class PatientWrapperComponent implements OnInit, OnDestroy {
   constructor(@Inject(backendEndPointToken) private backendEndPointToken: string) {
 
   }
@@ -108,7 +110,7 @@ export class PatientWrapperComponent {
           });
           if (['on-hold', 'finished', 'cancelled'].includes(status)) {
             this.stateService.setCurrentEncounter(null)
-          }else{
+          } else {
             this.stateService.setCurrentEncounter({
               ...this.stateService.currentEncounter?.getValue(),
               status: (status as Encounter['status']),
@@ -211,12 +213,13 @@ export class PatientWrapperComponent {
 
   resolvedData: any;
   patientDetailsStripService = inject(PatientDetailsKeyService);
-  isPatientAdmitted: boolean = false;
+  isPatientAdmitted$: Observable<boolean> = new Observable<boolean>();
+  // isPatientAdmitted: boolean = false;
   ngOnInit() {
     this.route.queryParams.subscribe((e: any) => {
       if (e['type'] && e['type'] == 'admitted') {
         alert(e['type']);
-        this.isPatientAdmitted = true;
+        // this.isPatientAdmitted = true;
       }
     })
     // this.patientDetailsStripService.openPatientDetailsStrip();
@@ -240,6 +243,15 @@ export class PatientWrapperComponent {
       // Initialize encounter state
       this.encounterState = this.ecounterService.getEncounterState(this.patientId);
       console.log('Encounter State:', this.encounterState);
+
+      // Subscribe to reactive admission status
+      this.isPatientAdmitted$ = this.stateService.isPatientAdmitted(this.patientId);
+
+      // Also keep synchronous property for backward compatibility
+      this.isPatientAdmitted$.subscribe(admitted => {
+        // this.isPatientAdmitted = admitted;
+        console.log('Patient admission status changed:', admitted);
+      });
     })
   }
 
@@ -828,7 +840,6 @@ export class PatientWrapperComponent {
 
 
 
-
       }
     })
   }
@@ -1069,9 +1080,14 @@ export class PatientWrapperComponent {
 
 
   ngOnDestroy() {
+    // Clean up top actions template
     if (this.topactions) {
       this.topactionService.removeTopAction();
     }
+
+    // Use centralized cleanup from StateService
+    console.log('PatientWrapperComponent destroyed - calling clearCurrentPatientContext');
+    this.stateService.clearCurrentPatientContext();
   }
 
   admissionService = inject(AdmissionService);

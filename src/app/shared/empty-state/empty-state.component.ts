@@ -100,5 +100,7 @@ export class EmptyStateComponent {
     NO_CONTENT: 'description',
     NO_FILES: 'folder_open',
     NO_IMAGES: 'image_not_supported',
+
+    HOSPITAL_BED: 'hotel',
   } as const;
 }

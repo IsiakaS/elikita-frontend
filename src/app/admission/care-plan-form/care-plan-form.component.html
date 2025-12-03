@@ -1,0 +1,43 @@
+<!-- Care Plan Form Section -->
+<div class="care-plan-wrapper">
+    @if (!admissionSubmitted) {
+    <div class="info-banner mb-20"
+        style="padding: 16px; background: var(--mat-sys-surface-variant); border-radius: 8px; border-left: 4px solid var(--mat-sys-primary);">
+        <div class="g-just-flex gap-12 align-items-start">
+            <mat-icon class="subtitle-text-color-2" style="margin-top: 2px;">lock</mat-icon>
+            <div>
+                <div class="mat-subtitle-2" style="margin-bottom: 4px; font-weight: 500;">Care Plan Locked</div>
+                <span class="mat-body-2 subtitle-text-color-2">
+                    Please submit the admission first to enable care plan creation.
+                </span>
+            </div>
+        </div>
+    </div>
+    }
+
+    <div [class.opacity-50]="!admissionSubmitted" [style.pointer-events]="admissionSubmitted ? 'auto' : 'none'">
+        <div class="form-segment mt-20">
+            <div class="segment-title my-15 g-just-flex gap-12 align-items-center">
+                <mat-icon>medical_services</mat-icon>
+                <span>Care Plan</span>
+            </div>
+
+            @if (carePlanFormFields) {
+            <app-dynamic-forms-v2 [formFields]="carePlanFormFields" [formMetaData]="undefined"></app-dynamic-forms-v2>
+            }
+
+            <div class="action my-15">
+                <button mat-raised-button (click)="showTaskForm()" [disabled]="!admissionSubmitted">
+                    <mat-icon>{{displayTaskForm ? 'remove' : 'add'}}</mat-icon>
+                    <span>{{displayTaskForm ? 'Hide Tasks' : 'Add Tasks'}}</span>
+                </button>
+            </div>
+
+            @if(displayTaskForm) {
+            <div class="task-form-section mt-20">
+                <app-testing-tasks></app-testing-tasks>
+            </div>
+            }
+        </div>
+    </div>
+</div>

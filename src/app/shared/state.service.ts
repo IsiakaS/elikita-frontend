@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration } from 'fhir/r4';
-import { Condition, Medication, MedicationRequest, Patient , Location} from 'fhir/r4';
-import { BehaviorSubject, mergeMapTo, Observable } from 'rxjs';
+import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration, Task } from 'fhir/r4';
+import { Condition, Medication, MedicationRequest, Patient, Location } from 'fhir/r4';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable, shareReplay } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
 
 @Injectable({
@@ -20,6 +20,40 @@ export class StateService {
     patientId: string,
     [key: string]: any
   }>(null);
+
+  currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
+
+  // ✅ NEW: Reactive stream for current patient ID with multiple source fallback
+  // currentPatientId$: Observable<string | null> = combineLatest([
+  //   this.PatientResources.currentPatient,
+  //   this.currentEncounter,
+  //   this.currentPatientIdFromResolver
+  // ]).pipe(
+  //   map(([patientWrapper, encounter, resolverId]) => {
+  //     // Priority 1: Check encounter's patient reference
+  //     if (encounter?.['subject']?.reference) {
+  //       const patientRef = encounter['subject'].reference;
+  //       const match = patientRef.match(/^Patient\/(.+)$/);
+  //       if (match) return match[1];
+  //       if (!patientRef.includes('/')) return patientRef;
+  //     }
+
+  //     // Priority 2: Check current patient resource
+  //     if (patientWrapper?.actualResource?.id) {
+  //       return patientWrapper.actualResource.id;
+  //     }
+
+  //     // Priority 3: Check patient ID from resolver
+  //     if (resolverId) {
+  //       return resolverId;
+  //     }
+
+  //     // No patient ID found
+  //     return null;
+  //   }),
+  //   distinctUntilChanged(), // Only emit when ID actually changes
+  //   shareReplay(1) // Cache latest value for late subscribers
+  // );
 
   //have all current encounter Resources here as beaahiour subject with referenceId, savedStatus & actualResources
   currentEncounterResources = {
@@ -101,11 +135,22 @@ export class StateService {
       savedStatus: 'saved' | 'unsaved',
       actualResource: Resource
     }>>([]),
+    tasks: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Task
+    }>>([]),
   }
 
 
 
   orgWideResources = {
+    patient: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Patient
+    }>>([]),
+
     observations: new BehaviorSubject<Array<{
       referenceId: string | null,
       savedStatus: 'saved' | 'unsaved',
@@ -159,6 +204,11 @@ export class StateService {
       referenceId: string | null,
       savedStatus: 'saved' | 'unsaved',
       actualResource: Resource
+    }>>([]),
+    tasks: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: Task
     }>>([]),
     locations: new BehaviorSubject<Array<{
       referenceId: string | null,
@@ -386,13 +436,21 @@ export class StateService {
       //     actualResource: resource as ServiceRequest
       //   });
       //   break;
-        
+
       // }
       case 'ServiceRequest': {
         this.upsertToSubject(this.PatientResources.serviceRequests, {
           referenceId,
           savedStatus,
           actualResource: resource as ServiceRequest
+        });
+        break;
+      }
+      case 'Task': {
+        this.upsertToSubject(this.PatientResources.tasks, {
+          referenceId,
+          savedStatus,
+          actualResource: resource as Task
         });
         break;
       }
@@ -431,6 +489,9 @@ export class StateService {
         break;
       case 'ServiceRequest':
         this.upsertToSubject(this.orgWideResources.serviceRequests, { referenceId, savedStatus, actualResource: resource as ServiceRequest });
+        break;
+      case 'Task':
+        this.upsertToSubject(this.orgWideResources.tasks, { referenceId, savedStatus, actualResource: resource as Task });
         break;
       default:
         break;
@@ -486,7 +547,7 @@ export class StateService {
         break;
     }
   }
-currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
+  // currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
   public isEncounterActive(): boolean {
     const enc = this.currentEncounter.value;
     return !!enc && ['in-progress', 'planned'].includes(enc.status);
@@ -500,7 +561,7 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
 
     }
   }
-  
+
   public persistPatientResource(resource: Resource, savedStatus: 'saved' | 'unsaved' = 'unsaved') {
     this.addResourceToPatientResources(resource, savedStatus);
   }
@@ -602,5 +663,272 @@ currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
     return { success: true, resource: obs };
   }
 
+  /**
+   * Get current patient ID from multiple sources with fallback
+   * Priority:
+   * 1. Current encounter's patient reference
+   * 2. Current patient resource ID
+   * 3. Patient ID set by resolver
+   * @returns Patient ID string or null if not found
+   */
+  // currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
+
+  // ✅ NEW: Reactive stream for current patient ID with multiple source fallback
+  currentPatientId$: Observable<string | null> = combineLatest([
+    this.PatientResources.currentPatient,
+    this.currentEncounter,
+    this.currentPatientIdFromResolver
+  ]).pipe(
+    map(([patientWrapper, encounter, resolverId]) => {
+      // Priority 1: Check encounter's patient reference
+      if (encounter?.['subject']?.reference) {
+        const patientRef = encounter['subject'].reference;
+        const match = patientRef.match(/^Patient\/(.+)$/);
+        if (match) return match[1];
+        if (!patientRef.includes('/')) return patientRef;
+      }
+
+      // Priority 2: Check current patient resource
+      if (patientWrapper?.actualResource?.id) {
+        return patientWrapper.actualResource.id;
+      }
+
+      // Priority 3: Check patient ID from resolver
+      if (resolverId) {
+        return resolverId;
+      }
+
+      // No patient ID found
+      return null;
+    }),
+    distinctUntilChanged(), // Only emit when ID actually changes
+    shareReplay(1) // Cache latest value for late subscribers
+  );
+
+
+  /**
+   * Get current patient data in various formats
+   * @param format - 'id' | 'reference-string' | 'reference-object' | 'resource'
+   * @returns Patient data in requested format, or null if not found
+ 
+
+  /**
+   * Helper: Extract display name from Patient resource
+   */
+  private getPatientDisplayName(patient: any): string | undefined {
+    if (!patient?.name || !Array.isArray(patient.name) || patient.name.length === 0) {
+      return undefined;
+    }
+
+    const name = patient.name[0];
+    const given = Array.isArray(name.given) ? name.given.join(' ') : '';
+    const family = name.family || '';
+
+    const fullName = `${given} ${family}`.trim();
+    return fullName || undefined;
+  }
+
+  /**
+   * Clear all patient-scoped data when navigating away from patient routes
+   * Should be called in ngOnDestroy of patient-scoped components
+   * 
+   * Implications of iterating and clearing:
+   * ✅ Ensures complete cleanup - no stale data
+   * ✅ Prevents memory leaks from accumulated arrays
+   * ✅ Resets UI state consistently
+   * ⚠️ Any active subscriptions will receive empty arrays
+   * ⚠️ Components must handle empty states gracefully
+   */
+  clearCurrentPatientContext(): void {
+    console.log('Clearing patient context from StateService');
+
+    // Clear encounter
+    this.setCurrentEncounter(null);
+
+    // Clear patient ID from resolver
+    this.currentPatientIdFromResolver.next(null);
+
+    // Iterate through ALL PatientResources properties and reset them
+    const resourceKeys = Object.keys(this.PatientResources) as Array<keyof typeof this.PatientResources>;
+
+    resourceKeys.forEach(key => {
+      const subject = this.PatientResources[key];
+
+      if (key === 'currentPatient') {
+        // Special handling for currentPatient (single object, not array)
+        (subject as BehaviorSubject<{
+          referenceId: null,
+          savedStatus: 'saved' | 'unsaved',
+          actualResource: Patient
+        }>).next({
+          referenceId: null,
+          savedStatus: 'unsaved',
+          actualResource: {} as Patient
+        })
+      } else {
+        // All other resources are arrays
+        (subject as BehaviorSubject<any[]>).next([]);
+      }
+    });
+
+    console.log('Patient context cleared successfully - all PatientResources reset');
+  }
+
+  /**
+   * ✅ NEW: Check if a patient has an active admission
+   * An active admission is defined as:
+   * - Encounter exists for the patient
+   * - Encounter status: 'in-progress'
+   * - Encounter class: 'IMP' (inpatient)
+   * - Has hospitalization data (indicates admission)
+   * 
+   * @param patientId - Patient ID to check (defaults to current patient)
+   * @returns Observable<boolean> that emits true if patient has active admission
+   */
+  isPatientAdmitted(patientId?: string): Observable<boolean> {
+    return combineLatest([
+      this.PatientResources.encounters,
+      this.currentPatientId$
+    ]).pipe(
+      map(([encounters, currentPatId]) => {
+        // Use provided patientId or fall back to current patient
+        const targetPatientId = patientId || currentPatId;
+
+        if (!targetPatientId) {
+          console.warn('No patient ID provided and no current patient found');
+          return false;
+        }
+
+        // Filter encounters for this specific patient
+        const patientEncounters = encounters.filter(wrapper => {
+          const encounter = wrapper.actualResource;
+          const subjectRef = encounter?.subject?.reference;
+
+          // Match "Patient/{id}" or just "{id}"
+          return subjectRef === `Patient/${targetPatientId}` ||
+            subjectRef === targetPatientId;
+        });
+
+        // Check if any encounter is an active admission
+        const hasActiveAdmission = patientEncounters.some(wrapper => {
+          const encounter = wrapper.actualResource;
+
+          // Check if encounter is in-progress
+          const isInProgress = encounter.status === 'in-progress';
+
+          // Check if encounter class is inpatient (IMP)
+          const isInpatient = encounter.class?.code?.toUpperCase() === 'IMP' ||
+            encounter.class?.display?.toLowerCase().includes('inpatient');
+
+          // Check if has hospitalization data (indicates admission)
+          const hasHospitalization = !!encounter.hospitalization;
+
+          // Additional check: has admission identifier
+          const hasAdmissionId = encounter.hospitalization?.preAdmissionIdentifier?.value ||
+            encounter.identifier?.some((id: any) =>
+              id.system?.includes('admission-id')
+            );
+
+          const isActive = isInProgress && isInpatient && hasAdmissionId;
+
+          if (isActive) {
+            console.log('🏥 Active admission found for patient:', {
+              patientId: targetPatientId,
+              encounterId: encounter.id,
+              status: encounter.status,
+              class: encounter.class,
+              admissionId: encounter.hospitalization?.preAdmissionIdentifier?.value,
+              hasHospitalization
+            });
+          }
+
+          return isActive;
+        });
+
+        return hasActiveAdmission;
+      }),
+      distinctUntilChanged(), // Only emit when admission status changes
+      shareReplay(1) // Cache latest result
+    );
+  }
+
+  /**
+   * ✅ NEW: Synchronous check if patient has active admission (uses cached value)
+   * @param patientId - Patient ID to check (defaults to current patient)
+   * @returns boolean indicating if patient has active admission
+   * @deprecated Consider using isPatientAdmitted() observable for reactive updates
+   */
+  isPatientAdmittedSync(patientId?: string): boolean {
+    const targetPatientId = patientId
+
+    if (!targetPatientId) {
+      console.warn('No patient ID provided and no current patient found');
+      return false;
+    }
+
+    const encounters = this.PatientResources.encounters.getValue();
+
+    // Filter encounters for this specific patient
+    const patientEncounters = encounters.filter(wrapper => {
+      const encounter = wrapper.actualResource;
+      const subjectRef = encounter?.subject?.reference;
+
+      return subjectRef === `Patient/${targetPatientId}` ||
+        subjectRef === targetPatientId;
+    });
+
+    // Check if any encounter is an active admission
+    return patientEncounters.some(wrapper => {
+      const encounter = wrapper.actualResource;
+
+      const isInProgress = encounter.status === 'in-progress';
+      const isInpatient = encounter.class?.code?.toUpperCase() === 'IMP' ||
+        encounter.class?.display?.toLowerCase().includes('inpatient');
+
+      return isInProgress && isInpatient;
+    });
+  }
+
+  /**
+   * ✅ NEW: Get active admission encounter for a patient
+   * @param patientId - Patient ID (defaults to current patient)
+   * @returns Observable<Encounter | null>
+   */
+  getActiveAdmission(patientId?: string): Observable<Encounter | null> {
+    return combineLatest([
+      this.PatientResources.encounters,
+      this.currentPatientId$
+    ]).pipe(
+      map(([encounters, currentPatId]) => {
+        const targetPatientId = patientId || currentPatId;
+
+        if (!targetPatientId) return null;
+
+        // Filter encounters for this patient
+        const patientEncounters = encounters.filter(wrapper => {
+          const encounter = wrapper.actualResource;
+          const subjectRef = encounter?.subject?.reference;
+
+          return subjectRef === `Patient/${targetPatientId}` ||
+            subjectRef === targetPatientId;
+        });
+
+        // Find the active admission encounter
+        const activeAdmission = patientEncounters.find(wrapper => {
+          const encounter = wrapper.actualResource;
+
+          const isInProgress = encounter.status === 'in-progress';
+          const isInpatient = encounter.class?.code?.toUpperCase() === 'IMP' ||
+            encounter.class?.display?.toLowerCase().includes('inpatient');
+
+          return isInProgress && isInpatient;
+        });
+
+        return activeAdmission?.actualResource || null;
+      }),
+      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+      shareReplay(1)
+    );
+  }
 }
 

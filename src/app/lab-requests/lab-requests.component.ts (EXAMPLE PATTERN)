@@ -1,0 +1,169 @@
+export class LabRequestsComponent {
+  dialog = inject(MatDialog);
+  
+  // Define custom actions in details builder
+  labRequestDetailsBuilder: DetailsBuilderObject = {
+    resourceName: 'Lab Request',
+    resourceIcon: 'science',
+    specialHeader: {
+      strongSectionKey: 'code',
+      iconSectionKeys: ['status'],
+      contentSectionKeys: ['subject', 'authoredOn']
+    },
+    groups: [
+      { groupName: 'Request Info', groupIcon: 'info', groupKeys: ['status', 'intent', 'priority'] },
+      { groupName: 'Test Details', groupIcon: 'biotech', groupKeys: ['code', 'specimen', 'note'] }
+    ],
+    // ✅ Custom action buttons configuration
+    customActions: [
+      {
+        label: 'Collect Specimen',
+        icon: 'water_drop',
+        color: 'primary',
+        action: 'collect-specimen',
+        requireConfirmation: true,
+        confirmationMessage: 'Are you sure you want to collect specimen for this lab request?'
+      },
+      {
+        label: 'Cancel Request',
+        icon: 'cancel',
+        color: 'warn',
+        action: 'cancel-request',
+        requireConfirmation: true,
+        confirmationMessage: 'Are you sure you want to cancel this lab request? This action cannot be undone.'
+      },
+      {
+        label: 'View Results',
+        icon: 'visibility',
+        color: 'accent',
+        action: 'view-results',
+        requireConfirmation: false
+      }
+    ]
+  };
+
+  showLabRequestDetails(serviceRequest: any): void {
+    const excludeKeys = this.computeEmptyKeys(serviceRequest);
+
+    const dialogRef = this.dialog.open(DetailzViewzComponent, {
+      maxHeight: '93vh',
+      maxWidth: '800px',
+      width: '100%',
+      data: {
+        resourceData: serviceRequest,
+        detailsBuilderObject: this.labRequestDetailsBuilder,
+        excludeKeys
+      }
+    });
+
+    // ✅ Subscribe to custom action clicks
+    dialogRef.componentInstance.customActionClicked?.subscribe((action: string) => {
+      switch (action) {
+        case 'collect-specimen':
+          this.collectSpecimen(serviceRequest);
+          dialogRef.close();
+          break;
+
+        case 'cancel-request':
+          this.cancelLabRequest(serviceRequest);
+          dialogRef.close();
+          break;
+
+        case 'view-results':
+          this.viewLabResults(serviceRequest);
+          // Don't close dialog for view action
+          break;
+
+        default:
+          console.warn('Unknown action:', action);
+      }
+    });
+  }
+
+  // Action handlers
+  private collectSpecimen(serviceRequest: any): void {
+    console.log('Collecting specimen for:', serviceRequest);
+    
+    // Example: Create Specimen resource
+    const specimen = {
+      resourceType: 'Specimen',
+      status: 'available',
+      subject: serviceRequest.subject,
+      request: [{ reference: `ServiceRequest/${serviceRequest.id}` }],
+      collection: {
+        collectedDateTime: new Date().toISOString()
+      }
+    };
+
+    this.http.post(`${this.backendUrl}/Specimen`, specimen).subscribe({
+      next: (response) => {
+        this.infoDialogService.show('Specimen collected successfully!');
+        // Update ServiceRequest status to 'active'
+        this.updateServiceRequestStatus(serviceRequest.id, 'active');
+      },
+      error: (err) => {
+        this.errorService.openandCloseError('Failed to collect specimen');
+      }
+    });
+  }
+
+  private cancelLabRequest(serviceRequest: any): void {
+    console.log('Cancelling lab request:', serviceRequest);
+
+    const updatedRequest = {
+      ...serviceRequest,
+      status: 'revoked'
+    };
+
+    this.http.put(`${this.backendUrl}/ServiceRequest/${serviceRequest.id}`, updatedRequest)
+      .subscribe({
+        next: () => {
+          this.infoDialogService.show('Lab request cancelled successfully');
+          // Update state
+          this.updateStateAfterCancellation(serviceRequest.id);
+        },
+        error: (err) => {
+          this.errorService.openandCloseError('Failed to cancel lab request');
+        }
+      });
+  }
+
+  private viewLabResults(serviceRequest: any): void {
+    console.log('Viewing results for:', serviceRequest);
+    
+    // Navigate to observations filtered by this service request
+    this.router.navigate(['/app/patients', this.patientId, 'observations'], {
+      queryParams: { basedOn: `ServiceRequest/${serviceRequest.id}` }
+    });
+  }
+
+  private updateStateAfterCancellation(requestId: string): void {
+    const currentRequests = this.stateService.PatientResources.serviceRequests.getValue();
+    const updatedRequests = currentRequests.map(wrapper => {
+      if (wrapper.actualResource.id === requestId) {
+        return {
+          ...wrapper,
+          actualResource: {
+            ...wrapper.actualResource,
+            status: 'revoked'
+          }
+        };
+      }
+      return wrapper;
+    });
+    this.stateService.PatientResources.serviceRequests.next(updatedRequests);
+  }
+
+  private computeEmptyKeys(resource: any): string[] {
+    if (!resource) return [];
+    return Object.keys(resource).filter(key => this.isEmptyValue(resource[key]));
+  }
+
+  private isEmptyValue(value: any): boolean {
+    if (value == null) return true;
+    if (typeof value === 'string') return value.trim() === '';
+    if (Array.isArray(value)) return value.length === 0;
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+    return false;
+  }
+}

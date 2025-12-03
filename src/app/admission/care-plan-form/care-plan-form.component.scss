@@ -1,0 +1,34 @@
+.care-plan-wrapper {
+    width: 100%;
+}
+
+.segment-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.info-banner {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.task-form-section {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+    padding-top: 20px;
+}

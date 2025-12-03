@@ -61,6 +61,7 @@ export class DynamicFormsV2Component {
   realHourScroll: any[] = [];
   @Input() formFields!: FormFields[];
   @Input() resetOnSubmit: boolean = true;
+  @Output() onEveryChange = new EventEmitter<any>();
   fb = inject(FormBuilder);
   fieldAutoCompleteObject: { [key: string]: Observable<any> | undefined } = {};
   // Holds latest backend-loaded options per field to enable client-side filtering
@@ -134,6 +135,7 @@ export class DynamicFormsV2Component {
   }
 
   ngOnInit() {
+
     // Initialization logic if needed
     console.log('Form Metadata:', this.formMetaData);
     console.log('Form Fields:', this.formFields);
@@ -158,6 +160,10 @@ export class DynamicFormsV2Component {
       this.minutes.push(m < 10 ? '0' + m : m);
     }
 
+
+    this.aForm.valueChanges.subscribe(value => {
+      this.onEveryChange.emit(value);
+    });
   }
 
   addFieldToForm(fG: FormGroup, field: FormFields) {
