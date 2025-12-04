@@ -8,13 +8,13 @@
         </mat-card-subtitle>
       </div>
       <div class="right gap-10 g-just-flex">
-        @if (canExportServiceCode$ | async) {
+        @if (canExport$ | async) {
         <a mat-flat-button extended class="secondary-button small-button" (click)="onExportServiceCodes()">
           <mat-icon>file_download</mat-icon>
           Export
         </a>
         }
-        @if (canAddServiceCode$ | async) {
+        @if (canAdd$ | async) {
         <a mat-flat-button (click)="onAddServiceCode()">
           <mat-icon>add</mat-icon>
           Add Service Code
@@ -26,14 +26,13 @@
 
   <mat-card-content class="my-12">
     <mat-divider></mat-divider>
-  @if(tableHeaderMappedFilterArray && tableHeaderMappedFilterArray.size || 0 > 0 ) {
+
     <app-table-header [patientsTableFilterArray]="tableHeaderMappedFilterArray!"
       [patientsFiltersFormControlObject]="tableHeaderFiltersFormControlObject">
     </app-table-header>
-}
 
     <div class="table-or-empty" style="background-color: var(--mat-sys-surface)">
-      @if ((tableDataSource && (tableDataSource.data?.length || 0)> 0)) {
+      @if (tableDataSource && (tableDataSource.data.length || 0)> 0) {
       <table style="min-width: 630px; width: unset" mat-table matSort [dataSource]="tableDataSource"
         class="mat-elevation-z8 demo-table">
 

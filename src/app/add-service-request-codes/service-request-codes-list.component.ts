@@ -55,23 +55,15 @@ import { PatientNamePipe } from '../shared/pipes/patient-name.pipe';
   styleUrls: ['../patient-observation/patient-observation.component.scss', './service-request-codes-list.component.scss']
 })
 export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent implements OnInit, OnDestroy {
-  // Permission observables
-  canAddServiceCode$ = new BehaviorSubject<boolean>(false);
-  canExportServiceCode$ = new BehaviorSubject<boolean>(false);
-
-  // Table setup
+  // Table setup - using inherited tableDataSource and tableDataLevel2
   override displayedColumns: string[] = ['title', 'status', 'purpose', 'count', 'meta', 'actions'];
-
-  // Raw data
-  serviceCodesData: CodeSystem[] = [];
 
   // Filters
   serviceCodeTableFilter: Map<string, any[]> = new Map([
     ['status', ['draft', 'active', 'retired', 'unknown']]
   ]);
 
-  serviceCodeTableFilterArray = this.serviceCodeTableFilter;
-  serviceCodeFiltersFormControlObject: any = {};
+
 
   // Details builder for dialog
   serviceCodeDetailsBuilder: DetailsBuilderObject = {
@@ -102,12 +94,10 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
   };
 
   override ngOnInit(): void {
-    // Call parent ngOnInit if it exists
-    super.ngOnInit?.();
-this.organizingSearchFilters(this.serviceCodeTableFilter);
-    // Compute permissions for 'serviceRequest' resource
-    this.computePermissions('serviceRequest');
-
+    this.organizingSearchFilters(this.serviceCodeTableFilter);
+    // Compute permissions for 'codeSystem' resource
+    // This sets the inherited canAdd$ and canExport$ from AdmittedPatientsComponent
+    this.computePermissions('codeSystem');
 
     // Load service codes (CodeSystem and ValueSet resources)
     this.loadServiceCodes();
@@ -239,14 +229,6 @@ this.organizingSearchFilters(this.serviceCodeTableFilter);
     return false;
   }
 
-
-  get canAddServiceCode(): boolean {
-    return this.canAddServiceCode$.getValue();
-  }
-
-  get canExportServiceCode(): boolean {
-    return this.canExportServiceCode$.getValue();
-  }
 
   override ngOnDestroy(): void {
     // Clear orgWideResources for CodeSystem and ValueSet

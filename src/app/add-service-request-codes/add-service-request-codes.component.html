@@ -1,18 +1,32 @@
-<section class="add-service-request-codes">
-  <header class="page-header">
-    <div>
-      <h2>
-        <mat-icon>science</mat-icon>
-        <span>Add Service Request Code</span>
-      </h2>
-      <p>Define standard service request codes for lab tests, imaging, and procedures.</p>
-    </div>
-  </header>
+<section class="add-service-codes">
+  <div class="header-section mb-20">
+    <h2>
+      <mat-icon class="me-8" style="vertical-align: sub;">science</mat-icon>
+      Add Service Request Codes
+    </h2>
+    <p class="subtitle-text-color-2">Define reusable service request codes for lab tests, imaging, and procedures</p>
+  </div>
 
-  <mat-card class="form-card">
+  <mat-card>
     <mat-card-content>
-      <p>Form fields will be implemented here.</p>
-      <!-- TODO: Add dynamic form component -->
+      <ng-container *ngIf="!loading; else loadingState">
+        @if (formMetaData && formFields) {
+          <div style="width: 650px; max-width: 100%;">
+            <app-dynamic-forms-v2
+              [formMetaData]="formMetaData"
+              [formFields]="formFields"
+              (formSubmitted)="onFormSubmit($event)">
+            </app-dynamic-forms-v2>
+          </div>
+        }
+      </ng-container>
+
+      <ng-template #loadingState>
+        <div class="loading-state">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Loading form fields...</p>
+        </div>
+      </ng-template>
     </mat-card-content>
   </mat-card>
 </section>
