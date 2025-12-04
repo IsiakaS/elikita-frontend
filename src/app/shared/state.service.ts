@@ -9,8 +9,6 @@ import { Bundle, Reference } from 'fhir/r4';
 })
 export class StateService {
 
-  constructor() { }
-
   currentEncounter: BehaviorSubject<null | {
     status: Encounter['status'],
     patientId: string,
@@ -23,11 +21,43 @@ export class StateService {
 
   currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
 
-  // ✅ NEW: Reactive stream for current patient ID with multiple source fallback
-  // currentPatientId$: Observable<string | null> = combineLatest([
-  //   this.PatientResources.currentPatient,
-  //   this.currentEncounter,
-  //   this.currentPatientIdFromResolver
+  // ✅ BehaviorSubject version of current patient ID with multiple source fallback
+  currentPatientId$ = new BehaviorSubject<string | null>(null);
+
+  constructor() {
+    // Subscribe to combined sources and update the currentPatientId$ BehaviorSubject
+    combineLatest([
+      this.PatientResources.currentPatient,
+      this.currentEncounter,
+      this.currentPatientIdFromResolver
+    ]).pipe(
+      map(([patientWrapper, encounter, resolverId]) => {
+        // Priority 1: Check encounter's patient reference
+        if (encounter?.['subject']?.reference) {
+          const patientRef = encounter['subject'].reference;
+          const match = patientRef.match(/^Patient\/(.+)$/);
+          if (match) return match[1];
+          if (!patientRef.includes('/')) return patientRef;
+        }
+
+        // Priority 2: Check current patient resource
+        if (patientWrapper?.actualResource?.id) {
+          return patientWrapper.actualResource.id;
+        }
+
+        // Priority 3: Check patient ID from resolver
+        if (resolverId) {
+          return resolverId;
+        }
+
+        // No patient ID found
+        return null;
+      }),
+      distinctUntilChanged() // Only emit when ID actually changes
+    ).subscribe(patientId => {
+      this.currentPatientId$.next(patientId);
+    });
+  }
   // ]).pipe(
   //   map(([patientWrapper, encounter, resolverId]) => {
   //     // Priority 1: Check encounter's patient reference
@@ -662,49 +692,6 @@ export class StateService {
     this.addResourceToCurrentEncounterResources(obs, 'unsaved');
     return { success: true, resource: obs };
   }
-
-  /**
-   * Get current patient ID from multiple sources with fallback
-   * Priority:
-   * 1. Current encounter's patient reference
-   * 2. Current patient resource ID
-   * 3. Patient ID set by resolver
-   * @returns Patient ID string or null if not found
-   */
-  // currentPatientIdFromResolver = new BehaviorSubject<string | null>(null);
-
-  // ✅ NEW: Reactive stream for current patient ID with multiple source fallback
-  currentPatientId$: Observable<string | null> = combineLatest([
-    this.PatientResources.currentPatient,
-    this.currentEncounter,
-    this.currentPatientIdFromResolver
-  ]).pipe(
-    map(([patientWrapper, encounter, resolverId]) => {
-      // Priority 1: Check encounter's patient reference
-      if (encounter?.['subject']?.reference) {
-        const patientRef = encounter['subject'].reference;
-        const match = patientRef.match(/^Patient\/(.+)$/);
-        if (match) return match[1];
-        if (!patientRef.includes('/')) return patientRef;
-      }
-
-      // Priority 2: Check current patient resource
-      if (patientWrapper?.actualResource?.id) {
-        return patientWrapper.actualResource.id;
-      }
-
-      // Priority 3: Check patient ID from resolver
-      if (resolverId) {
-        return resolverId;
-      }
-
-      // No patient ID found
-      return null;
-    }),
-    distinctUntilChanged(), // Only emit when ID actually changes
-    shareReplay(1) // Cache latest value for late subscribers
-  );
-
 
   /**
    * Get current patient data in various formats

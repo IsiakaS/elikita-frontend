@@ -1,3 +1,205 @@
-<div>
-    <p>tasks-table works!</p>
-</div>
+<mat-card style="width: max-content; max-width: 100%;">
+    <mat-card-header>
+        <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+            <div class="left">
+                <mat-card-title class="">
+                    Tasks
+                </mat-card-title>
+                <mat-card-subtitle>
+                    Active tasks for patient care and management
+                </mat-card-subtitle>
+            </div>
+            <div class="right gap-10 g-just-flex" style="flex-wrap: wrap;">
+                <a mat-flat-button class="secondary-button small-button">
+                    <mat-icon>file_upload</mat-icon> Import
+                </a>
+                <a mat-flat-button extended class="secondary-button small-button">
+                    <mat-icon>file_download</mat-icon> Export
+                </a>
+                <a mat-flat-button class="">
+                    <mat-icon>add</mat-icon>
+                    Add Task
+                </a>
+            </div>
+        </div>
+    </mat-card-header>
+
+    <mat-card-content class="my-12">
+        @if(tableDataSource.data && tableDataSource.data.length > 0){
+        <mat-divider></mat-divider>
+        @if(tableHeaderMappedFilterArray && tableHeaderMappedFilterArray.size || 0 > 0 ) {
+        <app-table-header [patientsTableFilterArray]="tableHeaderMappedFilterArray!"
+            [patientsFiltersFormControlObject]="tableHeaderFiltersFormControlObject">
+        </app-table-header>
+        }
+
+        <table mat-table matSort [dataSource]="tableDataSource.data" class="mat-elevation-z8 demo-table">
+            <!-- Task Name Column -->
+            <ng-container matColumnDef="taskName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="description"
+                    sortActionDescription="Sort by Task Name">
+                    Task Name
+                </th>
+                <td mat-cell *matCellDef="let element" [title]="element.taskName" #nameCell>
+                    <div class="stacked-cell">
+                        <div class="primary-line">
+                            {{element.taskName}}
+                        </div>
+                        <div class="secondary-line" [title]="element.code?.coding?.[0]?.display">
+                            {{element.code?.coding?.[0]?.display || element.code?.text || 'No code'}}
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Patient Column -->
+            <ng-container matColumnDef="patient">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Patient">
+                    Patient
+                </th>
+                <td mat-cell *matCellDef="let element" #patientCell>
+                    <div class="stacked-cell">
+                        @if(element.patientDetails) {
+                        <div class="primary-line" [title]="element.patientDetails.name | patientName">
+                            {{element.patientDetails.name | patientName}}
+                        </div>
+                        <div class="secondary-line" [title]="element.patientDetails.birthDate | patientAge:false">
+                            {{element.patientDetails.birthDate | patientAge:false}} •
+                            {{element.patientDetails.gender | titlecase}}
+                        </div>
+                        } @else {
+                        <span class="text-muted">{{element.for?.display || 'N/A'}}</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Status">
+                    Status
+                </th>
+                <td mat-cell *matCellDef="let element" #statusCell>
+                    <mat-chip [style.background-color]="element.status === 'completed' ? '#4caf50' : 
+                                                         element.status === 'in-progress' ? '#2196f3' : 
+                                                         element.status === 'cancelled' ? '#f44336' : 
+                                                         element.status === 'on-hold' ? '#ff9800' : '#9e9e9e'">
+                        {{element.status | titlecase}}
+                    </mat-chip>
+                </td>
+            </ng-container>
+
+            <!-- Priority Column -->
+            <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Priority">
+                    Priority
+                </th>
+                <td mat-cell *matCellDef="let element" #priorityCell>
+                    @if(element.priority) {
+                    <mat-chip [style.background-color]="element.priority === 'stat' || element.priority === 'urgent' ? '#ff5252' : 
+                                                         element.priority === 'asap' ? '#ff9800' : 
+                                                         element.priority === 'routine' ? '#4caf50' : '#9e9e9e'">
+                        {{element.priority | titlecase}}
+                    </mat-chip>
+                    } @else {
+                    <span class="text-muted">N/A</span>
+                    }
+                </td>
+            </ng-container>
+
+            <!-- Assigned To Column -->
+            <ng-container matColumnDef="assignedTo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Assigned To">
+                    Assigned To
+                </th>
+                <td mat-cell *matCellDef="let element" #assignedCell>
+                    {{element.assignedTo}}
+                </td>
+            </ng-container>
+
+            <!-- Start Date Column -->
+            <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Start Date">
+                    Start Date
+                </th>
+                <td mat-cell *matCellDef="let element" #startDateCell>
+                    <div class="stacked-cell">
+                        @if(element.startDate) {
+                        <div class="primary-line" [title]="element.startDate | date:'MMM d, yyyy'">
+                            {{element.startDate | date:'MMM d, yyyy'}}
+                        </div>
+                        <div class="secondary-line" [title]="element.startDate | date:'h:mm a'">
+                            {{element.startDate | date:'h:mm a'}}
+                        </div>
+                        } @else {
+                        <span class="text-muted">N/A</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Due Date Column -->
+            <ng-container matColumnDef="dueDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Due Date">
+                    Due Date
+                </th>
+                <td mat-cell *matCellDef="let element" #dueDateCell>
+                    <div class="stacked-cell">
+                        @if(element.dueDate) {
+                        <div class="primary-line" [title]="element.dueDate | date:'MMM d, yyyy'">
+                            {{element.dueDate | date:'MMM d, yyyy'}}
+                        </div>
+                        <div class="secondary-line" [title]="element.dueDate | date:'h:mm a'">
+                            {{element.dueDate | date:'h:mm a'}}
+                        </div>
+                        } @else {
+                        <span class="text-muted">No due date</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>
+                    Actions
+                </th>
+                <td mat-cell *matCellDef="let element" class="action-column" #actionCell>
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item>
+                            <mat-icon>visibility</mat-icon>
+                            <span>View Details</span>
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>edit</mat-icon>
+                            <span>Edit Task</span>
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>check_circle</mat-icon>
+                            <span>Mark Complete</span>
+                        </button>
+                        <button mat-menu-item>
+                            <mat-icon>cancel</mat-icon>
+                            <span>Cancel Task</span>
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" matHeaderRowDefSticky="true">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="cursor: pointer;"></tr>
+        </table>
+
+        <!-- No Data State -->
+        }@else{
+        <app-empty-state [icon]="'TASK_ALT'"
+            [subtitle]="'No active tasks found. Try adjusting your filters or add a new task.'" [title]="'No Tasks'">
+        </app-empty-state>
+        }
+
+    </mat-card-content>
+</mat-card>

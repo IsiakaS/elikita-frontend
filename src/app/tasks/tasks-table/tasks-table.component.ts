@@ -19,11 +19,18 @@ import { fetchFromReferencePipe } from "../../shared/Fetch.pipe";
 import { AdmittedPatientsComponent } from '../../admitted-patients/admitted-patients.component';
 import { backendEndPointToken } from '../../app.config';
 import { StateService } from '../../shared/state.service';
+import { PatientNamePipe } from '../../shared/pipes/patient-name.pipe';
+import { PatientAgePipe } from '../../shared/pipes/patient-age.pipe';
+import { PatientContactsPipe } from '../../shared/pipes/patient-contacts.pipe';
+import { DatePipe, TitleCasePipe } from '@angular/common';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { PatientAddressPipe } from '../../shared/pipes/patient-address.pipe';
 
 @Component({
   selector: 'app-tasks-table',
-  imports: [...commonImports, fetchFromReferencePipe, ReactiveFormsModule],
+  imports: [...commonImports, fetchFromReferencePipe, ReactiveFormsModule, PatientNamePipe, PatientAgePipe, PatientContactsPipe, DatePipe, TitleCasePipe, EmptyStateComponent],
   templateUrl: './tasks-table.component.html',
+  providers: [PatientNamePipe, PatientAgePipe, PatientContactsPipe, PatientAddressPipe, DatePipe, TitleCasePipe],
   styleUrl: './tasks-table.component.scss'
 })
 export class TasksTableComponent extends AdmittedPatientsComponent {
@@ -36,6 +43,9 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
 
   // Track current patient ID (will be set in ngOnInit)
   private currentPatientId: string | null = null;
+
+  // Table columns configuration
+  override displayedColumns: string[] = ['taskName', 'patient', 'status', 'priority', 'assignedTo', 'startDate', 'dueDate', 'actions'];
 
   /**
    * DATA PROCESSING FLOW - Overview of AdmittedPatientsComponent.ngOnInit() processes
@@ -139,24 +149,20 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
    */
 
   override ngOnInit(): void {
-    // Use the reactive currentPatientId$ observable from StateService (inherited from parent)
-    // This is more reliable than route params as it's centrally managed
-    firstValueFrom(this.localStateService.currentPatientId$).then(patientId => {
-      this.currentPatientId = patientId;
+    // Use the BehaviorSubject currentPatientId$ with getValue() for synchronous access
+    // This BehaviorSubject combines patient ID from multiple sources (encounter, patient resource, resolver)
+    this.currentPatientId = this.localStateService.currentPatientId$.getValue();
 
-      if (this.currentPatientId) {
-        // PATIENT-SPECIFIC MODE: Use PatientResources
-        console.log('Patient ID found:', this.currentPatientId, '- Using PatientResources');
-        this.loadPatientSpecificTasks();
-      } else {
-        // ORG-WIDE MODE: Use orgWideResources
-        console.log('No patient ID - Using orgWideResources');
-        this.loadOrgWideTasks();
-      }
-    });
-  }
-
-  /**
+    if (this.currentPatientId) {
+      // PATIENT-SPECIFIC MODE: Use PatientResources
+      console.log('Patient ID found:', this.currentPatientId, '- Using PatientResources');
+      this.loadPatientSpecificTasks();
+    } else {
+      // ORG-WIDE MODE: Use orgWideResources
+      console.log('No patient ID - Using orgWideResources');
+      this.loadOrgWideTasks();
+    }
+  }  /**
    * Load tasks for a specific patient from PatientResources
    */
   private loadPatientSpecificTasks(): void {
