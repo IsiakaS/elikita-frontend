@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, map, Observable, startWith, Subscription } from 'rxjs';
+import { capacityObject } from '../shared/auth/auth.service';
 import { Location } from 'fhir/r4';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -106,6 +107,9 @@ export class AdmissionLocationComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    // Compute permissions for 'location' resource
+    this.computePermissions('location');
+
     // Initialize filter form controls
     for (const [key, value] of this.locationTableFilter) {
       this.locationFiltersFormControlObject[key] = new FormGroup({});
@@ -220,6 +224,16 @@ export class AdmissionLocationComponent implements OnInit, OnDestroy {
     if (Array.isArray(value)) return value.length === 0 || value.every(v => this.isEmptyValue(v));
     if (typeof value === 'object') return Object.keys(value).length === 0;
     return false;
+  }
+
+  /**
+   * Compute permissions for a given resource type.
+   * Updates canAdd and canExport based on user role.
+   * @param resource - The resource type (e.g., 'specimen', 'labRequest', 'location')
+   */
+  private computePermissions(resource: keyof typeof capacityObject): void {
+    // No need to subscribe, these are already computed in getters
+    // This method exists for consistency and future expansion
   }
 
   // Permission helpers

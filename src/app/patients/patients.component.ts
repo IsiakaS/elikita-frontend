@@ -13,7 +13,7 @@ import { MatFormField } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider'
 import { MatChipsModule } from '@angular/material/chips'
 import { TitleCasePipe, DatePipe } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { RecordHolderService } from '../patients-record/record-holder.service';
 import { BreadcrumbService } from '../shared/breadcrumb.service';
 import { PatientNamePipe } from '../shared/pipes/patient-name.pipe';
@@ -63,6 +63,9 @@ export class PatientsComponent {
   };
 
   private auth = inject(AuthService);
+
+  canAdd$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('patient', 'add')));
+  canExport$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('patient', 'viewAll')));
 
   constructor() {
 

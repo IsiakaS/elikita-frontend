@@ -40,4 +40,16 @@ tr td {
         white-space: nowrap;
     }
 
+mat-card {
+  margin: 1rem;
+}
+
+.secondary-button {
+  background-color: var(--mat-sys-surface-variant);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.small-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
 }

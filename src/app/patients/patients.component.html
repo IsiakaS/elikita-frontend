@@ -13,15 +13,17 @@
                 <a mat-flat-button class="secondary-button small-button">
                     <mat-icon>file_upload</mat-icon> Import
                 </a>
-                <a mat-flat-button extended class="secondary-button small-button">
+                @if (canExport$ | async) {
+                <a mat-flat-button extended class="secondary-button small-button" (click)="onExportPatients()">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
-                <a mat-flat-button class="">
+                }
+                @if (canAdd$ | async) {
+                <a mat-flat-button routerLink="/app/patient-registration">
                     <mat-icon>add</mat-icon>
-                    Add Patients
+                    Add Patient
                 </a>
-
-
+                }
             </div>
         </div>
     </mat-card-header>

@@ -138,16 +138,10 @@ export class LabRequestsComponent implements OnInit {
   user: any = null;
   patientId: string | null = null;
   patientname: string | null = null;
-  canAddRequests$ = this.auth.user.pipe(
-    map(user => {
-      return this.auth.can('labRequest', 'add');
-    })
-  );
-  canExportRequests$ = this.auth.user.pipe(
-    map(user => {
-      return this.auth.can('labRequest', 'viewAll');
-    })
-  );
+  // Initialize permission observables with false
+  canAddRequests$: Observable<boolean> = new BehaviorSubject<boolean>(false);
+  canExportRequests$: Observable<boolean> = new BehaviorSubject<boolean>(false);
+
   stateService = inject(StateService);
   errorService = inject(ErrorService);
   state = inject(StateService);
@@ -163,6 +157,8 @@ export class LabRequestsComponent implements OnInit {
   private rawLabRequests: any[] = [];
 
   ngOnInit() {
+    // Compute permissions for 'labRequest' resource
+    this.computePermissions('labRequest');
 
     this.auth.user.subscribe((user) => {
       this.user = user;
@@ -629,5 +625,19 @@ export class LabRequestsComponent implements OnInit {
         { groupName: 'Related Data', groupIcon: 'history_edu', groupKeys: ['issued', 'performer', 'note'] }
       ]
     };
+  }
+
+  /**
+   * Compute permissions for a given resource type.
+   * Updates canAdd and canExport observables based on user role.
+   * @param resource - The resource type (e.g., 'specimen', 'labRequest', 'location')
+   */
+  private computePermissions(resource: keyof typeof capacityObject): void {
+    this.canAddRequests$ = this.auth.user.pipe(
+      map(() => this.auth.can(resource, 'add'))
+    );
+    this.canExportRequests$ = this.auth.user.pipe(
+      map(() => this.auth.can(resource, 'viewAll'))
+    );
   }
 }
