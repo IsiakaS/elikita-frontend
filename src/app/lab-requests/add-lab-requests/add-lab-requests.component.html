@@ -1,5 +1,75 @@
-<div class="component-wrapper g-just-flex p-20">
-    <div style="position: relative;"
+<div class="component-wrapper g-just-flex p-20" style="flex-direction: column;">
+
+    <!-- Category and Service Request Selection Form (shown ONLY when no typeOfService) -->
+    @if(!data?.typeOfService) {
+    <div class="category-selection-form" style="width: 100%; max-width: 600px; margin: 0 auto 30px auto;">
+        <h2 class="mat-h2">Select Service Request Type</h2>
+        <p class="mat-body-1">Please select the category and specific service request you want to make.</p>
+
+        <form [formGroup]="categoryForm" class="g-just-flex gap-20" style="flex-direction: column;">
+            <!-- Category Field -->
+            <mat-form-field appearance="outline" floatLabel="always" style="width: 100%;">
+                <mat-label>Service Request Category</mat-label>
+                <input type="text" matInput formControlName="category" [matAutocomplete]="categoryAuto"
+                    placeholder="Search for a category...">
+                <mat-hint>Start typing to search for categories (e.g., Laboratory, Imaging, Consultation)</mat-hint>
+                @if(loadingCategories) {
+                <mat-icon matSuffix>
+                    <span class="spinner-border spinner-border-sm"></span>
+                </mat-icon>
+                }
+                <mat-autocomplete #categoryAuto="matAutocomplete" [displayWith]="displayOption">
+                    @for(option of filteredCategoryOptions; track option.code) {
+                    <mat-option [value]="option">
+                        <strong>{{option.display}}</strong>
+                        @if(option.code) {
+                        <span class="text-muted"> ({{option.code}})</span>
+                        }
+                    </mat-option>
+                    }
+                    @empty {
+                    <mat-option disabled>
+                        No categories found. Try a different search term.
+                    </mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+
+            <!-- Service Request Code Field -->
+            <mat-form-field appearance="outline" floatLabel="always" style="width: 100%;">
+                <mat-label>Service Request Code</mat-label>
+                <input type="text" matInput formControlName="serviceRequestCode" [matAutocomplete]="serviceRequestAuto"
+                    placeholder="Search for a service...">
+                <mat-hint>Start typing to search for specific services (e.g., Blood Test, X-Ray, ECG)</mat-hint>
+                @if(loadingServiceRequests) {
+                <mat-icon matSuffix>
+                    <span class="spinner-border spinner-border-sm"></span>
+                </mat-icon>
+                }
+                <mat-autocomplete #serviceRequestAuto="matAutocomplete" [displayWith]="displayOption">
+                    @for(option of filteredServiceRequestOptions; track option.code) {
+                    <mat-option [value]="option">
+                        <strong>{{option.display}}</strong>
+                        @if(option.code) {
+                        <span class="text-muted"> ({{option.code}})</span>
+                        }
+                    </mat-option>
+                    }
+                    @empty {
+                    <mat-option disabled>
+                        No service codes found. Try a different search term.
+                    </mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </form>
+
+        <mat-divider style="margin: 20px 0;"></mat-divider>
+    </div>
+    }
+
+    <!-- Dynamic Form (ALWAYS shown, but code field is conditional) -->
+    <div style="position: relative; width: 100%;"
         [ngClass]="{'mb50': isChosenOption, 'mb-100': isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData}">
         <mat-form-field appearance="outline" floatLabel="always"
             style="display:block; justify-content:center; margin:auto; width:max-content; padding-bottom: 20px;">
@@ -16,7 +86,7 @@
         </mat-form-field>
 
         @if(isChosenOption && formFields && formMetaData){
-            <!-- {{isMultiple.value}} -->
+        <!-- {{isMultiple.value}} -->
         <!-- @for(form of medicineForms; track $index; ){ -->
         <app-dynamic-forms-v2 [formFields]="formFields" [formMetaData]="formMetaData"
             (formSubmitted)="processValues($event)" #cref>
@@ -25,7 +95,7 @@
         }
         @if(isMultiple.value == 'Multiple' && isChosenOption && formFields && formMetaData){
         <!-- A "request more test and finish-OR-WHATEVER IS APPROPPRIATE" button LOCATED TO THE END OF THE CONTAINER WITH 40PX GAP -->
-        
+
 
         <!--form group here-->
         <form [formGroup]="requestForm" class="mt-30">
@@ -43,13 +113,13 @@
         <div class="g-just-flex gap-30 justify-content-end mt-20 dactions flex-wrap">
 
 
-@if(requestForm && requestForm.valid && items && items.length > 0 ){
+            @if(requestForm && requestForm.valid && items && items.length > 0 ){
             <button mat-flat-button (click)="submitAllRequests()">
                 <mat-icon>check</mat-icon>
                 <span>Submit All Requests</span>
             </button>
 
-        }
+            }
         </div>
 
         }@else{ }

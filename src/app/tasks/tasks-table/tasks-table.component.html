@@ -9,17 +9,24 @@
                     Active tasks for patient care and management
                 </mat-card-subtitle>
             </div>
+
             <div class="right gap-10 g-just-flex" style="flex-wrap: wrap;">
+                @if(canExport$ | async) {
                 <a mat-flat-button class="secondary-button small-button">
                     <mat-icon>file_upload</mat-icon> Import
                 </a>
+                }
+                @if (canExport$ | async) {
                 <a mat-flat-button extended class="secondary-button small-button">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
-                <a mat-flat-button class="">
+                }
+                @if (canAdd$ | async) {
+                <a mat-flat-button class="" (click)="addTask()">
                     <mat-icon>add</mat-icon>
                     Add Task
                 </a>
+                }
             </div>
         </div>
     </mat-card-header>

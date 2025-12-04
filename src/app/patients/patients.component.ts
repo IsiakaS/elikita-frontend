@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input'
 import { MatFormField } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider'
 import { MatChipsModule } from '@angular/material/chips'
-import { TitleCasePipe, DatePipe } from '@angular/common';
+import { TitleCasePipe, DatePipe, AsyncPipe } from '@angular/common';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { RecordHolderService } from '../patients-record/record-holder.service';
 import { BreadcrumbService } from '../shared/breadcrumb.service';
@@ -29,7 +29,7 @@ import { AuthService } from '../shared/auth/auth.service';
   imports: [MatCardModule, MatButtonModule,
     MatFormField, MatDividerModule,
     MatExpansionModule, MatCheckboxModule, TitleCasePipe, DatePipe,
-    MatTableModule,
+    MatTableModule, AsyncPipe,
     MatChipsModule,
     MatInputModule,
     MatMenuModule, PatientNamePipe, PatientAddressPipe, PatientContactsPipe, PatientAgePipe, EmptyStateComponent,
@@ -82,14 +82,14 @@ export class PatientsComponent {
 
       console.log('Raw resolver data:', this.patientsRegistrationData);
       console.log('First patient sample:', this.patientsRegistrationData?.[0]);
-      
+
       // Determine the appropriate empty state based on data
       this.updateEmptyStateForDataScenario(this.patientsRegistrationData);
-      
+
       // Filter for active, non-deceased patients (additional layer of filtering)
       const activePatients = this.filterActivePatients(this.patientsRegistrationData);
       console.log(`Filtered ${this.patientsRegistrationData?.length || 0} down to ${activePatients.length} active patients`);
-      
+
       this.tableDataLevel2.next(activePatients.slice(0, 10).map((element: any) => {
         const eachElementKeys = Object.keys(element);
         for (const key of eachElementKeys) {
@@ -123,7 +123,7 @@ export class PatientsComponent {
       console.log('filterActivePatients: Received null/undefined data');
       return [];
     }
-    
+
     if (!Array.isArray(patients)) {
       console.log('filterActivePatients: Data is not an array:', typeof patients);
       return [];
@@ -142,20 +142,20 @@ export class PatientsComponent {
 
       // Check if patient is active (FHIR active field)
       const isActive = patient.active === true;
-      
+
       // Check if patient is not deceased (FHIR deceased fields)
       const isNotDeceased = !patient.deceasedBoolean && !patient.deceasedDateTime;
-      
+
       // Additional check for patient status if available
       const hasValidStatus = !patient.status || patient.status === 'active';
-      
+
       const shouldInclude = isActive && isNotDeceased && hasValidStatus;
-      
+
       // Debug logging for transparency
       if (!shouldInclude) {
         console.log(`Filtering out patient ${patient.id}: active=${patient.active}, deceased=${patient.deceasedBoolean || patient.deceasedDateTime || 'none'}, status=${patient.status || 'none'}`);
       }
-      
+
       return shouldInclude;
     });
   }
@@ -164,17 +164,17 @@ export class PatientsComponent {
   private patientRecordHolder = inject(RecordHolderService);
   showRow(row: any) {
     console.log('Row clicked:', row);
-    
+
     // Handle FHIR identifier structure
     const patientId = row.identifier?.value || row.identifier?.[0]?.value || row.id;
-    
+
     if (!patientId) {
       console.error('No patient identifier found in row:', row);
       return;
     }
-    
+
     console.log('Navigating to patient:', patientId);
-    
+
     const segments = [patientId];
     const role = this.auth.user.getValue()?.role;
     if (role === 'lab') {

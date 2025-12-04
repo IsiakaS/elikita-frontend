@@ -1,25 +1,30 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Optional, Inject, ViewChild } from '@angular/core';
-import { FormControl, ReactiveFormsModule, FormBuilder, FormArray, FormGroup } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { DynamicFormsV2Component } from '../../shared/dynamic-forms-v2/dynamic-forms-v2.component';
 import { CodeableConceptField, CodeField, GroupField, IndividualField, IndividualReferenceField, ReferenceFieldArray, formMetaData, codeableConceptDataType, ReferenceDataType, codingDataType, SingleCodeField } from '../../shared/dynamic-forms.interface2';
 import { FormFieldsSelectDataService } from '../../shared/form-fields-select-data.service';
 import { ErrorService } from '../../shared/error.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map, debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ResourceDataReviewComponent } from '../../shared/resource-data-review/resource-data-review.component'; // added
+import { ResourceDataReviewComponent } from '../../shared/resource-data-review/resource-data-review.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatDividerModule } from '@angular/material/divider';
+import { backendEndPointToken } from '../../app.config';
 type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField | CodeField | IndividualReferenceField | GroupField;
 
 
 @Component({
   selector: 'app-add-lab-requests',
-  imports: [CommonModule, MatFormFieldModule, MatSelectModule, DynamicFormsV2Component, ReactiveFormsModule, MatIconModule,
-    MatButtonModule, ResourceDataReviewComponent /* added */
+  imports: [CommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, DynamicFormsV2Component, ReactiveFormsModule, MatIconModule,
+    MatButtonModule, ResourceDataReviewComponent, MatAutocompleteModule, MatInputModule, MatDividerModule
   ],
   templateUrl: './add-lab-requests.component.html',
   styleUrl: './add-lab-requests.component.scss'
@@ -28,6 +33,23 @@ export class AddLabRequestsComponent {
   //constructor with optional mat dialog
   http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private backendUrl = inject(backendEndPointToken);
+
+  // New form for category and service request code selection
+  categoryForm = this.fb.group({
+    category: ['', Validators.required],
+    serviceRequestCode: ['', Validators.required]
+  });
+
+  // Autocomplete options
+  categoryOptions: any[] = [];
+  serviceRequestOptions: any[] = [];
+  filteredCategoryOptions: any[] = [];
+  filteredServiceRequestOptions: any[] = [];
+
+  // Loading states
+  loadingCategories = false;
+  loadingServiceRequests = false;
 
   // Root form with a form array that mirrors fields in this.formFields
   requestForm: FormGroup = this.fb.group({
@@ -91,32 +113,162 @@ export class AddLabRequestsComponent {
   ]
 
   ngOnInit() {
-      this.formMetaData = <formMetaData>{
-          // formName: 'Service Request (Lab Tests, e.t.c.)',
-          // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
-          // submitText: 'Submit Request',
+    // Setup category search with debouncing
+    this.categoryForm.get('category')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      if (typeof value === 'string' && value.trim()) {
+        this.searchCategory(value);
+      } else if (value && typeof value === 'object') {
+        // Category has been selected - update code options based on category
+        this.onCategorySelected(value);
+      }
+    });
 
-          formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
-          formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
-          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
-            ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
+    // Setup service request code search with debouncing
+    this.categoryForm.get('serviceRequestCode')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      if (typeof value === 'string' && value.trim()) {
+        this.searchServiceRequestCode(value);
+      } else if (value && typeof value === 'object') {
+        // Service request code has been selected
+        this.onServiceRequestCodeSelected(value);
+      }
+    });
 
-        };
+    // Always load the dynamic form fields
+    this.loadDynamicFormFields();
+  }
+
+  /**
+   * Called when category is selected from autocomplete
+   */
+  onCategorySelected(category: any): void {
+    console.log('Category selected:', category);
+    // Future: Update code options based on selected category
+    // For now, just log it
+    // You can implement category-specific code filtering here later
+  }
+
+  /**
+   * Called when service request code is selected from autocomplete
+   */
+  onServiceRequestCodeSelected(code: any): void {
+    console.log('Service request code selected:', code);
+    // Set the code value in the dynamic form if code field exists
+    if (this.formFields) {
+      const codeField = this.formFields.find(f => f.generalProperties.fieldApiName === 'code');
+      if (codeField) {
+        // Update the code field value with the selected code
+        codeField.generalProperties.value = `${code.code}$#$${code.display}$#$${code.system}`;
+      }
+    }
+  }
+
+  /**
+   * Search for service request categories from backend
+   */
+  searchCategory(searchTerm: string): void {
+    this.loadingCategories = true;
+    const searchUrl = `${this.backendUrl}/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/servicerequest-category&filter=${encodeURIComponent(searchTerm)}`;
+
+    this.http.get(searchUrl).pipe(
+      map((data: any) => {
+        if (data?.expansion?.contains) {
+          return data.expansion.contains.map((item: any) => ({
+            code: item.code,
+            display: item.display,
+            system: item.system
+          }));
+        }
+        return [];
+      })
+    ).subscribe({
+      next: (options) => {
+        this.categoryOptions = options;
+        this.filteredCategoryOptions = options;
+        this.loadingCategories = false;
+      },
+      error: (err) => {
+        console.error('Error searching categories:', err);
+        this.loadingCategories = false;
+        this.errorService.openandCloseError('Failed to search categories');
+      }
+    });
+  }
+
+  /**
+   * Search for service request codes from backend
+   */
+  searchServiceRequestCode(searchTerm: string): void {
+    this.loadingServiceRequests = true;
+    const searchUrl = `${this.backendUrl}/ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/procedure-code&filter=${encodeURIComponent(searchTerm)}`;
+
+    this.http.get(searchUrl).pipe(
+      map((data: any) => {
+        if (data?.expansion?.contains) {
+          return data.expansion.contains.map((item: any) => ({
+            code: item.code,
+            display: item.display,
+            system: item.system
+          }));
+        }
+        return [];
+      })
+    ).subscribe({
+      next: (options) => {
+        this.serviceRequestOptions = options;
+        this.filteredServiceRequestOptions = options;
+        this.loadingServiceRequests = false;
+      },
+      error: (err) => {
+        console.error('Error searching service request codes:', err);
+        this.loadingServiceRequests = false;
+        this.errorService.openandCloseError('Failed to search service request codes');
+      }
+    });
+  }
+
+  /**
+   * Display function for autocomplete
+   */
+  displayOption(option: any): string {
+    return option?.display || '';
+  }
+
+  /**
+   * Load dynamic form fields (original ngOnInit logic)
+   */
+  private loadDynamicFormFields(): void {
+    this.formMetaData = <formMetaData>{
+      // formName: 'Service Request (Lab Tests, e.t.c.)',
+      // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
+      // submitText: 'Submit Request',
+
+      formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
+      formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
+      submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+        ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
+
+    };
     this.isMultiple.valueChanges.subscribe((e: boolean | null) => {
       if (e !== null) {
         this.isChosenOption = true;
       }
-        this.formMetaData = <formMetaData>{
-          // formName: 'Service Request (Lab Tests, e.t.c.)',
-          // formDescription: "Use this form to order a lab test or any other medical services from your or other department",
-          // submitText: 'Submit Request',
+      this.formMetaData = <formMetaData>{
+        // formName: 'Service Request (Lab Tests, e.t.c.)',
+        // formDescription: "Use this form to order a lab test or anyHere in the Earth Service.  other medical services from your or other department",
+        // submitText: 'Submit Request',
 
-          formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
-          formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
-          submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
-            ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
+        formName: this.data && this.data.typeOfService ? `${this.data.typeOfService} Service Request` : 'Service Request (Lab Tests, e.t.c.)',
+        formDescription: "Use this form to order a " + (this.data.typeOfService ? this.data.typeOfService : "lab test or any other") + " medical services from your department or others",
+        submitText: ` ${this.isMultiple.value && this.isMultiple.value == 'Multiple'
+          ? 'Add' : 'Submit'} ${this.data && this.data.typeOfService ? this.data.typeOfService : ""} Request`,
 
-        }
+      }
     })
 
 
@@ -133,11 +285,8 @@ export class AddLabRequestsComponent {
       next: (g: any) => {
         console.log(g.medication);
 
-
-
-      
-
-        this.formFields = [
+        // Build formFields array - conditionally include code field based on typeOfService
+        const fieldsArray: FormFields[] = [
           {
 
             generalProperties: {
@@ -178,8 +327,12 @@ export class AddLabRequestsComponent {
             },
             data: "proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option".split(' | ')
 
-          },
-          {
+          }
+        ];
+
+        // Only add code field if typeOfService exists
+        if (this.data?.typeOfService) {
+          fieldsArray.push({
 
             generalProperties: {
 
@@ -196,7 +349,11 @@ export class AddLabRequestsComponent {
               isGroup: false
             },
             data: g.code
-          },
+          });
+        }
+
+        // Add remaining fields
+        fieldsArray.push(
           {
 
             generalProperties: {
@@ -251,12 +408,13 @@ export class AddLabRequestsComponent {
               isGroup: false
             },
             data: g.priority
-          },
+          }
           //category
+        );
 
+        // Assign the built array to formFields
+        this.formFields = fieldsArray;
 
-
-        ]
         // this.medicineForms.push({ formMetaData: this.formMetaData, formFields: [...this.formFields] });
 
         // Build the initial item in the FormArray once fields are available
@@ -267,9 +425,8 @@ export class AddLabRequestsComponent {
         this.errorService.openandCloseError('Error fetching medication data. Please try again later.');
       }
     })
-
-
   }
+
   addMoreMedicineRequest() {
 
     if (this.formMetaData && this.formFields) {
@@ -279,17 +436,17 @@ export class AddLabRequestsComponent {
     }
   }
 
-@ViewChild('cref') dynamicFormComponent!: DynamicFormsV2Component;
+  @ViewChild('cref') dynamicFormComponent!: DynamicFormsV2Component;
   processValues(values: any) {
     if (!values) return;
 
-    if(!values.code || values.code == '' ||
+    if (!values.code || values.code == '' ||
       values.intent == '' || !values.intent ||
       values.status == '' || !values.status
 
-    ){
+    ) {
       this.errorService.openandCloseError('Status, Intent and Service Requested fields are required.');
-    
+
       return;
     }
 
@@ -300,7 +457,7 @@ export class AddLabRequestsComponent {
       }
     }
     //vallidationbefore `pushing
-    
+
     this.items.push(this.buildItemGroup(values));
   }
 

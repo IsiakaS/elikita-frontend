@@ -159,6 +159,18 @@ export class AuthService {
 // ehr module with verbs-actions and users who can do them
 // this is used to determine if a user can perform an action on a resource
 export const capacityObject = {
+  task: {
+    add: ['doctor', 'nurse'],
+    start: ['doctor', 'nurse'],
+    complete: ['doctor', 'nurse'],
+    viewAll: ['admin', 'doctor', 'nurse'],
+    viewSelf: ['patient', 'doctor', 'nurse'],
+    update: ['doctor', 'nurse'],
+    delete: ['admin'],
+    assign: ['admin', 'receptionist'],
+    export: ['admin', 'doctor', 'nurse'],
+    fulfill: ['doctor', 'nurse', 'lab', 'consultant'],
+  },
   encounter: {
     add: ['doctor', 'nurse'],
     start: ['doctor', 'nurse'],

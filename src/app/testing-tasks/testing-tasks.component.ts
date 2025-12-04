@@ -953,45 +953,45 @@ export class TestingTasksComponent {
     }));
 
     // Create a simple dialog using dynamic forms for selection
-    import('../shared/dynamic-forms-v2/dynamic-forms-v2.component').then(m => {
-      const dialogRef = this.dialog.open(m.DynamicFormsV2Component, {
-        width: '600px',
-        maxWidth: '95vw',
-        data: {
-          formFields: [
-            <IndividualReferenceField>{
-              generalProperties: <generalFieldsData>{
-                fieldApiName: 'serviceRequest',
-                fieldName: "Select Lab Test or Procedure",
-                fieldLabel: "Choose from existing orders",
-                fieldType: 'IndividualReferenceField',
-                inputType: 'select',
-                isArray: false,
-                isGroup: false,
-                auth: {
-                  read: 'all',
-                  write: 'doctor, nurse'
-                },
+    // import('../shared/dynamic-forms-v2/dynamic-forms-v2.component').then(m => {
+    const dialogRef = this.dialog.open(DynamicFormsV2Component, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: {
+        formFields: [
+          <IndividualReferenceField>{
+            generalProperties: <generalFieldsData>{
+              fieldApiName: 'serviceRequest',
+              fieldName: "Select Lab Test or Procedure",
+              fieldLabel: "Choose from existing orders",
+              fieldType: 'IndividualReferenceField',
+              inputType: 'select',
+              isArray: false,
+              isGroup: false,
+              auth: {
+                read: 'all',
+                write: 'doctor, nurse'
               },
-              data: serviceRequestReferences
-            }
-          ],
-          formMetaData: {
-            formName: 'Select Existing Order',
-            formDescription: 'Choose from active lab tests or procedures for this patient'
+            },
+            data: serviceRequestReferences
           }
+        ],
+        formMetaData: {
+          formName: 'Select Existing Order',
+          formDescription: 'Choose from active lab tests or procedures for this patient'
         }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result && result.serviceRequest) {
-          // Store the selected service request reference in the task
-          const task = this.taskFormArray.at(taskIndex);
-          task.get(['taskFocus'])?.setValue(result.serviceRequest);
-          console.log('Selected service request:', result.serviceRequest);
-        }
-      });
+      }
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.serviceRequest) {
+        // Store the selected service request reference in the task
+        const task = this.taskFormArray.at(taskIndex);
+        task.get(['taskFocus'])?.setValue(result.serviceRequest);
+        console.log('Selected service request:', result.serviceRequest);
+      }
+    });
+    // });
   }
 
   /**

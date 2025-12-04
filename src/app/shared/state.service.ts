@@ -1,13 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration, Task } from 'fhir/r4';
+import { Injectable, inject } from '@angular/core';
+import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration, Task, OperationOutcome, BundleEntry } from 'fhir/r4';
 import { Condition, Medication, MedicationRequest, Patient, Location } from 'fhir/r4';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable, shareReplay } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
+import { ErrorService } from './error.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
+
+  // Inject ErrorService for error handling
+  private errorService = inject(ErrorService);
 
   // constructor() { }
 

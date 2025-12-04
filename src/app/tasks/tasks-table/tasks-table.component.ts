@@ -4,13 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, map, Observable, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { PatientDetailsKeyService } from '../../patient-sidedetails/patient-details-key.service';
 import { ErrorService } from '../../shared/error.service';
 import { UtilityService } from '../../shared/utility.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { Bundle, BundleEntry, Task } from 'fhir/r4';
-import { EncounterServiceService } from '../../patient-wrapper/encounter-service.service';
 import { TaskDetailsComponent } from '../task-details/task-details.component';
 import { baseStatusStyles } from '../../shared/statusUIIcons';
 import { LinkInReferencesService } from '../../shared/link-in-references.service';
@@ -25,6 +24,7 @@ import { PatientContactsPipe } from '../../shared/pipes/patient-contacts.pipe';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { PatientAddressPipe } from '../../shared/pipes/patient-address.pipe';
+import { TestingTasksComponent } from '../../testing-tasks/testing-tasks.component';
 
 @Component({
   selector: 'app-tasks-table',
@@ -148,18 +148,43 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
    *   - Ready for table display with filter UI controls
    */
 
+  addTask() {
+    this.dialog.open(TestingTasksComponent, {
+      maxHeight: '90vh',
+      maxWidth: '900px',
+      autoFocus: false,
+      disableClose: true,
+      data: {
+        isCarePlanAvailable: this.isCarePlanForThisPatient,
+        carePlanId: this.carePlanId
+      }
+    })
+  }
+  carePlanId?: string | null = null;
+
   override ngOnInit(): void {
+
+    this.http.get(`${this.backendUrl}/CarePlan?status=active`).subscribe({
+      next: (data: any) => {
+        if (data.entry && data.entry.length > 0) {
+          this.isCarePlanForThisPatient = true;
+          this.carePlanId = data.entry[0].resource.id;
+        }
+      }
+    });
+    this.computePermissions('task');
+
     // Use the BehaviorSubject currentPatientId$ with getValue() for synchronous access
     // This BehaviorSubject combines patient ID from multiple sources (encounter, patient resource, resolver)
     this.currentPatientId = this.localStateService.currentPatientId$.getValue();
 
     if (this.currentPatientId) {
       // PATIENT-SPECIFIC MODE: Use PatientResources
-      console.log('Patient ID found:', this.currentPatientId, '- Using PatientResources');
+      console.log('Patient ID found:', this.currentPatientId, '- Loading patient-specific tasks');
       this.loadPatientSpecificTasks();
     } else {
       // ORG-WIDE MODE: Use orgWideResources
-      console.log('No patient ID - Using orgWideResources');
+      console.log('No patient ID - Loading org-wide tasks');
       this.loadOrgWideTasks();
     }
   }  /**
@@ -171,22 +196,27 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
     if (!currentTasks || currentTasks.length === 0) {
       // Fetch patient-specific tasks from backend if not in PatientResources
       console.log('Patient tasks not found in PatientResources, fetching from backend...');
-      this.localHttp.get<Bundle>(`${this.localBackendUrl}/Task?for=Patient/${this.currentPatientId}&_count=200&_sort=-_lastUpdated`)
-        .pipe(
-          map(bundle => bundle.entry?.map(e => ({
-            referenceId: `Task/${e.resource?.id}` as string | null,
-            savedStatus: 'saved' as 'saved' | 'unsaved',
-            actualResource: e.resource as Task
-          })) || [])
-        )
+      this.localHttp.get<Bundle>(`${this.localBackendUrl}/Task?for=Patient/${this.currentPatientId}&_count=10000`)
         .subscribe({
-          next: (tasks) => {
-            // Add fetched tasks to PatientResources
-            this.localStateService.PatientResources.tasks.next(tasks);
-            console.log('Patient tasks loaded into PatientResources:', tasks);
+          next: (bundle) => {
+            console.log('Fetched ' + (bundle.entry?.length || 0) + ' tasks for patient ' + this.currentPatientId);
 
-            // Now subscribe to the data source
-            this.inititateDataSourceSubscription(this.localStateService.PatientResources.tasks);
+            // Check if there's a current patient ID from StateService
+            const currentPatientId = this.localStateService.currentPatientId$.getValue();
+
+            if (currentPatientId) {
+              // If patient ID exists, use both methods
+              console.log('Patient ID exists, using both processBundleTransaction and processOrgWideBundleTransaction');
+              this.localStateService.processBundleTransaction(bundle);
+              this.localStateService.processOrgWideBundleTransaction(bundle);
+            } else {
+              // No patient ID, use only org-wide
+              console.log('No patient ID, using only processOrgWideBundleTransaction');
+              this.localStateService.processOrgWideBundleTransaction(bundle);
+            }
+
+            // Subscribe to PatientResources.tasks for patient-specific context
+            this.initiateDataSourceSubscription(this.localStateService.PatientResources.tasks);
             this.applyTaskFiltersAndTransforms();
           },
           error: (err) => {
@@ -196,7 +226,7 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
     } else {
       // Tasks already in PatientResources, use them directly
       console.log('Using existing patient tasks from PatientResources');
-      this.inititateDataSourceSubscription(this.localStateService.PatientResources.tasks);
+      this.initiateDataSourceSubscription(this.localStateService.PatientResources.tasks);
       this.applyTaskFiltersAndTransforms();
     }
   }
@@ -211,21 +241,29 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
       // Fetch org-wide tasks from backend if not in orgWideResources
       console.log('Org-wide tasks not found in orgWideResources, fetching from backend...');
       this.localHttp.get<Bundle>(`${this.localBackendUrl}/Task?_count=200&_sort=-_lastUpdated`)
-        .pipe(
-          map(bundle => bundle.entry?.map(e => ({
-            referenceId: `Task/${e.resource?.id}` as string | null,
-            savedStatus: 'saved' as 'saved' | 'unsaved',
-            actualResource: e.resource as Task
-          })) || [])
-        )
         .subscribe({
-          next: (tasks) => {
-            // Add fetched tasks to orgWideResources
-            this.localStateService.orgWideResources.tasks.next(tasks);
-            console.log('Org-wide tasks loaded into orgWideResources:', tasks);
+          next: (bundle) => {
+            // if resourcetype is Operation Outcome
+            if (bundle.entry && bundle.entry.length > 0 && bundle.entry[0].resource?.resourceType === 'OperationOutcome') {
+              throw new Error('OperationOutcome received instead of Task resources' + JSON.stringify(bundle.entry[0].resource));
+            }
+
+            // Check if there's a current patient ID from StateService
+            const currentPatientId = this.localStateService.currentPatientId$.getValue();
+
+            if (currentPatientId) {
+              // If patient ID exists, use both methods
+              console.log('Patient ID exists, using both processBundleTransaction and processOrgWideBundleTransaction');
+              this.localStateService.processBundleTransaction(bundle);
+              this.localStateService.processOrgWideBundleTransaction(bundle);
+            } else {
+              // No patient ID, use only org-wide
+              console.log('No patient ID, using only processOrgWideBundleTransaction');
+              this.localStateService.processOrgWideBundleTransaction(bundle);
+            }
 
             // Now subscribe to the data source
-            this.inititateDataSourceSubscription(this.localStateService.orgWideResources.tasks);
+            this.initiateDataSourceSubscription(this.localStateService.orgWideResources.tasks);
             this.applyTaskFiltersAndTransforms();
           },
           error: (err) => {
@@ -235,7 +273,7 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
     } else {
       // Tasks already in orgWideResources, use them directly
       console.log('Using existing org-wide tasks from orgWideResources');
-      this.inititateDataSourceSubscription(this.localStateService.orgWideResources.tasks);
+      this.initiateDataSourceSubscription(this.localStateService.orgWideResources.tasks);
       this.applyTaskFiltersAndTransforms();
     }
   }

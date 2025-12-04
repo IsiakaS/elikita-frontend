@@ -19,7 +19,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 
 import { StateService } from '../shared/state.service';
-import { AuthService } from '../shared/auth/auth.service';
+import { AuthService, capacityObject } from '../shared/auth/auth.service';
 import { ErrorService } from '../shared/error.service';
 import { InfoDialogService } from '../shared/info-dialog/info-dialog.service';
 import { backendEndPointToken } from '../app.config';
@@ -797,7 +797,7 @@ export class AdmittedPatientsComponent implements OnInit, OnDestroy {
         this.tableDataSource.data = transformedData;
     }
 
-    inititateDataSourceSubscription(dataSource: Observable<any>, actualResource: any = null) {
+    initiateDataSourceSubscription(dataSource: Observable<any>, actualResource: any = null) {
         this.subs.add(
             dataSource.subscribe({
                 next: (data) => {
@@ -832,11 +832,34 @@ export class AdmittedPatientsComponent implements OnInit, OnDestroy {
 
 
     }
+    isCarePlanForThisPatient = false;
+
+    canAdd$: Observable<boolean> = of(false);
+    canExport$: Observable<boolean> = of(false);
+
+    computePermissions(resource: keyof typeof capacityObject): void {
+        this.canAdd$ = this.auth.user.pipe(
+            map(() => this.auth.can(resource, 'add'))
+        );
+        this.canExport$ = this.auth.user.pipe(
+            map(() => this.auth.can(resource, 'viewAll'))
+        );
+    }
 
     ngOnInit(): void {
+        this.computePermissions('task');
+        this.http.get(`${this.backendUrl}/CarePlan?status=active`).subscribe({
+            next: (data: any) => {
+                if (data.entry && data.entry.length > 0) {
+                    this.isCarePlanForThisPatient = true;
+                }
+            }
+        });
+
+
         console.log(this.stateService.orgWideResources.encounters.getValue());
         // TODO: Implement
-        this.inititateDataSourceSubscription(this.stateService.orgWideResources.encounters);
+        this.initiateDataSourceSubscription(this.stateService.orgWideResources.encounters);
         //apply filter
         this.applyFilter('status', (row) => {
 

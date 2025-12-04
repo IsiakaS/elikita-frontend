@@ -31,7 +31,7 @@ import { EncounterCheckComponent } from '../encounter-check/encounter-check.comp
 import { AddLabRequestsComponent } from '../lab-requests/add-lab-requests/add-lab-requests.component';
 import { AddMedicineRequestsComponent } from '../medicine-requests/add-medicine-requests/add-medicine-requests.component';
 import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
-import { TestingTasksComponent } from '../testing-tasks/testing-tasks.component';
+// import { TestingTasksComponent } from '../testing-tasks/testing-tasks.component';
 // import { AddAlllergyComponent } from '../allergy/add-alllergy/add-alllergy.component';
 import { AddAllergyComponent } from '../allergy/add-allergy/add-allergy.component';
 import { UtilityService } from '../shared/utility.service';
@@ -943,11 +943,11 @@ export class EncounterServiceService {
 
 
   addObservation(patientId: string, observationCategory: string | null = null, incomingDref: MatDialogRef<any> | null = null, ObsCat: string | null = null) {
-    if(!this.stateService.isEncounterActive()){
-this.errorService.openandCloseError("You need to initiate an encounter before an observation can be added for this patient");
+    if (!this.stateService.isEncounterActive()) {
+      this.errorService.openandCloseError("You need to initiate an encounter before an observation can be added for this patient");
       return;
     }
-    
+
     let category = 'category'
     if (observationCategory) {
       switch (observationCategory) {
@@ -1512,8 +1512,8 @@ this.errorService.openandCloseError("You need to initiate an encounter before an
                   fieldApiName: 'subject',
                   fieldName: 'Who Specimen is from',
                   fieldLabel: 'Who Specimen is from',
-                  value:patientId?"Patient/"+patientId:"",
-                  isHidden:patientId?true:false,
+                  value: patientId ? "Patient/" + patientId : "",
+                  isHidden: patientId ? true : false,
                   auth: {
                     read: 'all',
                     write: 'doctor, nurse'
@@ -1525,13 +1525,13 @@ this.errorService.openandCloseError("You need to initiate an encounter before an
                 data: g.subject
               },
               {
-generalProperties: {
+                generalProperties: {
                   fieldApiName: 'request',
                   fieldName: 'Referenced Lab Test Request ',
                   fieldLabel: 'Referenced Lab Test Request ',
                   moreHint: "Lab request for which this specimen is intended",
-                  value:serviceRequestId?"ServiceRequest/"+serviceRequestId:"",
-                  isHidden:serviceRequestId?true:false,
+                  value: serviceRequestId ? "ServiceRequest/" + serviceRequestId : "",
+                  isHidden: serviceRequestId ? true : false,
 
                   auth: {
                     read: 'all',
@@ -1622,7 +1622,7 @@ generalProperties: {
                   isArray: false,
                   isGroup: false
                 },
-      
+
               }
             ]
           }
@@ -1636,12 +1636,12 @@ generalProperties: {
   }
   addServiceRequest(patientId: string | null, typeOfService: string | null = null) {
     // return early if there is no encounter
-    if(this.stateService.isEncounterActive() === false){
+    if (this.stateService.isEncounterActive() === false) {
       this.errorService.openandCloseError("You need to initiate an encounter before a service request can be added for this patient");
       return;
     }
-    
-    
+
+
     of(sample).subscribe({
       next: (g: any) => {
         console.log(g.medication);
@@ -1780,7 +1780,7 @@ generalProperties: {
 
         dRef.afterClosed().subscribe((values) => {
           // alert("i am closed");
-          if(!values){
+          if (!values) {
             this.errorService.openandCloseError('No Service Request was created as the form was closed without submission.');
             return;
           }
@@ -1793,88 +1793,90 @@ generalProperties: {
           values = values.values ? values.values : values;
           let serviceRequestBundle: any = [];
           console.log('Service Request dialog closed');
-          console.log(values);  
+          console.log(values);
           const isReturnedValueAnArray = Array.isArray(values);
           if (isReturnedValueAnArray) {
             console.log('The returned value is an array.');
           } else {
             console.log('The returned value is not an array.');
           }
-          
-          if(!isReturnedValueAnArray){
-values = [values];
-          }            serviceRequestBundle = values.map((val: any) => {
-            if(val.category  && !Array.isArray(val.category)){
-              val = {...val, category: [val.category]};
+
+          if (!isReturnedValueAnArray) {
+            values = [values];
+          } serviceRequestBundle = values.map((val: any) => {
+            if (val.category && !Array.isArray(val.category)) {
+              val = { ...val, category: [val.category] };
             }
-            if(val.note){
-              if(!Array.isArray(val.note)){
+            if (val.note) {
+              if (!Array.isArray(val.note)) {
                 val.note = [val.note];
               }
             }
-            if(val.note){
+            if (val.note) {
               val.note = val.note.map((n: any) => {
-                if(typeof n === 'string'){
-                  return {text: n};
+                if (typeof n === 'string') {
+                  return { text: n };
                 } else {
                   return n;
                 }
               });
             }
-            if(!val.category || !val.category.length || val.category.length === 0){
-            val = {...val, category: [{text: typeOfService ? typeOfService : "General"}]};
+            if (!val.category || !val.category.length || val.category.length === 0) {
+              val = { ...val, category: [{ text: typeOfService ? typeOfService : "General" }] };
             }
-              return {...this.fhirTransformService.transformValues('ServiceRequest', val),
-                requester: {
-                  reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`
-                },
-                subject: {
-                  reference: `Patient/${this.stateService.currentEncounter.getValue()?.['patientId']}`
+            return {
+              ...this.fhirTransformService.transformValues('ServiceRequest', val),
+              requester: {
+                reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`
               },
-                encounter: {
-                  reference: `Encounter/${this.stateService.currentEncounter.getValue()?.['id']}`  
-                },
-                requisition: requisition,
-                resourceType: 'ServiceRequest',
-                authoredOn: new Date().toISOString(),
-                
-            }});
-            console.log('Transformed Service Request Bundle:', serviceRequestBundle);
+              subject: {
+                reference: `Patient/${this.stateService.currentEncounter.getValue()?.['patientId']}`
+              },
+              encounter: {
+                reference: `Encounter/${this.stateService.currentEncounter.getValue()?.['id']}`
+              },
+              requisition: requisition,
+              resourceType: 'ServiceRequest',
+              authoredOn: new Date().toISOString(),
+
+            }
+          });
+          console.log('Transformed Service Request Bundle:', serviceRequestBundle);
           // }
 
-            //process the serviceRequestBundle to a real fhir bundle and post to backend
-            const fhirBundle = {
-              resourceType: "Bundle",
-              type: "transaction",
-              entry: serviceRequestBundle.map((resource: any) => ({
-                resource,
-                request: {
-                  method: "POST",
-                  url: 'ServiceRequest'
-                }
-              }))
-            } as Bundle<any>;
-
-
-
-            this.fhirResourceService.postBundle(fhirBundle).subscribe({
-              next: (res: any) => {
-                console.log('Service Request Bundle posted successfully:', res);
-              //  / this.errorService.openandCloseError('Service Request(s) created successfully.');
-                this.sn.openFromComponent(SuccessMessageComponent, {
-                  data: {
-                    message: `${typeOfService ? typeOfService : "Service"} Request(s) created successfully.`
-                  },
-                  duration: 3000,
-                  
-                })
-              },
-              error: (err: any) => {
-                console.error('Error posting Service Request Bundle:', err);
-                this.errorService.openandCloseError(`Error creating ${typeOfService ? typeOfService : "Service"} Request(s). Please try again later.`);
+          //process the serviceRequestBundle to a real fhir bundle and post to backend
+          const fhirBundle = {
+            resourceType: "Bundle",
+            type: "transaction",
+            entry: serviceRequestBundle.map((resource: any) => ({
+              resource,
+              request: {
+                method: "POST",
+                url: 'ServiceRequest'
               }
-            })
-            });
+            }))
+          } as Bundle<any>;
+
+
+
+          this.fhirResourceService.postBundle(fhirBundle).subscribe({
+            next: (res: any) => {
+              console.log('Service Request Bundle posted successfully:', res);
+              //  / this.errorService.openandCloseError('Service Request(s) created successfully.');
+              this.sn.openFromComponent(SuccessMessageComponent, {
+                data: {
+                  message: `${typeOfService ? typeOfService : "Service"} Request(s) created successfully.`
+                },
+                duration: 3000,
+
+              })
+            },
+            error: (err: any) => {
+              console.error('Error posting Service Request Bundle:', err);
+              this.errorService.openandCloseError(`Error creating ${typeOfService ? typeOfService : "Service"} Request(s). Please try again later.`);
+            }
+          })
+        });
 
 
 
@@ -1896,8 +1898,8 @@ values = [values];
     // }
   }
 
- fhirTransformService = inject(FhirResourceTransformService);
- fhirResourceService = inject(FhirResourceService);
+  fhirTransformService = inject(FhirResourceTransformService);
+  fhirResourceService = inject(FhirResourceService);
   state = inject(StateService);
   encounterStateCheck(patientId: string) {
     if (this.state.currentEncounter.getValue()
@@ -2183,7 +2185,7 @@ values = [values];
     //   && this.globalEncounterState[patientId].getValue() == 'in-progress'
     // ) {
     // return early if there is no encounter and patient
-    if(this.stateService.isEncounterActive() === false){
+    if (this.stateService.isEncounterActive() === false) {
       this.errorService.openandCloseError("You need to initiate an encounter before a medication request can be added for this patient");
       return;
     }
@@ -2194,116 +2196,118 @@ values = [values];
       maxHeight: '90vh',
       maxWidth: '650px',
       autoFocus: false,
-        })
+    })
 
-      dRef.afterClosed().subscribe((result) => {
+    dRef.afterClosed().subscribe((result) => {
 
-//         {
-//     "values": [
-//         {
-//             "status": "active",
-//             "intent": "order",
-//             "priority": "routine",
-//             "medicationCodeableConcept": "tugu$#$tugu$#$https://elikita-server.daalitech.com",
-//             "performerType": {
-//                 "code": "registerednurse",
-//                 "display": "Registered Nurse",
-//                 "system": "http://hl7.org/fhir/CodeSystem/medication-intended-performer-role"
-//             },
-//             "reasonCode": "103009000$#$Headache due to cold exposure$#$http://snomed.info/sct",
-//             "reasonReference": [
-//                 {
-//                     "reference": "6c2a264c-a952-401f-b5f8-528f9f435640",
-//                     "display": "sdjjfjf"
-//                 }
-//             ],
-//             "dosageInstruction": ""
-//         }
-//     ]
-// }
-        console.log('Medication Request dialog closed with result:', result);
-        // Handle the result here (e.g., save to backend or update state)
-// if no values, return
-        if (!result || !result.values || (result.values.length && result.values.length === 0)) {
-          this.errorService.openandCloseError('No Medication Request was created as the form was closed without submission.');
-          return;
-        }
-        const groupIdentifier = this.utilityService.generateRequisition({
-          prefix: 'MEDREQ',
-          resourceType: 'medReq',
-          system: "https://elikita-server.daalitech.com"
-        });
-
-        let values = result.values;
-
-        const isReturnedValueAnArray = Array.isArray(values);
-          if (isReturnedValueAnArray) {
-            console.log('The returned value is an array.');
-          } else {
-            console.log('The returned value is not an array.');
-          }
-          
-          if(!isReturnedValueAnArray){
-values = [values];
-          }
-        let medicationRequestBundle: any = [];
-        console.log('Medication Request Values:', values)
-        medicationRequestBundle = values.map((val: any) => {
-          if(val.reasonCode && !Array.isArray(val.reasonCode)){
-            val.reasonCode = [val.reasonCode];
-          } 
-          if(val.reasonReference && !Array.isArray(val.reasonReference)){
-            val.reasonReference = [val.reasonReference];
-          }
-          return {...this.fhirTransformService.transformValues('MedicationRequest', val),
-            subject: {
-              reference: `Patient/${this.stateService.currentEncounter.getValue()?.['patientId']}`
-            },
-            encounter: {
-              reference: `Encounter/${this.stateService.currentEncounter.getValue()?.['id']}`  
-            },
-            groupIdentifier: groupIdentifier,
-            resourceType: 'MedicationRequest',
-            authoredOn: new Date().toISOString(),
-            requester: {
-              reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`
-            },
-            recorder: {
-              reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`   
-            },
-
-          }}         
-         );
-         console.log('Transformed Medication Request Bundle:', medicationRequestBundle);
-        //process the medicationRequestBundle to a real fhir bundle and post to backend
-        const fhirBundle = {
-          resourceType: "Bundle",
-          type: "transaction",
-          entry: medicationRequestBundle.map((resource: any) => ({
-            resource,
-            request: {
-              method: "POST",
-              url: 'MedicationRequest'
-            }
-          }))
-        } as Bundle<any>;
-        this.fhirResourceService.postBundle(fhirBundle).subscribe({
-          next: (res: any) => {
-            console.log('Medication Request Bundle posted successfully:', res);
-            this.sn.openFromComponent(SuccessMessageComponent, {
-              data: {
-                message: `Medication Request(s) created successfully.`
-              },
-              duration: 3000,
-            })
-          },
-          error: (err: any) => {
-            console.error('Error posting Medication Request Bundle:', err);
-            this.errorService.openandCloseError(`Error creating Medication Request(s). Please try again later.`);
-          }
-        })
-
+      //         {
+      //     "values": [
+      //         {
+      //             "status": "active",
+      //             "intent": "order",
+      //             "priority": "routine",
+      //             "medicationCodeableConcept": "tugu$#$tugu$#$https://elikita-server.daalitech.com",
+      //             "performerType": {
+      //                 "code": "registerednurse",
+      //                 "display": "Registered Nurse",
+      //                 "system": "http://hl7.org/fhir/CodeSystem/medication-intended-performer-role"
+      //             },
+      //             "reasonCode": "103009000$#$Headache due to cold exposure$#$http://snomed.info/sct",
+      //             "reasonReference": [
+      //                 {
+      //                     "reference": "6c2a264c-a952-401f-b5f8-528f9f435640",
+      //                     "display": "sdjjfjf"
+      //                 }
+      //             ],
+      //             "dosageInstruction": ""
+      //         }
+      //     ]
+      // }
+      console.log('Medication Request dialog closed with result:', result);
+      // Handle the result here (e.g., save to backend or update state)
+      // if no values, return
+      if (!result || !result.values || (result.values.length && result.values.length === 0)) {
+        this.errorService.openandCloseError('No Medication Request was created as the form was closed without submission.');
+        return;
+      }
+      const groupIdentifier = this.utilityService.generateRequisition({
+        prefix: 'MEDREQ',
+        resourceType: 'medReq',
+        system: "https://elikita-server.daalitech.com"
       });
+
+      let values = result.values;
+
+      const isReturnedValueAnArray = Array.isArray(values);
+      if (isReturnedValueAnArray) {
+        console.log('The returned value is an array.');
+      } else {
+        console.log('The returned value is not an array.');
+      }
+
+      if (!isReturnedValueAnArray) {
+        values = [values];
+      }
+      let medicationRequestBundle: any = [];
+      console.log('Medication Request Values:', values)
+      medicationRequestBundle = values.map((val: any) => {
+        if (val.reasonCode && !Array.isArray(val.reasonCode)) {
+          val.reasonCode = [val.reasonCode];
+        }
+        if (val.reasonReference && !Array.isArray(val.reasonReference)) {
+          val.reasonReference = [val.reasonReference];
+        }
+        return {
+          ...this.fhirTransformService.transformValues('MedicationRequest', val),
+          subject: {
+            reference: `Patient/${this.stateService.currentEncounter.getValue()?.['patientId']}`
+          },
+          encounter: {
+            reference: `Encounter/${this.stateService.currentEncounter.getValue()?.['id']}`
+          },
+          groupIdentifier: groupIdentifier,
+          resourceType: 'MedicationRequest',
+          authoredOn: new Date().toISOString(),
+          requester: {
+            reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`
+          },
+          recorder: {
+            reference: `Practitioner/${this.authService.user.getValue()?.['userId']}`
+          },
+
+        }
+      }
+      );
+      console.log('Transformed Medication Request Bundle:', medicationRequestBundle);
+      //process the medicationRequestBundle to a real fhir bundle and post to backend
+      const fhirBundle = {
+        resourceType: "Bundle",
+        type: "transaction",
+        entry: medicationRequestBundle.map((resource: any) => ({
+          resource,
+          request: {
+            method: "POST",
+            url: 'MedicationRequest'
+          }
+        }))
+      } as Bundle<any>;
+      this.fhirResourceService.postBundle(fhirBundle).subscribe({
+        next: (res: any) => {
+          console.log('Medication Request Bundle posted successfully:', res);
+          this.sn.openFromComponent(SuccessMessageComponent, {
+            data: {
+              message: `Medication Request(s) created successfully.`
+            },
+            duration: 3000,
+          })
+        },
+        error: (err: any) => {
+          console.error('Error posting Medication Request Bundle:', err);
+          this.errorService.openandCloseError(`Error creating Medication Request(s). Please try again later.`);
+        }
+      })
+
+    });
 
 
 
@@ -2385,18 +2389,18 @@ values = [values];
 
 
 
-  addTask(patientId: string) {
-    this.dialog.open(TestingTasksComponent, {
-      maxHeight: '90vh',
-      maxWidth: '650px',
-      backdropClass: 'custom-backdrop',
-      panelClass: 'custom-dialog-panel',
-      autoFocus: false,
-      data: {
-        patientId
-      }
-    });
-  }
+  // addTask(patientId: string) {
+  //   this.dialog.open(TestingTasksComponent, {
+  //     maxHeight: '90vh',
+  //     maxWidth: '650px',
+  //     backdropClass: 'custom-backdrop',
+  //     panelClass: 'custom-dialog-panel',
+  //     autoFocus: false,
+  //     data: {
+  //       patientId
+  //     }
+  //   });
+  // }
   utilityService = inject(UtilityService);
   addInventory() {
     const InventoryDetailsFormFields = this.utilityService.convertFormFields(new Map([
@@ -2622,11 +2626,11 @@ values = [values];
   }
 
   addAnyObservation(patientId: string | null = null) {
-//return earlly if there is no encounter
-if(this.stateService.isEncounterActive() === false){
-  this.errorService.openandCloseError("You need to initiate an encounter before an observation can be added for this patient");
-  return;
-}
+    //return earlly if there is no encounter
+    if (this.stateService.isEncounterActive() === false) {
+      this.errorService.openandCloseError("You need to initiate an encounter before an observation can be added for this patient");
+      return;
+    }
 
     this.dialog.open(AddObservationComponent, {
       maxHeight: '90vh',

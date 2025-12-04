@@ -14,7 +14,7 @@
                     <mat-icon>file_upload</mat-icon> Import
                 </a>
                 @if (canExport$ | async) {
-                <a mat-flat-button extended class="secondary-button small-button" (click)="onExportPatients()">
+                <a mat-flat-button extended class="secondary-button small-button">
                     <mat-icon>file_download</mat-icon> Export
                 </a>
                 }
@@ -138,9 +138,7 @@
 
         <!-- No Data State -->
         @if (isDataEmpty()) {
-        <app-empty-state 
-            [icon]="currentEmptyState.icon" 
-            [title]="currentEmptyState.title"
+        <app-empty-state [icon]="currentEmptyState.icon" [title]="currentEmptyState.title"
             [subtitle]="currentEmptyState.subtitle">
         </app-empty-state>
         }
