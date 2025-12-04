@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, forkJoin } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CodeSystem } from 'fhir/r4';
+import { Bundle, CodeSystem } from 'fhir/r4';
 import { capacityObject } from '../shared/auth/auth.service';
 import { AdmittedPatientsComponent } from '../admitted-patients/admitted-patients.component';
 import { ChipsDirective } from '../chips.directive';
@@ -20,6 +20,11 @@ import { NaPipe } from '../shared/na.pipe';
 import { ReferenceDisplayDirective } from '../shared/reference-display.directive';
 import { DetailzViewzComponent } from '../detailz-viewz/detailz-viewz.component';
 import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
+import { PatientAddressPipe } from '../shared/pipes/patient-address.pipe';
+import { PatientAgePipe } from '../shared/pipes/patient-age.pipe';
+import { PatientContactsPipe } from '../shared/pipes/patient-contacts.pipe';
+import { PatientNamePipe } from '../shared/pipes/patient-name.pipe';
+// import { PatientNamePipe } from '../shared/pipes/patient-name.pipe';
 
 @Component({
   selector: 'app-service-request-codes-list',
@@ -35,6 +40,7 @@ import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
     MatDividerModule,
     ReactiveFormsModule,
     DatePipe,
+    
     TitleCasePipe,
     ChipsDirective,
     EmptyStateComponent,
@@ -43,6 +49,8 @@ import { DetailsBuilderObject } from '../detailz-viewz/details-builder.service';
     NaPipe,
     ReferenceDisplayDirective
   ],
+   providers: [PatientNamePipe, PatientContactsPipe, PatientAgePipe, PatientAddressPipe],
+    
   templateUrl: './service-request-codes-list.component.html',
   styleUrls: ['../patient-observation/patient-observation.component.scss', './service-request-codes-list.component.scss']
 })
@@ -51,15 +59,13 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
   canAddServiceCode$ = new BehaviorSubject<boolean>(false);
   canExportServiceCode$ = new BehaviorSubject<boolean>(false);
 
-  // Table setup - reusing inherited tableDataSource if available
-//   override tableDataSource = new MatTableDataSource<CodeSystem>([]);
-//   override tableDataLevel2 = new BehaviorSubject<CodeSystem[]>([]);
+  // Table setup
   override displayedColumns: string[] = ['title', 'status', 'purpose', 'count', 'meta', 'actions'];
 
   // Raw data
   serviceCodesData: CodeSystem[] = [];
 
-  // Filters - following AdmittedPatientsComponent pattern
+  // Filters
   serviceCodeTableFilter: Map<string, any[]> = new Map([
     ['status', ['draft', 'active', 'retired', 'unknown']]
   ]);
@@ -98,56 +104,96 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
   override ngOnInit(): void {
     // Call parent ngOnInit if it exists
     super.ngOnInit?.();
-
+this.organizingSearchFilters(this.serviceCodeTableFilter);
     // Compute permissions for 'serviceRequest' resource
     this.computePermissions('serviceRequest');
 
-    // Use inherited initializeFilters method if available, otherwise initialize manually
-    if (typeof (this as any).initializeFilters === 'function') {
-      (this as any).initializeFilters(this.serviceCodeTableFilter, this.serviceCodeFiltersFormControlObject);
-    } else {
-      // Fallback: Initialize filter form controls manually
-      for (const [key, value] of this.serviceCodeTableFilter) {
-        this.serviceCodeFiltersFormControlObject[key] = new FormGroup({});
-        for (const filterValue of value) {
-          this.serviceCodeFiltersFormControlObject[key].addControl(filterValue, new FormControl(false));
-        }
-      }
-    }
 
-    // Connect table data source
-    this.tableDataSource.connect = () => this.tableDataLevel2;
-
-    // Load service codes from backend
+    // Load service codes (CodeSystem and ValueSet resources)
     this.loadServiceCodes();
   }
 
   private loadServiceCodes(): void {
-    // Using inherited http service
-    this.http.get<any>(`${this.backendUrl}/CodeSystem?_count=500`).subscribe({
-      next: (bundle) => {
-        const entries = bundle?.entry || [];
-        this.serviceCodesData = entries
-          .map((e: any) => e.resource as CodeSystem)
-          .filter(Boolean)
-          .filter((cs: CodeSystem) => 
-            cs.url?.includes('service') || 
-            cs.title?.toLowerCase().includes('service') ||
-            cs.purpose?.toLowerCase().includes('service')
-          );
+    const currentCodeSystems = this.stateService.orgWideResources.codeSystems?.getValue();
+    const currentValueSets = this.stateService.orgWideResources.valueSets?.getValue();
 
-        this.tableDataLevel2.next(this.serviceCodesData);
-      },
-      error: (err) => {
-        console.error('Failed to load service codes:', err);
-        // Using inherited errorService
-        this.errorService.openandCloseError('Failed to load service request codes');
-      }
+    const hasCodeSystems = currentCodeSystems && currentCodeSystems.length > 0;
+    const hasValueSets = currentValueSets && currentValueSets.length > 0;
+
+    if (!hasCodeSystems && !hasValueSets) {
+        
+      // Fetch both CodeSystem and ValueSet from backend if not in orgWideResources
+      console.log('Service codes not found in orgWideResources, fetching from backend...');
+
+      forkJoin({
+        codeSystems: this.http.get<Bundle>(`${this.backendUrl}/CodeSystem?_count=500`),
+        valueSets: this.http.get<Bundle>(`${this.backendUrl}/ValueSet?_count=500`)
+      }).subscribe({
+        next: ({ codeSystems, valueSets }) => {
+          console.log(`Fetched ${codeSystems.entry?.length || 0} CodeSystems and ${valueSets.entry?.length || 0} ValueSets`);
+
+          // Process CodeSystems
+          if (codeSystems.entry && codeSystems.entry.length > 0) {
+            this.stateService.processOrgWideBundleTransaction(codeSystems);
+          }
+
+          // Process ValueSets
+          if (valueSets.entry && valueSets.entry.length > 0) {
+            this.stateService.processOrgWideBundleTransaction(valueSets);
+          }
+
+          // Subscribe to orgWideResources after loading
+          this.initiateDataSourceSubscription(this.stateService.orgWideResources.codeSystems);
+          this.applyServiceCodeFiltersAndTransforms();
+        },
+        error: (err) => {
+          console.error('Failed to load service codes:', err);
+          this.errorService.openandCloseError('Failed to load service codes: ' + err.message);
+        }
+      });
+    } else {
+      // Resources already in orgWideResources, use them directly
+      console.log('Using existing service codes from orgWideResources');
+      this.initiateDataSourceSubscription(this.stateService.orgWideResources.codeSystems);
+      this.applyServiceCodeFiltersAndTransforms();
+    }
+  }
+
+  private applyServiceCodeFiltersAndTransforms(): void {
+    // STEP 2: Apply filters - filter for service-request related codes
+    this.applyFilter('relevance', (row: any) => {
+      const url = row.url?.toLowerCase() || '';
+      const title = row.title?.toLowerCase() || '';
+      const purpose = row.purpose?.toLowerCase() || '';
+
+      return url.includes('service') || 
+             title.includes('service') || 
+             purpose.includes('service') ||
+             url.includes('procedure') ||
+             title.includes('procedure');
     });
+
+    // STEP 3: Sort by meta.lastUpdated (descending - newest first)
+    this.sortData(['meta.lastUpdated', 'date'], false);
+
+    // STEP 5: Transform data to extract relevant information
+    this.transformData((row: CodeSystem) => {
+      return {
+        ...row,
+        conceptCount: row.count || row.concept?.length || 0,
+        lastUpdated: row.meta?.lastUpdated || row.date
+      };
+    });
+
+    // STEP 6: Organize search filters for UI
+    this.organizingSearchFilters(new Map<string, any[]>(
+      [
+        ['status', ['draft', 'active', 'retired', 'unknown']]
+      ]
+    ));
   }
 
   onAddServiceCode(): void {
-    // Using inherited router
     this.router.navigate(['/app/service-codes/add']);
   }
 
@@ -168,7 +214,6 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
   showServiceCodeDetails(codeSystem: CodeSystem): void {
     const excludeKeys = this.computeEmptyKeys(codeSystem);
 
-    // Using inherited dialog service
     this.dialog.open(DetailzViewzComponent, {
       maxHeight: '93vh',
       maxWidth: '650px',
@@ -194,11 +239,6 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
     return false;
   }
 
-  private computePermissions(resource: keyof typeof capacityObject): void {
-    // Using inherited auth service
-    this.canAddServiceCode$.next(this.auth.can(resource, 'add'));
-    this.canExportServiceCode$.next(this.auth.can(resource, 'viewAll'));
-  }
 
   get canAddServiceCode(): boolean {
     return this.canAddServiceCode$.getValue();
@@ -209,6 +249,17 @@ export class ServiceRequestCodesListComponent extends AdmittedPatientsComponent 
   }
 
   override ngOnDestroy(): void {
+    // Clear orgWideResources for CodeSystem and ValueSet
+    console.log('Cleaning up service codes from orgWideResources');
+    
+    if (this.stateService.orgWideResources.codeSystems) {
+      this.stateService.orgWideResources.codeSystems.next([]);
+    }
+    
+    if (this.stateService.orgWideResources.valueSets) {
+      this.stateService.orgWideResources.valueSets.next([]);
+    }
+
     // Call parent cleanup if needed
     super.ngOnDestroy?.();
   }

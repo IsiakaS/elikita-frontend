@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Encounter, Observation, Resource, ServiceRequest, Specimen, MedicationDispense, MedicationAdministration, Task, OperationOutcome, BundleEntry } from 'fhir/r4';
-import { Condition, Medication, MedicationRequest, Patient, Location } from 'fhir/r4';
+import { Condition, Medication, MedicationRequest, Patient, Location, CodeSystem, ValueSet } from 'fhir/r4';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable, shareReplay } from 'rxjs';
 import { Bundle, Reference } from 'fhir/r4';
 import { ErrorService } from './error.service';
@@ -250,6 +250,16 @@ export class StateService {
       referenceId: string | null,
       savedStatus: 'saved' | 'unsaved',
       actualResource: Location
+    }>>([]),
+    codeSystems: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: CodeSystem
+    }>>([]),
+    valueSets: new BehaviorSubject<Array<{
+      referenceId: string | null,
+      savedStatus: 'saved' | 'unsaved',
+      actualResource: ValueSet
     }>>([])
   }
 
@@ -531,6 +541,12 @@ export class StateService {
         break;
       case 'Task':
         this.upsertToSubject(this.orgWideResources.tasks, { referenceId, savedStatus, actualResource: resource as Task });
+        break;
+      case 'CodeSystem':
+        this.upsertToSubject(this.orgWideResources.codeSystems, { referenceId, savedStatus, actualResource: resource as CodeSystem });
+        break;
+      case 'ValueSet':
+        this.upsertToSubject(this.orgWideResources.valueSets, { referenceId, savedStatus, actualResource: resource as ValueSet });
         break;
       default:
         break;

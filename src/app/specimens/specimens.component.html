@@ -8,13 +8,13 @@
         </mat-card-subtitle>
       </div>
       <div class="right gap-10 g-just-flex">
-        @if (canExportSpecimen$ | async) {
+        @if (canExport$ | async) {
         <a mat-flat-button extended class="secondary-button small-button" (click)="onExportSpecimens()">
           <mat-icon>file_download</mat-icon>
           Export
         </a>
         }
-        @if (canAddSpecimen$ | async) {
+        @if (canAdd$ | async) {
         <a mat-flat-button extended (click)="onAddSpecimen()">
           <mat-icon>add</mat-icon>
           Add Specimen

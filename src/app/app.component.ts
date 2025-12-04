@@ -44,18 +44,18 @@ export class AppComponent {
     // document.body.classList.toggle('dark-theme', this.isDark);
   }
   ngOnInit() {
-    // Developer mode: set user to doctor and route to a specific patient's summary
-    const target = '/app/admitted-patients/b47fc122-f4d9-4970-81c7-97badc18e311';
+    // Developer mode: set user to admin and route to service-codes
+    const target = '/app/service-codes';
     // const target = '/app/admission-location/add';
     //speimens
     // const target = 'app/medicine-stock';
     const current = this.auth.user.getValue();
-    if (!current || current.role !== 'doctor') {
+    if (!current || current.role !== 'admin') {
       // Ensure login redirects to our target route
       this.auth.triedUrl = target;
-      this.auth.login('doctor123', 'doctor123');
+      this.auth.login('admin123', 'admin123');
     } else {
-      // Already a doctor: navigate directly
+      // Already an admin: navigate directly
       this.router.navigateByUrl(target);
     }
     // Ensure auth user has practitioner type and a random userId for Observation.performer

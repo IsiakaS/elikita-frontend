@@ -191,7 +191,11 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
    * Load tasks for a specific patient from PatientResources
    */
   private loadPatientSpecificTasks(): void {
-    const currentTasks = this.localStateService.PatientResources.tasks.getValue();
+    let currentTasks;
+    if(this.localStateService.currentPatientId$.getValue()){
+      currentTasks = this.localStateService.PatientResources.tasks.getValue()}else{
+    currentTasks = this.localStateService.orgWideResources.tasks.getValue();
+      }
 
     if (!currentTasks || currentTasks.length === 0) {
       // Fetch patient-specific tasks from backend if not in PatientResources
@@ -216,7 +220,11 @@ export class TasksTableComponent extends AdmittedPatientsComponent {
             }
 
             // Subscribe to PatientResources.tasks for patient-specific context
+            if(this.localStateService.currentPatientId$.getValue()){
             this.initiateDataSourceSubscription(this.localStateService.PatientResources.tasks);
+            }else{
+              this.initiateDataSourceSubscription(this.localStateService.orgWideResources.tasks);
+            }
             this.applyTaskFiltersAndTransforms();
           },
           error: (err) => {

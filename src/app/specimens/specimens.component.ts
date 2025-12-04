@@ -82,9 +82,8 @@ export class SpecimensComponent {
   dialog = inject(MatDialog);
   statusStyles = baseStatusStyles;
 
-  // Initialize permission observables with false
-  canAddSpecimen$: Observable<boolean> = new BehaviorSubject<boolean>(false);
-  canExportSpecimen$: Observable<boolean> = new BehaviorSubject<boolean>(false);
+  canAdd$ = new BehaviorSubject<boolean>(false);
+  canExport$ = new BehaviorSubject<boolean>(false);
 
   tableDataSource = new MatTableDataSource<Specimen>();
   tableDataLevel2 = new BehaviorSubject<Specimen[]>([]);
@@ -111,9 +110,7 @@ export class SpecimensComponent {
     ]
   };
   ngOnInit(): void {
-    // Compute permissions for 'specimen' resource
-    this.computePermissions('specimen');
-
+    this.computePermissions('specimen')
     this.specimenTableFilterArray.forEach((values, key) => {
       const group = this.fb.group({});
       values.forEach(value => group.addControl(value, new FormControl(false)));
@@ -148,6 +145,7 @@ export class SpecimensComponent {
         });
       this.tableDataLevel2.next(specimens);
     });
+    this.computePermissions('specimen');
   }
 
   private snackBar = inject(MatSnackBar);
@@ -256,16 +254,11 @@ export class SpecimensComponent {
   }
 
   /**
-   * Compute permissions for a given resource type.
-   * Updates canAdd and canExport observables based on user role.
-   * @param resource - The resource type (e.g., 'specimen', 'labRequest', 'location')
+   * Compute and set permissions for a given resource type
+   * @param resourceType - The resource type to check permissions for
    */
-  private computePermissions(resource: keyof typeof capacityObject): void {
-    this.canAddSpecimen$ = this.auth.user.pipe(
-      map(() => this.auth.can(resource, 'add'))
-    );
-    this.canExportSpecimen$ = this.auth.user.pipe(
-      map(() => this.auth.can(resource, 'viewAll'))
-    );
+  public computePermissions(resourceType: string): void {
+    this.canAdd$.next(this.auth.can(resourceType as any, 'add'));
+    this.canExport$.next(this.auth.can(resourceType as any, 'viewAll'));
   }
 }

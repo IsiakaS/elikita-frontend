@@ -25,7 +25,7 @@ type FormFields = IndividualField | ReferenceFieldArray | CodeableConceptField |
   imports: [CommonModule, MatFormFieldModule, MatSelectModule, DynamicFormsV2Component, ReactiveFormsModule, MatIconModule,
     MatButtonModule, ResourceDataReviewComponent /* added */
   ],
-  templateUrl: '../../lab-requests/add-lab-requests/add-lab-requests.component.html',
+  template: '',
   styleUrls: ['../../lab-requests/add-lab-requests/add-lab-requests.component.scss']
 })
 export class AddSpecimenComponent {

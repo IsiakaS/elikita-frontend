@@ -307,6 +307,22 @@ export const capacityObject = {
     update: ['doctor', 'nurse'],
     delete: ['admin'],
     export: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy']
+  },
+  codeSystem: {
+    add: ['admin'],
+    viewAll: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    view: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    update: ['admin'],
+    delete: ['admin'],
+    export: ['admin']
+  },
+  valueSet: {
+    add: ['admin'],
+    viewAll: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    view: ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'],
+    update: ['admin'],
+    delete: ['admin'],
+    export: ['admin']
   }
 }
 
