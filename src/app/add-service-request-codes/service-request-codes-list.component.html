@@ -1,0 +1,131 @@
+<mat-card>
+  <mat-card-header>
+    <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+      <div class="left">
+        <mat-card-title>Service Request Codes</mat-card-title>
+        <mat-card-subtitle>
+          Manage standard service request codes (lab tests, imaging, procedures) defined for the organization.
+        </mat-card-subtitle>
+      </div>
+      <div class="right gap-10 g-just-flex">
+        @if (canExportServiceCode) {
+        <a mat-flat-button extended class="secondary-button small-button" (click)="onExportServiceCodes()">
+          <mat-icon>file_download</mat-icon>
+          Export
+        </a>
+        }
+        @if (canAddServiceCode) {
+        <a mat-flat-button (click)="onAddServiceCode()">
+          <mat-icon>add</mat-icon>
+          Add Service Code
+        </a>
+        }
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="my-12">
+    <mat-divider></mat-divider>
+
+    <app-table-header [patientsTableFilterArray]="serviceCodeTableFilterArray"
+      [patientsFiltersFormControlObject]="serviceCodeFiltersFormControlObject">
+    </app-table-header>
+
+    <div class="table-or-empty" style="background-color: var(--mat-sys-surface)">
+      @if ((tableDataLevel2 | async)?.length) {
+      <table style="min-width: 630px; width: unset" mat-table matSort [dataSource]="tableDataSource"
+        class="mat-elevation-z8 demo-table">
+
+        <!-- Title Column -->
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="title">Service Name</th>
+          <td mat-cell *matCellDef="let code" style="padding-top: 8px; padding-bottom: 8px;">
+            <div class="top">
+              <span class="restrict-length">{{ code.title | na | titlecase }}</span>
+            </div>
+            @if (code.description) {
+            <div class="subtitle-text-color-2 small-subtitle">
+              <span class="restrict-length">{{ code.description }}</span>
+            </div>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
+          <td mat-cell *matCellDef="let code">
+            @if (code.status) {
+            <div [appChips]="code.status" [fontSize]="'14px'"></div>
+            } @else {
+            <span class="subtitle-text-color-2">N/A</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Purpose Column -->
+        <ng-container matColumnDef="purpose">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="purpose">Purpose</th>
+          <td mat-cell *matCellDef="let code">
+            <span class="restrict-length">{{ code.purpose | na }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Concept Count Column -->
+        <ng-container matColumnDef="count">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="count">Codes</th>
+          <td mat-cell *matCellDef="let code">
+            {{ code.count || (code.concept?.length || 0) }}
+          </td>
+        </ng-container>
+
+        <!-- Last Updated Column -->
+        <ng-container matColumnDef="meta">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="meta">Last Updated</th>
+          <td mat-cell *matCellDef="let code" style="padding-top: 4px; padding-bottom: 4px;">
+            <span class="restrict-length">{{ code.meta?.lastUpdated | date: 'mediumDate' | na }}</span>
+            <br>
+            <span class="restrict-length subtitle-text-color-2 small-subtitle">
+              {{ code.meta?.lastUpdated | date: 'shortTime' | na }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let code">
+            <button mat-icon-button [matMenuTriggerFor]="codeMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #codeMenu="matMenu">
+              <button mat-menu-item (click)="showServiceCodeDetails(code); $event.stopPropagation()">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item (click)="$event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="$event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" matHeaderRowDefSticky="true"></tr>
+        <tr mat-row (click)="showRow(row)" *matRowDef="let row; columns: displayedColumns;" style="cursor: pointer;">
+        </tr>
+      </table>
+      } @else {
+      <div class="g-just-flex flex-column align-items-center py-40" style="text-align:center;">
+        <app-empty-state [icon]="'SCIENCE'" [title]="'No Service Codes Found'"
+          [subtitle]="'No service request codes are defined yet. Click Add Service Code to create one.'">
+        </app-empty-state>
+      </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -333,7 +333,7 @@ export class SidemenuComponent {
           icon: "location_city"
         },
         {
-          link: "/app/service-codes/add",
+          link: "/app/service-codes",
           title: "Service Request Codes",
           icon: "science"
         },
