@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { commonImports } from '../shared/table-interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { forkJoin, map, of, switchMap, take, catchError, Subject } from 'rxjs';
+import { forkJoin, map, of, switchMap, take, catchError, Subject, tap } from 'rxjs';
 import { AddVitalsComponent } from '../patient-observation/add-vitals/add-vitals.component';
 import { ObsResComponent } from '../obs-res/obs-res.component';
 import { PatSympComponent } from "../pat-symp/pat-symp.component";
@@ -22,10 +22,12 @@ import { Encounter } from 'fhir/r4';
 import { AddObservationComponent } from '../patient-observation/add-observation/add-observation.component';
 import { LabRequestsComponent } from '../lab-requests/lab-requests.component';
 import { NaPipe } from '../shared/na.pipe';
+import { VitalHistoryDialogComponent } from './vital-history-dialog.component';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-check-sheet',
-  imports: [...commonImports, NaPipe,
+  imports: [...commonImports, NaPipe, JsonPipe,
     MatSelectModule, ChipsDirective, LabRequestsComponent,
     AddVitalsComponent, ObsResComponent, PatSympComponent, MatDividerModule, CodeableReferenceDisplayComponent,
     MatMenuModule,
@@ -271,8 +273,9 @@ export class CheckSheetComponent {
     return Array.from(byCode.values());
   }
   vitalAllForCurrentEncounter: any = [];
+  vitalsByCode: Array<[any, any[]]> = [];
   vitalTableDataSource: MatTableDataSource<any> = new MatTableDataSource<any>();
-  displayedColumns: string[] = ['display', 'value', 'status', 'actions'];
+  displayedColumns: string[] = ['display', 'value', 'status', 'actions', 'history'];
   examDisplayedColumns: string[] = ['name', 'value', 'status', 'actions'];
   examTableDataSource: MatTableDataSource<any> = new MatTableDataSource<any>();
   // Complaints table state
@@ -309,7 +312,11 @@ export class CheckSheetComponent {
         : [];
     }
 
-    this.vitalRows = (this.vitalAllForCurrentEncounter || []).map((v: any) => {
+    // Build grouped vitals array: [[latestFinal, [others...]], ...]
+
+    // Use only the latest-final observation from each group for the main table
+    const latestVitals = this.vitalAllForCurrentEncounter
+    this.vitalRows = (latestVitals || []).map((v: any) => {
       const name = this.utilityService.chooseFirstStringFromCodeableConcept(v?.code);
       const isBp = (name + '').toLowerCase() === 'blood pressure';
       const value = isBp
@@ -325,11 +332,13 @@ export class CheckSheetComponent {
       };
     });
 
+        this.vitalsByCode = this.groupVitalsByCode(this.vitalRows);
+
     // Refresh datasource with a new array reference
-    this.vitalTableDataSource.data = this.vitalRows.slice();
+    this.vitalTableDataSource.data = this.vitalsByCode.slice();
 
     // Ensure table updates on every emission (new reference) and trigger CD
-    this.vitalTableDataSource.data = this.vitalRows.slice();
+    // this.vitalTableDataSource.data = this.vitalRows.slice();
     this.cdr.markForCheck();
 
     // Build exam observations (category 'exam') for current encounter
@@ -442,8 +451,10 @@ export class CheckSheetComponent {
   // Persist a FHIR transaction bundle to the backend
   private processBundle(bundle: any) {
     return this.http.post<any>(`${this.backend}`, bundle, {
-      headers: new HttpHeaders({ 'Content-Type': 'application/fhir+json' })
-    });
+      headers: new HttpHeaders({ 'Content-Type': 'application/fhir+json', 
+      'Prefer': 'return=representation'
+       })
+    }).pipe(tap(e=>this.state.processBundleTransaction(e)));
   }
 
   // Build a transaction bundle that updates the Observation status via PUT
@@ -470,25 +481,25 @@ export class CheckSheetComponent {
     const prevStatus = row.status;
 
     // Optimistic update
-    row.original.status = newStatus;
-    row.status = newStatus;
+    // row.original.status = newStatus;
+    // row.status = newStatus;
 
     // Clone for payload to avoid accidental reference issues
-    const updated = JSON.parse(JSON.stringify(row.original));
+    const updated = JSON.parse(JSON.stringify({...row.original, status: newStatus}));
     const bundle = this.buildObservationStatusBundle(updated);
 
     this.processBundle(bundle).subscribe({
       next: () => {
         // Refresh table datasource
-        this.vitalTableDataSource.data = this.vitalRows.slice();
+        // this.vitalTableDataSource.data = this.vitalRows.slice();
         this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Failed to persist status change', err);
         // Revert on failure
-        row.original.status = prevStatus;
-        row.status = prevStatus;
-        this.vitalTableDataSource.data = this.vitalRows.slice();
+        // row.original.status = prevStatus;
+        // row.status = prevStatus;
+        // this.vitalTableDataSource.data = this.vitalRows.slice();
         this.cdr.markForCheck();
       }
     });
@@ -497,20 +508,20 @@ export class CheckSheetComponent {
   changeExamStatus(row: { status: string; original: any }, newStatus: 'entered-in-error' | 'cancelled') {
     if (!row?.original?.id) return;
     const prev = row.status;
-    row.original.status = newStatus;
-    row.status = newStatus;
-    const updated = JSON.parse(JSON.stringify(row.original));
+    // row.original.status = newStatus;
+    // row.status = newStatus;
+    const updated = JSON.parse(JSON.stringify({...row.original, status: newStatus}));
     const bundle = this.buildObservationStatusBundle(updated);
     this.processBundle(bundle).subscribe({
       next: () => {
-        this.examTableDataSource.data = this.examRows.slice();
+        // this.examTableDataSource.data = this.examRows.slice();
         this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Failed to persist exam status change', err);
-        row.original.status = prev;
-        row.status = prev;
-        this.examTableDataSource.data = this.examRows.slice();
+        // row.original.status = prev;
+        // row.status = prev;
+        // this.examTableDataSource.data = this.examRows.slice();
         this.cdr.markForCheck();
       }
     });
@@ -632,10 +643,89 @@ export class CheckSheetComponent {
 
   }
 
+  /**
+   * Group vitals by LOINC code. For each code, return [latestFinalObs, [otherObs...]].
+   * latestFinalObs = most recent observation with status='final', sorted by effectiveDateTime desc.
+   * otherObs = all remaining observations for that code, sorted by effectiveDateTime desc.
+   */
+  private groupVitalsByCode(observations: any[]): Array<[any, any[]]> {
+    // alert(JSON.stringify(observations));
+    // observations = observations.map(o => o.original);
+    const byCode = new Map<string, any[]>();
+    const getCode = (obs: any) =>
+      obs?.original?.code?.coding?.[0]?.code
+    const getTime = (obs: any) =>
+      new Date(obs?.original?.effectiveDateTime || obs?.original?.issued || obs?.original?.meta?.lastUpdated || 0).getTime();
 
+    for (const obs of observations || []) {
+      const code = getCode(obs);
+      if (!code) continue;
+      if (!byCode.has(code)) byCode.set(code, []);
+      byCode.get(code)!.push(obs);
+    }
 
+    const result: Array<[any, any[]]> = [];
+    for (const [code, list] of byCode.entries()) {
+      // sort all by effectiveDateTime desc
+      list.sort((a, b) => getTime(b) - getTime(a));
+
+      // find first with status='final'
+      const finalIdx = list.findIndex(o => (o.status || '').toLowerCase() === 'final');
+      if (finalIdx > -1) {
+        const latest = list[finalIdx];
+        const others = list//.filter((_, i) => i !== finalIdx);
+        result.push([latest, others]);
+      } else {
+        // no final status, treat first as "latest", rest as others
+        // const [latest, ...others] = list;
+        result.push([{
+           id: 'N/A',
+        display: 'N/A',
+        value: 'N/A',
+        status: 'N/A',
+        original: {}
+        }, list]);
+      }
+    }
+    // alert(JSON.stringify(result));
+    return result;
+  }
+
+  showVitalHistory(row: [ any, any[]]) {
+    // const code = this.getLoincCode(row[0].code);
+    // const group = this.vitalsByCode.find(([latest, _]) => this.getLoincCode(latest) === code);
+    // if (!group) return;
+
+    // const [_latest, others] = group;
+    // const historyRows = others.map((v: any) => {
+    //   const name = this.utilityService.chooseFirstStringFromCodeableConcept(v?.code);
+    //   const isBp = (name + '').toLowerCase() === 'blood pressure';
+    //   const value = isBp
+    //     ? (this.utilityService.convertAllValueTypesToString(v?.component?.[0]) + '/' +
+    //       this.utilityService.convertAllValueTypesToString(v?.component?.[1])).replace(/\s+mmHg/g, '') + ' mmHg'
+    //     : this.utilityService.convertAllValueTypesToString(v);
+    //   return {
+    //     id: v.id,
+    //     display: name,
+    //     value,
+    //     status: v?.status || 'unknown',
+    //     effectiveDateTime: v?.effectiveDateTime || v?.issued || '',
+    //     original: v
+    //   };
+    // });
+
+    this.dialog.open(VitalHistoryDialogComponent, {
+      maxWidth: '800px',
+      maxHeight: '90vh',
+      data: { vitalName: this.utilityService.chooseFirstStringFromCodeableConcept(row[0]?.original.code), history: row[1] }
+    });
+  }
+
+  private getLoincCode(obs: any): string | undefined {
+    return obs?.code?.coding?.find((c: any) => c.system?.includes('loinc'))?.code ||
+      obs?.code?.coding?.[0]?.code;
+  }
 }
-
 // NOTE: Observation display sources:
 // - Vitals table: built here (vitalTableDataSource) from Observation category 'vital signs'.
 // - Exam table: built here (examTableDataSource) from Observation category 'Exam'.

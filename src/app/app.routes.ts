@@ -79,6 +79,7 @@ import { AdmissionLocationComponent } from './admission-location/admission-locat
 import { AddAdmissionLocationComponent } from './admission-location/add-admission-location.component';
 import { MedicationDispenseComponent } from './medication-dispense/medication-dispense.component';
 import { AdmittedPatientsComponent } from './admitted-patients/admitted-patients.component';
+import { AddServiceRequestCodesComponent } from './add-service-request-codes/add-service-request-codes.component';
 
 export const routes: Routes = [
 
@@ -318,6 +319,15 @@ export const routes: Routes = [
             {
                 path: "admission-location/add",
                 component: AddAdmissionLocationComponent
+            },
+            {
+                path: "service-codes/add",
+                component: AddServiceRequestCodesComponent,
+                data: {
+                    title: "Add Service Code",
+                    breadCrumbTitle: "Add Service Code",
+                    breadCrumbIcon: "science"
+                }
             },
             {
                 path: "claims",

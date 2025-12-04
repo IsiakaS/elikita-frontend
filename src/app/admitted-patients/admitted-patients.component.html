@@ -195,3 +195,44 @@
 
     </mat-card-content>
 </mat-card>
+<mat-card>
+  <mat-card-header>
+    <div class="g-just-flex flex-between w-100 flex-wrap gap-20">
+      <div class="left">
+        <mat-card-title>Admitted Patients</mat-card-title>
+        <mat-card-subtitle>
+          View and manage all currently admitted patients.
+        </mat-card-subtitle>
+      </div>
+      <div class="right gap-10 g-just-flex">
+        @if (canExport$ | async) {
+        <a mat-flat-button extended class="secondary-button small-button" (click)="onExportAdmittedPatients()">
+          <mat-icon>file_download</mat-icon>
+          Export
+        </a>
+        }
+        @if (canAdd$ | async) {
+        <a mat-flat-button routerLink="/app/patient-registration">
+          <mat-icon>add</mat-icon>
+          Add Patient
+        </a>
+        }
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="my-12">
+    <div *ngIf="(admittedPatients$ | async) as patients">
+      @if (patients.length > 0) {
+      <p>Showing {{ patients.length }} admitted patient(s).</p>
+      <!-- TODO: Add table to display admitted patients -->
+      } @else {
+      <div class="g-just-flex flex-column align-items-center py-40" style="text-align:center;">
+        <mat-icon style="font-size: 64px; width: 64px; height: 64px; color: #9e9e9e;">hotel</mat-icon>
+        <h3>No Admitted Patients</h3>
+        <p>There are currently no patients with active admissions.</p>
+      </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

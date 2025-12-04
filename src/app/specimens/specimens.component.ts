@@ -82,8 +82,9 @@ export class SpecimensComponent {
   dialog = inject(MatDialog);
   statusStyles = baseStatusStyles;
 
-  canAddSpecimen$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('specimen', 'add')));
-  canExportSpecimen$: Observable<boolean> = this.auth.user.pipe(map(() => this.auth.can('specimen', 'viewAll')));
+  // Initialize permission observables with false
+  canAddSpecimen$: Observable<boolean> = new BehaviorSubject<boolean>(false);
+  canExportSpecimen$: Observable<boolean> = new BehaviorSubject<boolean>(false);
 
   tableDataSource = new MatTableDataSource<Specimen>();
   tableDataLevel2 = new BehaviorSubject<Specimen[]>([]);
@@ -110,6 +111,9 @@ export class SpecimensComponent {
     ]
   };
   ngOnInit(): void {
+    // Compute permissions for 'specimen' resource
+    this.computePermissions('specimen');
+
     this.specimenTableFilterArray.forEach((values, key) => {
       const group = this.fb.group({});
       values.forEach(value => group.addControl(value, new FormControl(false)));
@@ -249,5 +253,19 @@ export class SpecimensComponent {
 
   onExportSpecimens(): void {
     console.warn('Export specimens not implemented yet.');
+  }
+
+  /**
+   * Compute permissions for a given resource type.
+   * Updates canAdd and canExport observables based on user role.
+   * @param resource - The resource type (e.g., 'specimen', 'labRequest', 'location')
+   */
+  private computePermissions(resource: keyof typeof capacityObject): void {
+    this.canAddSpecimen$ = this.auth.user.pipe(
+      map(() => this.auth.can(resource, 'add'))
+    );
+    this.canExportSpecimen$ = this.auth.user.pipe(
+      map(() => this.auth.can(resource, 'viewAll'))
+    );
   }
 }
